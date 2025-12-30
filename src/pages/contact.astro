@@ -1,0 +1,73 @@
+---
+const FORM_ENDPOINT = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT || "";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Contact</title>
+  </head>
+
+  <body style="font-family: system-ui; max-width: 760px; margin: 0 auto; padding: 32px;">
+    <h1>Contact</h1>
+    <p style="opacity:.85; line-height:1.7;">
+      Tell me what you’re building and your timeline. I’ll respond within 1–2 business days.
+    </p>
+
+    <form
+      method="POST"
+      action={FORM_ENDPOINT || "https://formspree.io/f/REPLACE_ME"}
+      style="margin-top: 24px; display: grid; gap: 14px;"
+    >
+      <label>
+        <div style="font-size: 14px; margin-bottom: 6px;">Name</div>
+        <input
+          name="name"
+          required
+          autocomplete="name"
+          style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ddd;"
+        />
+      </label>
+
+      <label>
+        <div style="font-size: 14px; margin-bottom: 6px;">Email</div>
+        <input
+          type="email"
+          name="email"
+          required
+          autocomplete="email"
+          style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ddd;"
+        />
+      </label>
+
+      <label>
+        <div style="font-size: 14px; margin-bottom: 6px;">What are you working on?</div>
+        <textarea
+          name="message"
+          required
+          rows="6"
+          style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ddd; resize: vertical;"
+        ></textarea>
+      </label>
+
+      <!-- simple spam deterrent (bots fill hidden fields) -->
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <!-- where to redirect after submit -->
+      <input type="hidden" name="_redirect" value="/contact/thanks" />
+
+      <button
+        type="submit"
+        style="padding: 12px 14px; border-radius: 10px; border: 1px solid #111; background:#111; color:#fff; cursor:pointer;"
+      >
+        Send
+      </button>
+
+      <p style="font-size: 13px; opacity:.7;">
+        Prefer email? <a href="mailto:REPLACE_ME@example.com">REPLACE_ME@example.com</a>
+      </p>
+    </form>
+  </body>
+</html>
