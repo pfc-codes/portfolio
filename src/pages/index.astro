@@ -1,88 +1,195 @@
 ---
 import Layout from "../layouts/Layout.astro";
 ---
+
 <Layout title="phro.design — Design & VFX" description="In progress — stay tuned.">
   <style>
+    :root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
+      from { opacity: 0; transform: translateY(22px); }
       to { opacity: 1; transform: translateY(0); }
     }
     @keyframes expandWidth {
       from { width: 0; }
       to { width: 100%; }
     }
-    .fade-in-up { animation: fadeInUp 1.2s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; }
-    .delay-1 { animation-delay: 0.2s; }
-    .delay-2 { animation-delay: 0.4s; }
-    .delay-3 { animation-delay: 0.6s; }
-    .delay-4 { animation-delay: 0.8s; }
-    .line-expand { animation: expandWidth 1.5s cubic-bezier(0.22,1,0.36,1) forwards; width: 0; }
+    @keyframes softGlow {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.55; }
+    }
+
+    .fade-in-up { animation: fadeInUp 1.05s var(--ease-out) forwards; opacity: 0; }
+    .delay-1 { animation-delay: 0.10s; }
+    .delay-2 { animation-delay: 0.22s; }
+    .delay-3 { animation-delay: 0.34s; }
+    .delay-4 { animation-delay: 0.46s; }
+    .delay-5 { animation-delay: 0.58s; }
+
+    .line-expand { animation: expandWidth 1.25s var(--ease-out) forwards; width: 0; }
+
     .text-gradient {
-      background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #bdbdbd 55%, #7a7a7a 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
     .noise {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: transparent
         url('data:image/svg+xml,%3Csvg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E')
         repeat;
-      opacity: 0.03;
+      opacity: 0.028;
       pointer-events: none;
       z-index: 1;
     }
+
+    .ambient {
+      position: absolute;
+      inset: -40vh -20vw auto -20vw;
+      height: 90vh;
+      background: radial-gradient(60% 50% at 50% 40%, rgba(255,255,255,0.10), rgba(255,255,255,0.00) 65%);
+      filter: blur(8px);
+      animation: softGlow 7s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Premium nav underline reveal */
+    .navlink { position: relative; display: inline-block; }
+    .navlink::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      height: 1px;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left;
+      background: rgba(255,255,255,0.55);
+      transition: transform 360ms var(--ease-out);
+    }
+    .navlink:hover::after,
+    .navlink:focus-visible::after { transform: scaleX(1); }
+
+    /* CTA micro-interactions */
+    .hover-lift { transition: transform 360ms var(--ease-out); }
+    .hover-lift:hover { transform: translateY(-4px); }
+    .hover-lift:active { transform: translateY(-2px); }
+
+    /* Primary CTA sheen */
+    .sheen { position: relative; overflow: hidden; }
+    .sheen::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      transform: translateX(-55%) rotate(18deg);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+      transition: transform 650ms var(--ease-out);
+      pointer-events: none;
+    }
+    .sheen:hover::before,
+    .sheen:focus-visible::before { transform: translateX(55%) rotate(18deg); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fade-in-up, .line-expand, .ambient { animation: none !important; opacity: 1 !important; transform: none !important; }
+      .line-expand { width: 100% !important; }
+      .hover-lift { transition: none !important; }
+      .navlink::after { transition: none !important; transform: scaleX(1) !important; }
+      .sheen::before { display: none !important; }
+    }
   </style>
+
   <div class="noise"></div>
+
   <div class="relative z-10 min-h-screen flex flex-col">
+    <div class="ambient"></div>
+
     <header class="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 md:py-8">
       <nav class="flex justify-between items-center fade-in-up">
         <div class="text-xl md:text-2xl font-light tracking-tight">
           phro<span class="text-gray-500">.</span>design
         </div>
-        <div class="flex gap-8 text-sm md:text-base">
-          <a href="/work/" class="hover:text-gray-400 transition-colors">Work</a>
-          <a href="/contact/" class="hover:text-gray-400 transition-colors">Contact</a>
+        <div class="flex gap-8 text-sm md:text-base text-gray-300">
+          <a href="/work/" class="navlink hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">Work</a>
+          <a href="/contact/" class="navlink hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">Contact</a>
         </div>
       </nav>
     </header>
-    <main class="flex-1 flex items-center justify-center px-6 md:px-12">
-      <div class="max-w-5xl w-full">
-        <div class="space-y-6 md:space-y-8 mb-16">
-          <div class="fade-in-up delay-4 text-xs tracking-[0.22em] uppercase text-gray-500">
-            In progress
-          </div>
-          <h1 class="text-5xl md:text-7xl lg:text-8xl font-light leading-none tracking-tight">
-            <div class="fade-in-up delay-1">Design</div>
-            <div class="fade-in-up delay-2 text-gradient">&amp;</div>
-            <div class="fade-in-up delay-3">Visual Effects</div>
-          </h1>
-          <div class="line-expand h-px bg-gradient-to-r from-white via-gray-500 to-transparent delay-4"></div>
-          <p class="text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed fade-in-up delay-4">
-            In progress — stay tuned. The full portfolio is being built now.
-          </p>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-4 fade-in-up delay-4">
-          <a href="/work/" class="group px-8 py-4 bg-white text-black text-center hover:bg-gray-200 transition-all">
-            <span class="font-medium">View Projects</span>
-          </a>
-          <a href="/contact/" class="px-8 py-4 border border-white/20 text-center hover:border-white/40 hover:bg-white/5 transition-all">
-            <span class="font-light">Get in Touch</span>
-          </a>
+
+    <main class="flex-1 px-6 md:px-12 pt-28 md:pt-32 pb-14">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          <section class="lg:col-span-8">
+            <div class="fade-in-up delay-4 inline-flex items-center gap-3 text-xs tracking-[0.22em] uppercase text-gray-500">
+              <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                <span class="h-1.5 w-1.5 rounded-full bg-gray-300/70"></span>
+                In progress
+              </span>
+              <span class="hidden sm:inline text-gray-600">Portfolio building now</span>
+            </div>
+
+            <h1 class="mt-6 text-5xl md:text-7xl lg:text-8xl font-light leading-[0.92] tracking-tight">
+              <div class="fade-in-up delay-1">Design</div>
+              <div class="fade-in-up delay-2 text-gradient">&amp;</div>
+              <div class="fade-in-up delay-3">Visual Effects</div>
+            </h1>
+
+            <div class="mt-8 line-expand h-px bg-gradient-to-r from-white/90 via-gray-500/60 to-transparent delay-5"></div>
+
+            <p class="mt-8 text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed fade-in-up delay-4">
+              In progress — stay tuned. The full portfolio is being built now.
+            </p>
+
+            <div class="mt-8 flex flex-wrap gap-2 fade-in-up delay-4">
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">Web + UI</span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">Motion Design</span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">VFX Supervision</span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">3D / Scans</span>
+            </div>
+          </section>
+
+          <aside class="lg:col-span-4 lg:pt-14">
+            <div class="fade-in-up delay-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div class="text-sm text-gray-300">Next up</div>
+              <div class="mt-2 text-base text-gray-400 leading-relaxed">
+                Selected work pages and case studies are being finalized.
+              </div>
+
+              <div class="mt-6 grid gap-3">
+                <a
+                  href="/work/"
+                  class="sheen hover-lift group w-full px-6 py-3 rounded-xl bg-white text-black text-center transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                >
+                  <span class="font-medium">View Projects</span>
+                </a>
+
+                <a
+                  href="/contact/"
+                  class="hover-lift w-full px-6 py-3 rounded-xl border border-white/20 text-center text-white/90 hover:border-white/40 hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                >
+                  <span class="font-light">Get in Touch</span>
+                </a>
+              </div>
+
+              <div class="mt-6 text-xs text-gray-500">
+                Based in the US. Available for select freelance engagements.
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </main>
-    <footer class="px-6 py-8 md:px-12 fade-in-up delay-4">
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
-        <div>© {new Date().getFullYear()} phro.design</div>
-        <div class="flex gap-6">
-          <a href="mailto:pietrofranciscosta@gmail.com" class="hover:text-gray-400 transition-colors">Email</a>
+
+    <footer class="px-6 py-8 md:px-12">
+      <div class="max-w-6xl mx-auto fade-in-up delay-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
+          <div>© {new Date().getFullYear()} phro.design</div>
+          <div class="flex gap-6">
+            <a href="mailto:pietrofranciscosta@gmail.com" class="navlink hover:text-gray-300 transition-colors">Email</a>
+          </div>
         </div>
       </div>
     </footer>
