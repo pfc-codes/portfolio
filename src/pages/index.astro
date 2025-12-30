@@ -1,222 +1,609 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { projects } from "../data/projects";
 ---
 
-<Layout title="phro.design — Design & VFX" description="In progress — stay tuned.">
+<Layout title="phro.design — Design & VFX" description="Design systems, motion design, and visual effects.">
   <style>
-    :root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes expandWidth {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-    @keyframes softGlow {
-      0%, 100% { opacity: 0.35; }
-      50% { opacity: 0.55; }
+    :root {
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in: cubic-bezier(0.64, 0, 0.78, 0);
     }
 
-    .fade-in-up { animation: fadeInUp 1.05s var(--ease-out) forwards; opacity: 0; }
-    .delay-1 { animation-delay: 0.10s; }
-    .delay-2 { animation-delay: 0.22s; }
-    .delay-3 { animation-delay: 0.34s; }
-    .delay-4 { animation-delay: 0.46s; }
-    .delay-5 { animation-delay: 0.58s; }
-
-    .line-expand { animation: expandWidth 1.25s var(--ease-out) forwards; width: 0; }
-
-    .text-gradient {
-      background: linear-gradient(135deg, #ffffff 0%, #bdbdbd 55%, #7a7a7a 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* Full-viewport stage */
+    .stage {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: center;
+      background: #000;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
     }
 
-    .ambient {
-      position: absolute;
-      inset: -40vh -20vw auto -20vw;
-      height: 90vh;
-      background: radial-gradient(60% 50% at 50% 40%, rgba(255,255,255,0.10), rgba(255,255,255,0.00) 65%);
-      filter: blur(8px);
-      animation: softGlow 7s ease-in-out infinite;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Premium nav underline reveal */
-    .navlink { position: relative; display: inline-block; }
-    .navlink::after {
+    /* Subtle baseline grid rhythm (loader vibe) */
+    .stage::before {
       content: "";
       position: absolute;
-      left: 0;
-      bottom: -6px;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.06), rgba(255,255,255,0) 22%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.05) 0px,
+          rgba(255,255,255,0.05) 1px,
+          rgba(255,255,255,0.00) 1px,
+          rgba(255,255,255,0.00) 56px
+        );
+      opacity: 0.25;
+      pointer-events: none;
+      transition: opacity 520ms var(--ease-out);
+    }
+
+    /* After Enter: remove the horizontal grid lines */
+    .stage.is-entered::before { opacity: 0; }
+
+    /* Centered loader */
+    .loader {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 20;
+      background: #000;
+      transition: opacity 520ms var(--ease-out), visibility 0ms linear 520ms;
+    }
+    .loader.is-hidden { opacity: 0; visibility: hidden; }
+    .loader-inner { width: min(520px, 82vw); }
+    .loader-label {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .bar { margin-top: 14px; height: 1px; width: 100%; background: rgba(255,255,255,0.10); position: relative; overflow: hidden; }
+    .bar > i {
+      display: block;
       height: 1px;
-      width: 100%;
-      transform: scaleX(0);
-      transform-origin: left;
-      background: rgba(255,255,255,0.55);
-      transition: transform 360ms var(--ease-out);
+      width: 40%;
+      background: rgba(255,255,255,0.75);
+      transform: translateX(-120%);
+      animation: sweep 920ms var(--ease-out) infinite;
     }
-    .navlink:hover::after,
-    .navlink:focus-visible::after { transform: scaleX(1); }
+    @keyframes sweep {
+      0% { transform: translateX(-120%); opacity: 0.45; }
+      45% { opacity: 0.85; }
+      100% { transform: translateX(260%); opacity: 0.55; }
+    }
 
-    /* CTA micro-interactions */
-    .hover-lift { transition: transform 360ms var(--ease-out); }
-    .hover-lift:hover { transform: translateY(-4px); }
-    .hover-lift:active { transform: translateY(-2px); }
+    /* Enter gate */
+    .gate {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 15;
+      background: #000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 520ms var(--ease-out), visibility 0ms linear 520ms;
+    }
+    .gate.is-visible { opacity: 1; visibility: visible; transition: opacity 520ms var(--ease-out), visibility 0ms; }
 
-    /* Primary CTA sheen */
-    .sheen { position: relative; overflow: hidden; }
-    .sheen::before {
+    .enter-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 12px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 420ms var(--ease-out), border-color 420ms var(--ease-out), background 420ms var(--ease-out);
+      backdrop-filter: blur(10px);
+    }
+    .enter-btn:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.34); background: rgba(255,255,255,0.09); }
+    .enter-btn:active { transform: translateY(-1px); }
+    .enter-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(255,255,255,0.22); }
+
+    /* Main content initially hidden until "entered" */
+    .content {
+      position: relative;
+      z-index: 5;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+    }
+    .content.is-live { opacity: 1; transform: translateY(0); }
+
+    /* Hero container */
+    .hero {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0; /* left-leaning, editorial */
+      padding: 24px 24px 26px clamp(24px, 5vw, 72px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .brand {
+      font-weight: 300;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      font-size: clamp(40px, 5.4vw, 96px);
+      margin: 0;
+    }
+    .brand .dot { color: rgba(255,255,255,0.34); font-weight: 200; }
+
+    .sub {
+      margin: 0;
+      max-width: 58ch;
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.62);
+      font-weight: 300;
+    }
+
+    /* Strands block */
+    .strands {
+  position: relative;
+  width: min(1100px, 86vw);
+  height: 380px;
+  margin-top: 14px;
+
+  /* center ONLY the strands block */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+    .frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  overflow: hidden;
+
+  /* remove the container UI */
+  border: none;
+  background: transparent;
+}
+
+
+    /* Preview image behind strands (framed) */
+    .preview {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 140ms linear;
+      will-change: opacity, transform;
+      transform: translate(var(--px, 0px), var(--py, 0px));
+    }
+    .preview::before {
       content: "";
       position: absolute;
-      inset: -40%;
-      transform: translateX(-55%) rotate(18deg);
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-      transition: transform 650ms var(--ease-out);
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.10) 52%, rgba(0,0,0,0.55));
       pointer-events: none;
     }
-    .sheen:hover::before,
-    .sheen:focus-visible::before { transform: translateX(55%) rotate(18deg); }
-
-    /* Page transition (optional; used by the primary CTA) */
-    .page {
-      transform: translateX(0);
-      opacity: 1;
-      transition: transform 520ms var(--ease-out), opacity 520ms var(--ease-out);
-      will-change: transform, opacity;
+    .preview img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%);
+      opacity: 0.92;
     }
-    .page.is-leaving-left {
-      transform: translateX(-14vw);
-      opacity: 0.55;
+
+    .caption {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 140ms linear;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      color: rgba(255,255,255,0.82);
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.36);
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(8px);
+      max-width: calc(100% - 24px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .caption small {
+      display: block;
+      margin-top: 6px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.60);
+      letter-spacing: 0.22em;
+    }
+
+    /* SVG strands */
+    .svg {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      transition: opacity 140ms linear;
+    }
+
+    /* pixel dotted look */
+    .strand {
+      fill: none;
+      stroke: rgba(255,255,255,0.62);
+      stroke-width: 2;
+      stroke-linecap: butt;         /* square ends => pixel vibe */
+      stroke-dasharray: 1 7;        /* tiny square "dot" + gap */
+      shape-rendering: crispEdges;  /* keep it sharp */
+    }
+
+    /* Nodes layer */
+    .nodes {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+    }
+
+    .facet-labels {
+      position: absolute;
+      left: -64px;
+      top: 0;
+      bottom: 0;
+      width: 56px;
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .facet-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.72);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 10px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      transition: border-color 180ms linear, color 180ms linear, background 180ms linear;
+    }
+    .facet-link:hover { color: rgba(255,255,255,0.95); border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); }
+    .facet-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      opacity: 0.9;
+    }
+
+    .node {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.22);
+      color: rgba(255,255,255,0.88);
+      text-decoration: none;
+      transform: translate(-50%, -50%);
+      transition: border-color 140ms linear, background 140ms linear, transform 140ms var(--ease-out);
+      outline: none;
+    }
+    .node:hover { border-color: rgba(255,255,255,0.34); transform: translate(-50%, -50%) scale(1.03); }
+    .node:focus-visible { box-shadow: 0 0 0 2px rgba(255,255,255,0.22); }
+
+    .node svg {
+      width: 13px;
+      height: 13px;
+      display: block;
+      opacity: 0.92;
+    }
+
+    /* Hover state: strands fade, preview shows */
+    .strands[data-hovering="true"] .svg { opacity: 0.15; }
+    .strands[data-hovering="true"] .preview { opacity: 1; }
+    .strands[data-hovering="true"] .caption { opacity: 1; }
+
+    @media (max-width: 720px) {
+      .strands { width: min(92vw, 1100px); height: 320px; }
+      .facet-labels { left: -78px; width: 70px; }
+      .facet-link { gap: 8px; padding: 7px 8px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .fade-in-up, .line-expand, .ambient { animation: none !important; opacity: 1 !important; transform: none !important; }
-      .line-expand { width: 100% !important; }
-      .hover-lift { transition: none !important; }
-      .navlink::after { transition: none !important; transform: scaleX(1) !important; }
-      .sheen::before { display: none !important; }
-
-      .page { transition: none !important; }
-      .page.is-leaving-left { transform: none !important; opacity: 1 !important; }
+      .preview, .caption, .svg, .node { transition: none !important; }
+      .bar > i { animation: none !important; }
     }
   </style>
 
-  <div id="page" class="relative z-10 min-h-screen flex flex-col bg-black text-white page">
-    <div class="ambient"></div>
-
-    <!-- Header (identical across pages) -->
-    <header class="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 md:py-8">
-      <nav class="flex justify-between items-center fade-in-up">
-        <a href="/" class="text-xl md:text-2xl font-light tracking-tight navlink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">
-          phro<span class="text-gray-500">.</span>design
-        </a>
-        <div class="flex gap-8 text-sm md:text-base text-gray-300">
-          <a href="/work/" class="navlink hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">Work</a>
-          <a href="/contact/" class="navlink hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">Contact</a>
+  <div id="stage" class="stage">
+    <!-- Loading -->
+    <div id="loader" class="loader" aria-hidden="true">
+      <div class="loader-inner">
+        <div class="loader-label">
+          <span>Loading</span>
+          <span id="pct">0%</span>
         </div>
-      </nav>
-    </header>
-
-    <!-- Main (identical spacing across pages) -->
-    <main class="flex-1 px-6 md:px-12 pt-28 md:pt-32 pb-16">
-      <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          <section class="lg:col-span-8">
-            <div class="fade-in-up delay-4 inline-flex items-center gap-3 text-xs tracking-[0.22em] uppercase text-gray-500">
-              <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                <span class="h-1.5 w-1.5 rounded-full bg-gray-300/70"></span>
-                In progress
-              </span>
-              <span class="hidden sm:inline text-gray-600">Portfolio building now</span>
-            </div>
-
-            <h1 class="mt-6 text-5xl md:text-7xl lg:text-8xl font-light leading-[0.92] tracking-tight">
-              <div class="fade-in-up delay-1">Design</div>
-              <div class="fade-in-up delay-2 text-gradient">&amp;</div>
-              <div class="fade-in-up delay-3">Visual Effects</div>
-            </h1>
-
-            <div class="mt-8 line-expand h-px bg-gradient-to-r from-white/90 via-gray-500/60 to-transparent delay-5"></div>
-
-            <p class="mt-8 text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed fade-in-up delay-4">
-              In progress — stay tuned. The full portfolio is being built now.
-            </p>
-
-            <div class="mt-8 flex flex-wrap gap-2 fade-in-up delay-4">
-              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">Web + UI</span>
-              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">Motion Design</span>
-              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">VFX Supervision</span>
-              <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">3D / Scans</span>
-            </div>
-          </section>
-
-          <aside class="lg:col-span-4 lg:pt-14">
-            <div class="fade-in-up delay-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <div class="text-sm text-gray-300">Next up</div>
-              <div class="mt-2 text-base text-gray-400 leading-relaxed">
-                Selected work pages and case studies are being finalized.
-              </div>
-
-              <div class="mt-6 grid gap-3">
-                <a
-                  id="primary-cta"
-                  href="/work/"
-                  class="sheen hover-lift group w-full px-6 py-3 rounded-xl bg-white text-black text-center transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-                >
-                  <span class="font-medium">View Projects</span>
-                </a>
-
-                <a
-                  href="/contact/"
-                  class="hover-lift w-full px-6 py-3 rounded-xl border border-white/20 text-center text-white/90 hover:border-white/40 hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-                >
-                  <span class="font-light">Get in Touch</span>
-                </a>
-              </div>
-
-              <div class="mt-6 text-xs text-gray-500">
-                Based in the US. Available for select freelance engagements.
-              </div>
-            </div>
-          </aside>
-        </div>
+        <div class="bar" aria-hidden="true"><i></i></div>
       </div>
-    </main>
+    </div>
 
-    <!-- Footer (identical across pages; sticks to bottom when content is short) -->
-    <footer class="mt-auto px-6 py-8 md:px-12">
-      <div class="max-w-6xl mx-auto fade-in-up delay-4">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
-          <div>© {new Date().getFullYear()} phro.design</div>
-          <div class="flex gap-6">
-            <a href="mailto:pietrofranciscosta@gmail.com" class="navlink hover:text-gray-300 transition-colors">Email</a>
+    <!-- Enter gate -->
+    <div id="gate" class="gate" aria-hidden="true">
+      <button id="enter" class="enter-btn" type="button">Enter</button>
+    </div>
+
+    <!-- Main -->
+    <main id="content" class="content" aria-label="Homepage">
+      <section class="hero">
+        <h1 class="brand">PHRO<span class="dot">.</span>design</h1>
+        <p class="sub">Design systems, motion design, and visual effects — built with precision and restraint.</p>
+
+        <div id="strands" class="strands" data-hovering="false">
+          <div class="frame" aria-hidden="true"></div>
+
+          <!-- Hover preview -->
+          <div id="preview" class="preview" aria-hidden="true" style="--px: 0px; --py: 0px;">
+            <img id="previewImg" src="/previews/placeholder-1.jpg" alt="" />
+          </div>
+
+          <div id="caption" class="caption" aria-hidden="true">
+            <span id="capLine1">Project — facet</span>
+            <small id="capLine2">Year · Client</small>
+          </div>
+
+          <!-- Strands SVG -->
+          <svg class="svg" viewBox="0 0 1100 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <!-- Top: web -->
+<path class="strand"
+  d="M 40 120
+     C 180 86, 320 154, 460 120
+     C 600 86, 740 154, 880 120
+     C 980 96, 1040 104, 1060 120" />
+
+<!-- Middle: vfx -->
+<path class="strand"
+  d="M 40 190
+     C 180 208, 320 172, 460 190
+     C 600 208, 740 172, 880 190
+     C 980 204, 1040 198, 1060 190" />
+
+<!-- Bottom: 3d -->
+<path class="strand"
+  d="M 40 260
+     C 180 294, 320 226, 460 260
+     C 600 294, 740 226, 880 260
+     C 980 284, 1040 276, 1060 260" />
+          </svg>
+
+          <!-- Left facet labels -->
+          <div class="facet-labels" aria-label="Facets">
+            <a class="facet-link" href="/web" data-transition="right" aria-label="Web design projects">
+              <svg class="facet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 5.5h16v10H4z"/><path d="M9 19h6"/><path d="M12 15.5v3.5"/>
+              </svg>
+              Web
+            </a>
+
+            <a class="facet-link" href="/vfx" data-transition="right" aria-label="VFX projects">
+              <svg class="facet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M7 7v10"/><path d="M7 9h6"/><path d="M13 9v6"/><path d="M13 12h4"/><path d="M17 12v5"/>
+              </svg>
+              VFX
+            </a>
+
+            <a class="facet-link" href="/3d" data-transition="right" aria-label="3D render projects">
+              <svg class="facet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/>
+                <path d="M12 3v18"/><path d="M4 7.5l8 4.5 8-4.5"/>
+              </svg>
+              3D
+            </a>
+          </div>
+
+          <!-- Project nodes -->
+          <div class="nodes" aria-label="Projects">
+            {projects.slice(0, 8).map((p, i) => {
+              // simple deterministic x positions with left/right padding
+              const leftPad = 140;
+              const rightPad = 70;
+              const span = 1100 - leftPad - rightPad;
+              const x = leftPad + (span * (i / Math.max(1, Math.min(7, 8 - 1))));
+
+              // y per facet (top/middle/bottom) and junction if multi-facet
+              const isMulti = p.facets.length > 1;
+              const y =
+                isMulti ? 180 :
+                p.facets[0] === "web" ? 110 :
+                p.facets[0] === "vfx" ? 180 : 250;
+
+              const href = `/${p.primaryFacet}/${p.slug}`;
+
+              const facetLabel = p.facets.join(" · ");
+
+              return (
+                <a
+                  class="node"
+                  href={href}
+                  data-transition="right"
+                  style={`left:${(x / 1100) * 100}%; top:${(y / 360) * 100}%;`}
+                  data-title={p.title}
+                  data-year={p.year}
+                  data-client={p.client}
+                  data-facets={facetLabel}
+                  data-img={p.hoverImage}
+                  aria-label={`Open case study: ${p.title}`}
+                >
+                  {/* placeholder outline icon */}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 6v12"/><path d="M6 12h12"/>
+                  </svg>
+                </a>
+              );
+            })}
           </div>
         </div>
-      </div>
-    </footer>
+      </section>
+    </main>
   </div>
 
-  <script>
-    // Optional: animate page left before navigating via the primary CTA (if present)
-    const page = document.getElementById("page");
-    const cta = document.getElementById("primary-cta");
+  <script is:inline>
+    (() => {
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (page && cta) {
-      cta.addEventListener("click", (e) => {
-        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (reduce) return;
+      const stage = document.getElementById("stage");
+      const loader = document.getElementById("loader");
+      const gate = document.getElementById("gate");
+      const enterBtn = document.getElementById("enter");
+      const content = document.getElementById("content");
+      const pct = document.getElementById("pct");
 
-        e.preventDefault();
-        page.classList.add("is-leaving-left");
-        window.setTimeout(() => {
-          window.location.href = cta.getAttribute("href") || "/work/";
-        }, 520);
+      // strands/preview
+      const strands = document.getElementById("strands");
+      const preview = document.getElementById("preview");
+      const previewImg = document.getElementById("previewImg");
+      const capLine1 = document.getElementById("capLine1");
+      const capLine2 = document.getElementById("capLine2");
+
+      // Preload hover images (simple)
+      const preload = () => {
+        const nodes = document.querySelectorAll(".node[data-img]");
+        nodes.forEach((n) => {
+          const url = n.getAttribute("data-img");
+          if (!url) return;
+          const img = new Image();
+          img.src = url;
+        });
+      };
+
+      const showGate = () => {
+        if (loader) loader.classList.add("is-hidden");
+        if (gate) gate.classList.add("is-visible");
+        if (gate) gate.setAttribute("aria-hidden", "false");
+      };
+
+      const enterSite = () => {
+        if (gate) gate.classList.remove("is-visible");
+        if (gate) gate.setAttribute("aria-hidden", "true");
+        if (content) content.classList.add("is-live");
+        if (stage) stage.classList.add("is-entered");
+        preload();
+      };
+
+      // Hover interactions
+      const setHover = (on) => {
+        if (!strands) return;
+        strands.setAttribute("data-hovering", on ? "true" : "false");
+      };
+
+      const updatePreviewFromNode = (node) => {
+        if (!node || !preview || !previewImg || !capLine1 || !capLine2) return;
+
+        const title = node.getAttribute("data-title") || "Project";
+        const facets = node.getAttribute("data-facets") || "";
+        const year = node.getAttribute("data-year") || "";
+        const client = node.getAttribute("data-client") || "";
+        const img = node.getAttribute("data-img") || "";
+
+        capLine1.textContent = `${title} — ${facets}`;
+        capLine2.textContent = `${year} · ${client}`;
+        if (img) previewImg.src = img;
+
+        // bias the preview toward the hovered node
+        const rect = strands.getBoundingClientRect();
+        const r = node.getBoundingClientRect();
+        const cx = (r.left + r.right) / 2 - (rect.left + rect.right) / 2;
+        const cy = (r.top + r.bottom) / 2 - (rect.top + rect.bottom) / 2;
+
+        // subtle shift (clamped)
+        const px = Math.max(-26, Math.min(26, cx * 0.06));
+        const py = Math.max(-14, Math.min(14, cy * 0.06));
+
+        preview.style.setProperty("--px", px + "px");
+        preview.style.setProperty("--py", py + "px");
+      };
+
+      const bindNodes = () => {
+        const nodes = document.querySelectorAll(".node");
+        nodes.forEach((node) => {
+          node.addEventListener("mouseenter", () => {
+            setHover(true);
+            updatePreviewFromNode(node);
+          });
+          node.addEventListener("mouseleave", () => {
+            setHover(false);
+          });
+          node.addEventListener("focus", () => {
+            setHover(true);
+            updatePreviewFromNode(node);
+          });
+          node.addEventListener("blur", () => {
+            setHover(false);
+          });
+        });
+      };
+
+      // Reduced motion: skip loader, show gate immediately
+      if (prefersReduced) {
+        if (loader) loader.classList.add("is-hidden");
+        if (gate) gate.classList.add("is-visible");
+        if (gate) gate.setAttribute("aria-hidden", "false");
+        if (enterBtn) enterBtn.addEventListener("click", () => { enterSite(); bindNodes(); });
+        return;
+      }
+
+      // Fake boot progress
+      let p = 0;
+      const start = performance.now();
+      const duration = 950;
+
+      const tick = (t) => {
+        const elapsed = t - start;
+        const k = Math.min(1, elapsed / duration);
+        const eased = 1 - Math.pow(1 - k, 3);
+        p = Math.floor(eased * 100);
+        if (pct) pct.textContent = p + "%";
+        if (k < 1) requestAnimationFrame(tick);
+        else showGate();
+      };
+      requestAnimationFrame(tick);
+
+      if (enterBtn) {
+        enterBtn.addEventListener("click", () => {
+          enterSite();
+          bindNodes();
+        });
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        if (!gate || !gate.classList.contains("is-visible")) return;
+        enterSite();
+        bindNodes();
       });
-    }
+    })();
   </script>
 </Layout>

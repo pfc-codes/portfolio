@@ -1,0 +1,143 @@
+1. 
+
+title: whitespace projects Napoli website
+
+year: 2025-ongoing
+
+client_or_artist: WPN
+
+facets: web
+
+primaryFacet: web
+
+slug: /whitespace
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+2. 
+
+title: BACAS
+
+year: 2023-ongoing
+
+client_or_artist: BACAS org
+
+facets: web
+
+primaryFacet: web 
+
+slug: /bacas
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+3.
+
+title: pietrocosta.com
+
+year: 2022-ongoing
+
+client_or_artist: pietrocosta studio
+
+facets: web
+
+primaryFacet: web
+
+slug: /pcostastudio
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+4.
+
+title: personal projects
+
+year: until the end
+
+client_or_artist: PFC
+
+facets: web, vfx, and 3d 
+
+primaryFacet: web ← controls URL like /web/project-slug
+
+slug: /pfc
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+5.
+
+title: Agnes Questionmark Trailer
+
+year: 2025
+
+client_or_artist: WPN
+
+facets: VFX (video editing)
+
+primaryFacet: vfx
+
+slug: /aq-trailer
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+6.
+
+title:
+
+year:
+
+client_or_artist:
+
+facets: (web | vfx | 3d) or multiple like (web,vfx)
+
+primaryFacet: (web | vfx | 3d) ← controls URL like /web/project-slug
+
+slug:
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+7.
+
+title:
+
+year:
+
+client_or_artist:
+
+facets: (web | vfx | 3d) or multiple like (web,vfx)
+
+primaryFacet: (web | vfx | 3d) ← controls URL like /web/project-slug
+
+slug:
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder
+
+8.
+
+title:
+
+year:
+
+client_or_artist:
+
+facets: (web | vfx | 3d) or multiple like (web,vfx)
+
+primaryFacet: (web | vfx | 3d) ← controls URL like /web/project-slug
+
+slug:
+
+hoverImage filename (where it will live, usually /public/previews/...): placeholder
+
+nodeIcon: placeholder

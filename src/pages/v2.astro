@@ -21,7 +21,7 @@ import Layout from "../layouts/Layout.astro";
       overflow: hidden;
     }
 
-    /* Subtle baseline grid rhythm (optional, restrained) */
+    /* Subtle baseline grid rhythm (loader vibe) */
     .stage::before {
       content: "";
       position: absolute;
@@ -37,6 +37,12 @@ import Layout from "../layouts/Layout.astro";
         );
       opacity: 0.25;
       pointer-events: none;
+      transition: opacity 520ms var(--ease-out);
+    }
+
+    /* After Enter: remove the horizontal grid lines */
+    .stage.is-entered::before {
+      opacity: 0;
     }
 
     /* Centered loader */
@@ -147,12 +153,16 @@ import Layout from "../layouts/Layout.astro";
       transform: translateY(0);
     }
 
-    /* The requested big left-justified mark */
+    /* Left-justified layout with editorial gutter */
     .wrap {
       width: 100%;
       max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
+      margin: 0; /* was: 0 auto; */
+      padding-top: 24px;
+      padding-bottom: 24px;
+      padding-left: clamp(24px, 5vw, 72px);
+      padding-right: 24px;
+      text-align: left;
     }
 
     .mark {
@@ -219,16 +229,22 @@ import Layout from "../layouts/Layout.astro";
       .content { opacity: 1 !important; transform: none !important; }
       .loader { display: none !important; }
       .gate { opacity: 1 !important; visibility: visible !important; }
+      .stage::before { opacity: 0.25 !important; } /* harmless; still subtle */
     }
 
-    /* Slightly more left bias on wide screens (still within wrap) */
+    /* Wide screen typography + gutter */
     @media (min-width: 900px) {
-      .wrap { padding: 44px 56px; }
+      .wrap {
+        padding-top: 44px;
+        padding-bottom: 56px;
+        padding-left: clamp(44px, 6vw, 96px);
+        padding-right: 56px;
+      }
       .mark { font-size: clamp(72px, 6.8vw, 132px); }
     }
   </style>
 
-  <div class="stage">
+  <div id="stage" class="stage">
     <!-- Loading -->
     <div id="loader" class="loader" aria-hidden="true">
       <div class="loader-inner">
@@ -268,6 +284,7 @@ import Layout from "../layouts/Layout.astro";
     (() => {
       const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+      const stage = document.getElementById("stage");
       const loader = document.getElementById("loader");
       const gate = document.getElementById("gate");
       const enterBtn = document.getElementById("enter");
@@ -286,6 +303,9 @@ import Layout from "../layouts/Layout.astro";
         if (gate) gate.classList.remove("is-visible");
         if (gate) gate.setAttribute("aria-hidden", "true");
         if (content) content.classList.add("is-live");
+
+        // Remove baseline grid lines after entering
+        if (stage) stage.classList.add("is-entered");
       };
 
       // Reduced motion: skip loader, show gate immediately
@@ -296,7 +316,6 @@ import Layout from "../layouts/Layout.astro";
         if (enterBtn) enterBtn.addEventListener("click", enterSite);
         return;
       }
-
 
       // Fake boot progress (deterministic, short, “premium”)
       let p = 0;
