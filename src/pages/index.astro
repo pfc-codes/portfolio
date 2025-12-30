@@ -1,16 +1,147 @@
 ---
+import { getCollection } from "astro:content";
 
+const featured = (await getCollection("projects"))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 6);
 ---
 
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Pietro Costa — Design + VFX</title>
+    <meta
+      name="description"
+      content="Design + VFX freelancer. Portfolio, case studies, and contact."
+    />
+  </head>
+
+  <body style="font-family: system-ui; max-width: 1100px; margin: 0 auto; padding: 32px;">
+    <!-- Nav -->
+    <header style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+      <a href="/" style="text-decoration:none; color:inherit; font-weight:700;">
+        Pietro Costa
+      </a>
+      <nav style="display:flex; gap:18px; font-size:14px;">
+        <a href="/work/">Work</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section style="margin-top:56px;">
+      <h1 style="font-size:42px; letter-spacing:-0.02em; line-height:1.05; margin:0;">
+        Design + VFX freelancer focused on clean visuals and production-ready workflows.
+      </h1>
+
+      <p style="margin-top:16px; font-size:18px; line-height:1.6; opacity:.85; max-width: 70ch;">
+        I build portfolio sites and brand systems for creatives, and I supervise / execute VFX work
+        with a strong technical foundation (scans, point clouds, Blender pipelines, and post).
+      </p>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;">
+        <a
+          href="/work/"
+          style="display:inline-block; padding:12px 14px; border-radius:12px; border:1px solid #111; background:#111; color:#fff; text-decoration:none;"
+        >
+          View selected work
+        </a>
+        <a
+          href="/contact/"
+          style="display:inline-block; padding:12px 14px; border-radius:12px; border:1px solid #ddd; text-decoration:none; color:inherit;"
+        >
+          Contact
+        </a>
+      </div>
+
+      <div style="margin-top:24px; display:flex; gap:14px; flex-wrap:wrap; font-size:14px; opacity:.85;">
+        <span><b>Based:</b> NY</span>
+        <span><b>Email:</b> <a href="mailto:pietrofranciscosta@gmail.com">pietrofranciscosta@gmail.com</a></span>
+        <span><b>Instagram:</b> <a href="https://instagram.com/" target="_blank" rel="noreferrer">instagram</a></span>
+      </div>
+    </section>
+
+    <!-- Featured Work -->
+    <section style="margin-top:64px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px;">
+        <h2 style="margin:0;">Selected work</h2>
+        <a href="/work/" style="font-size:14px;">View all →</a>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin-top:18px;">
+        {featured.map((p) => (
+          <a
+            href={`/work/${p.id}/`}
+            style="border:1px solid #ddd; border-radius:14px; padding:20px; text-decoration:none; color:inherit;"
+          >
+            <div style="font-size:12px; opacity:.6; text-transform:uppercase;">
+              {p.data.category}
+            </div>
+            <div style="font-size:18px; font-weight:650; margin-top:8px;">
+              {p.data.title}
+            </div>
+            <p style="opacity:.85; margin-top:8px; line-height:1.5;">
+              {p.data.summary}
+            </p>
+            {p.data.tools?.length > 0 && (
+              <p style="margin-top:12px; font-size:13px; opacity:.75;">
+                {p.data.tools.slice(0, 4).join(" • ")}
+              </p>
+            )}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section style="margin-top:64px;">
+      <h2 style="margin:0;">Services</h2>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin-top:18px;">
+        <div style="border:1px solid #ddd; border-radius:14px; padding:20px;">
+          <h3 style="margin:0;">Design + Web</h3>
+          <p style="opacity:.85; line-height:1.6; margin-top:10px;">
+            Portfolio sites, landing pages, and clean visual systems with a fast build-to-launch cycle.
+          </p>
+          <ul style="margin-top:10px; padding-left:18px; opacity:.85; line-height:1.7;">
+            <li>Brand + layout direction</li>
+            <li>Astro-based site builds</li>
+            <li>Performance + SEO fundamentals</li>
+          </ul>
+        </div>
+
+        <div style="border:1px solid #ddd; border-radius:14px; padding:20px;">
+          <h3 style="margin:0;">VFX Supervision / CG</h3>
+          <p style="opacity:.85; line-height:1.6; margin-top:10px;">
+            On-set to post support: capture strategy, scan workflows, and production-ready shot delivery.
+          </p>
+          <ul style="margin-top:10px; padding-left:18px; opacity:.85; line-height:1.7;">
+            <li>On-set VFX notes + capture</li>
+            <li>Blender pipelines (Geo Nodes, scans)</li>
+            <li>Breakdowns + documentation</li>
+          </ul>
+        </div>
+
+        <div style="border:1px solid #ddd; border-radius:14px; padding:20px;">
+          <h3 style="margin:0;">Creative R&amp;D</h3>
+          <p style="opacity:.85; line-height:1.6; margin-top:10px;">
+            Prototype-style experiments (point clouds, depth, scans) for music videos and social content.
+          </p>
+          <ul style="margin-top:10px; padding-left:18px; opacity:.85; line-height:1.7;">
+            <li>Short turnarounds</li>
+            <li>Look development</li>
+            <li>Reusable node setups</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="margin-top:72px; padding-top:24px; border-top:1px solid #eee; font-size:14px; opacity:.75;">
+      © {new Date().getFullYear()} Pietro Costa • <a href="/contact/">Contact</a>
+    </footer>
+  </body>
 </html>
