@@ -35,17 +35,6 @@ import Layout from "../layouts/Layout.astro";
       background-clip: text;
     }
 
-    .noise {
-      position: fixed;
-      inset: 0;
-      background: transparent
-        url('data:image/svg+xml,%3Csvg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E')
-        repeat;
-      opacity: 0.028;
-      pointer-events: none;
-      z-index: 1;
-    }
-
     .ambient {
       position: absolute;
       inset: -40vh -20vw auto -20vw;
@@ -93,25 +82,39 @@ import Layout from "../layouts/Layout.astro";
     .sheen:hover::before,
     .sheen:focus-visible::before { transform: translateX(55%) rotate(18deg); }
 
+    /* Page transition (optional; used by the primary CTA) */
+    .page {
+      transform: translateX(0);
+      opacity: 1;
+      transition: transform 520ms var(--ease-out), opacity 520ms var(--ease-out);
+      will-change: transform, opacity;
+    }
+    .page.is-leaving-left {
+      transform: translateX(-14vw);
+      opacity: 0.55;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .fade-in-up, .line-expand, .ambient { animation: none !important; opacity: 1 !important; transform: none !important; }
       .line-expand { width: 100% !important; }
       .hover-lift { transition: none !important; }
       .navlink::after { transition: none !important; transform: scaleX(1) !important; }
       .sheen::before { display: none !important; }
+
+      .page { transition: none !important; }
+      .page.is-leaving-left { transform: none !important; opacity: 1 !important; }
     }
   </style>
 
-  <div class="noise"></div>
-
-  <div class="relative z-10 min-h-screen flex flex-col">
+  <div id="page" class="relative z-10 min-h-screen flex flex-col bg-black text-white page">
     <div class="ambient"></div>
 
+    <!-- Header (identical across pages) -->
     <header class="fixed top-0 left-0 right-0 z-50 px-6 py-6 md:px-12 md:py-8">
       <nav class="flex justify-between items-center fade-in-up">
-        <div class="text-xl md:text-2xl font-light tracking-tight">
+        <a href="/" class="text-xl md:text-2xl font-light tracking-tight navlink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">
           phro<span class="text-gray-500">.</span>design
-        </div>
+        </a>
         <div class="flex gap-8 text-sm md:text-base text-gray-300">
           <a href="/work/" class="navlink hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">Work</a>
           <a href="/contact/" class="navlink hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30">Contact</a>
@@ -119,7 +122,8 @@ import Layout from "../layouts/Layout.astro";
       </nav>
     </header>
 
-    <main class="flex-1 px-6 md:px-12 pt-28 md:pt-32 pb-14">
+    <!-- Main (identical spacing across pages) -->
+    <main class="flex-1 px-6 md:px-12 pt-28 md:pt-32 pb-16">
       <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <section class="lg:col-span-8">
@@ -160,6 +164,7 @@ import Layout from "../layouts/Layout.astro";
 
               <div class="mt-6 grid gap-3">
                 <a
+                  id="primary-cta"
                   href="/work/"
                   class="sheen hover-lift group w-full px-6 py-3 rounded-xl bg-white text-black text-center transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 >
@@ -183,7 +188,8 @@ import Layout from "../layouts/Layout.astro";
       </div>
     </main>
 
-    <footer class="px-6 py-8 md:px-12">
+    <!-- Footer (identical across pages; sticks to bottom when content is short) -->
+    <footer class="mt-auto px-6 py-8 md:px-12">
       <div class="max-w-6xl mx-auto fade-in-up delay-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
           <div>© {new Date().getFullYear()} phro.design</div>
@@ -194,4 +200,23 @@ import Layout from "../layouts/Layout.astro";
       </div>
     </footer>
   </div>
+
+  <script>
+    // Optional: animate page left before navigating via the primary CTA (if present)
+    const page = document.getElementById("page");
+    const cta = document.getElementById("primary-cta");
+
+    if (page && cta) {
+      cta.addEventListener("click", (e) => {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduce) return;
+
+        e.preventDefault();
+        page.classList.add("is-leaving-left");
+        window.setTimeout(() => {
+          window.location.href = cta.getAttribute("href") || "/work/";
+        }, 520);
+      });
+    }
+  </script>
 </Layout>
