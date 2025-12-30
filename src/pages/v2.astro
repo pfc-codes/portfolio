@@ -1,0 +1,339 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="phro.design — Design & VFX" description="Design systems, motion design, and visual effects.">
+  <style>
+    :root {
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in: cubic-bezier(0.64, 0, 0.78, 0);
+    }
+
+    /* Full-viewport stage */
+    .stage {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: center;
+      background: #000;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle baseline grid rhythm (optional, restrained) */
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.06), rgba(255,255,255,0) 22%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.05) 0px,
+          rgba(255,255,255,0.05) 1px,
+          rgba(255,255,255,0.00) 1px,
+          rgba(255,255,255,0.00) 56px
+        );
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    /* Centered loader */
+    .loader {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 20;
+      background: #000;
+      transition: opacity 520ms var(--ease-out), visibility 0ms linear 520ms;
+    }
+    .loader.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-inner {
+      width: min(520px, 82vw);
+    }
+
+    .loader-label {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .bar {
+      margin-top: 14px;
+      height: 1px;
+      width: 100%;
+      background: rgba(255,255,255,0.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .bar > i {
+      display: block;
+      height: 1px;
+      width: 40%;
+      background: rgba(255,255,255,0.75);
+      transform: translateX(-120%);
+      animation: sweep 920ms var(--ease-out) infinite;
+    }
+    @keyframes sweep {
+      0% { transform: translateX(-120%); opacity: 0.45; }
+      45% { opacity: 0.85; }
+      100% { transform: translateX(260%); opacity: 0.55; }
+    }
+
+    /* Enter gate */
+    .gate {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 15;
+      background: #000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 520ms var(--ease-out), visibility 0ms linear 520ms;
+    }
+    .gate.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 520ms var(--ease-out), visibility 0ms;
+    }
+
+    .enter-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 12px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 420ms var(--ease-out), border-color 420ms var(--ease-out), background 420ms var(--ease-out);
+      backdrop-filter: blur(10px);
+    }
+    .enter-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.34);
+      background: rgba(255,255,255,0.09);
+    }
+    .enter-btn:active { transform: translateY(-1px); }
+    .enter-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.22);
+    }
+
+    /* Main content initially hidden until "entered" */
+    .content {
+      position: relative;
+      z-index: 5;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+    }
+    .content.is-live {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* The requested big left-justified mark */
+    .wrap {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .mark {
+      font-weight: 300;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      font-size: clamp(54px, 7vw, 110px);
+      text-align: left;
+    }
+
+    .mark .dot {
+      color: rgba(255,255,255,0.34);
+      font-weight: 200;
+    }
+
+    .sub {
+      margin-top: 18px;
+      max-width: 56ch;
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.62);
+      font-weight: 300;
+    }
+
+    .links {
+      margin-top: 28px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .link {
+      position: relative;
+      color: rgba(255,255,255,0.82);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 10px 0;
+      transition: color 320ms var(--ease-out);
+    }
+    .link:hover { color: #fff; }
+
+    .link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 4px;
+      height: 1px;
+      width: 100%;
+      background: rgba(255,255,255,0.55);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 360ms var(--ease-out);
+    }
+    .link:hover::after,
+    .link:focus-visible::after { transform: scaleX(1); }
+
+    /* Reduced motion: skip loader/gate animations */
+    @media (prefers-reduced-motion: reduce) {
+      .loader, .gate, .content { transition: none !important; }
+      .bar > i { animation: none !important; transform: none !important; width: 100% !important; opacity: 0.7 !important; }
+      .content { opacity: 1 !important; transform: none !important; }
+      .loader { display: none !important; }
+      .gate { opacity: 1 !important; visibility: visible !important; }
+    }
+
+    /* Slightly more left bias on wide screens (still within wrap) */
+    @media (min-width: 900px) {
+      .wrap { padding: 44px 56px; }
+      .mark { font-size: clamp(72px, 6.8vw, 132px); }
+    }
+  </style>
+
+  <div class="stage">
+    <!-- Loading -->
+    <div id="loader" class="loader" aria-hidden="true">
+      <div class="loader-inner">
+        <div class="loader-label">
+          <span>Loading</span>
+          <span id="pct">0%</span>
+        </div>
+        <div class="bar" aria-hidden="true"><i></i></div>
+      </div>
+    </div>
+
+    <!-- Enter gate -->
+    <div id="gate" class="gate" aria-hidden="true">
+      <button id="enter" class="enter-btn" type="button">Enter</button>
+    </div>
+
+    <!-- Main -->
+    <main id="content" class="content" aria-label="Homepage">
+      <div class="wrap">
+        <h1 class="mark">
+          PHRO<span class="dot">.</span>design
+        </h1>
+
+        <p class="sub">
+          Design systems, motion design, and visual effects — built with precision and restraint.
+        </p>
+
+        <nav class="links" aria-label="Primary">
+          <a class="link" href="/work/" data-transition="right">Work</a>
+          <a class="link" href="/contact/" data-transition="right">Contact</a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const loader = document.getElementById("loader");
+      const gate = document.getElementById("gate");
+      const enterBtn = document.getElementById("enter");
+      const content = document.getElementById("content");
+      const pct = document.getElementById("pct");
+
+      // Helper to show gate / show content
+      const showGate = () => {
+        if (loader) loader.classList.add("is-hidden");
+        if (gate) gate.classList.add("is-visible");
+        if (gate) gate.setAttribute("aria-hidden", "false");
+      };
+
+      const enterSite = () => {
+        // Hide gate, reveal content
+        if (gate) gate.classList.remove("is-visible");
+        if (gate) gate.setAttribute("aria-hidden", "true");
+        if (content) content.classList.add("is-live");
+      };
+
+      // Reduced motion: skip loader, show gate immediately
+      if (prefersReduced) {
+        if (loader) loader.classList.add("is-hidden");
+        if (gate) gate.classList.add("is-visible");
+        if (gate) gate.setAttribute("aria-hidden", "false");
+        if (enterBtn) enterBtn.addEventListener("click", enterSite);
+        return;
+      }
+
+
+      // Fake boot progress (deterministic, short, “premium”)
+      let p = 0;
+      const start = performance.now();
+      const duration = 950; // ms
+
+      const tick = (t) => {
+        const elapsed = t - start;
+        const k = Math.min(1, elapsed / duration);
+        // Ease out
+        const eased = 1 - Math.pow(1 - k, 3);
+        p = Math.floor(eased * 100);
+
+        if (pct) pct.textContent = p + "%";
+
+        if (k < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          showGate();
+        }
+      };
+
+      requestAnimationFrame(tick);
+
+      // Enter click
+      if (enterBtn) {
+        enterBtn.addEventListener("click", () => {
+          enterSite();
+        });
+      }
+
+      // Optional: allow Enter key to proceed when gate visible
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        if (!gate || !gate.classList.contains("is-visible")) return;
+        enterSite();
+      });
+    })();
+  </script>
+</Layout>
