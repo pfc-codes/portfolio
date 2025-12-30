@@ -1,43 +1,25 @@
-export async function onRequest(context: any) {
-  const { request, env, next } = context;
-
-  // Change this if you only want to protect one path.
-  // Example to protect ONLY "/" and "/contact":
-  // const pathname = new URL(request.url).pathname;
-  // if (pathname !== "/" && pathname !== "/contact" && !pathname.startsWith("/work")) return next();
-
-  const USER = env.BASIC_USER || "pietro";
-  const PASS = env.BASIC_PASS || "changeme";
+export async function onRequest({ request, env, next }: any) {
+  const USER = env.BASIC_USER;
+  const PASS = env.BASIC_PASS;
 
   const auth = request.headers.get("Authorization");
+
   if (!auth || !auth.startsWith("Basic ")) {
-    return unauthorized();
+    return new Response("Authentication required", {
+      status: 401,
+      headers: { "WWW-Authenticate": 'Basic realm="Private Site"' },
+    });
   }
 
-  const encoded = auth.slice(6);
-  let decoded = "";
-  try {
-    decoded = atob(encoded);
-  } catch {
-    return unauthorized();
-  }
+  const decoded = atob(auth.split(" ")[1]);
+  const [user, pass] = decoded.split(":");
 
-  const idx = decoded.indexOf(":");
-  const u = idx >= 0 ? decoded.slice(0, idx) : "";
-  const p = idx >= 0 ? decoded.slice(idx + 1) : "";
-
-  if (u !== USER || p !== PASS) {
-    return unauthorized();
+  if (user !== USER || pass !== PASS) {
+    return new Response("Unauthorized", {
+      status: 401,
+      headers: { "WWW-Authenticate": 'Basic realm="Private Site"' },
+    });
   }
 
   return next();
-}
-
-function unauthorized() {
-  return new Response("Authentication required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="Private"',
-    },
-  });
 }
