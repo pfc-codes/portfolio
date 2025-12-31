@@ -8,10 +8,10 @@
   </nav>
 </div>
 
-<script type="module">
-  import { mountPointCloudHero } from "/src/scripts/pointcloud-hero.js";
+<script>
+  import { mountPointCloudHero } from "@/scripts/pointcloud-hero.js";
 
-  let cleanup;
+  let cleanup: (() => void) | undefined;
 
   const mount = async () => {
     cleanup = await mountPointCloudHero({
