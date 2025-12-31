@@ -4,10 +4,9 @@ import "../styles/global.css";
 const {
   title = "phro.design",
   description,
-  // scroll: "y" (normal pages) or "x" (horizontal gallery pages)
   scroll = "y",
+  bodyClass = "",
 } = Astro.props;
-
 const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
 ---
 
@@ -20,33 +19,35 @@ const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
     {description && <meta name="description" content={description} />}
   </head>
 
-  <body class={`bg-black text-white font-sans antialiased ${scrollClass}`} style="scrollbar-gutter: stable;">
+  <body
+    class={`bg-black text-white font-sans antialiased ${scrollClass} ${bodyClass}`}
+    style="scrollbar-gutter: stable;"
+  >
     <style>
-      :root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+      :root {
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      }
 
-      /* Page enter/exit transitions */
       .page {
+        min-height: 100vh;
         transform: translateX(18px);
         opacity: 0;
-        transition: transform 520ms var(--ease-out), opacity 520ms var(--ease-out);
+        transition:
+          transform 520ms var(--ease-out),
+          opacity 520ms var(--ease-out);
         will-change: transform, opacity;
       }
       .page.is-entered {
         transform: translateX(0);
         opacity: 1;
       }
-      .page.is-leaving-left {
-        transform: translateX(-14vw);
-        opacity: 0.55;
-      }
-      .page.is-leaving-right {
-        transform: translateX(14vw);
-        opacity: 0.55;
-      }
 
       @media (prefers-reduced-motion: reduce) {
-        .page { transition: none !important; transform: none !important; opacity: 1 !important; }
-        .page.is-entered, .page.is-leaving-left, .page.is-leaving-right { transform: none !important; opacity: 1 !important; }
+        .page {
+          transition: none !important;
+          transform: none !important;
+          opacity: 1 !important;
+        }
       }
     </style>
 
@@ -56,59 +57,15 @@ const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
 
     <script is:inline>
       (() => {
-        const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const prefersReduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
         const page = document.getElementById("page");
         if (!page) return;
 
-        // Enter animation on load
-        if (!prefersReduced) {
+        if (!prefersReduced)
           requestAnimationFrame(() => page.classList.add("is-entered"));
-        } else {
-          page.classList.add("is-entered");
-        }
-
-        // Intercept internal navigation and animate out
-        document.addEventListener("click", (e) => {
-          if (prefersReduced) return;
-
-          const target = e.target;
-          if (!(target instanceof Element)) return;
-
-          const a = target.closest("a");
-          if (!a) return;
-
-          const href = a.getAttribute("href");
-          if (!href) return;
-
-          // Allow: external, new tabs, downloads, mailto/tel, hash links, modified clicks
-          const url = new URL(a.href, window.location.href);
-          const isExternal = url.origin !== window.location.origin;
-          const isNewTab = a.target === "_blank";
-          const isDownload = a.hasAttribute("download");
-          const isSpecial = href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:");
-          const isModifiedClick = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
-
-          if (isExternal || isNewTab || isDownload || isSpecial || isModifiedClick) return;
-
-          // If link only changes hash on same page, allow default
-          const current = new URL(window.location.href);
-          const samePath = current.pathname === url.pathname && current.search === url.search;
-          if (samePath && current.hash !== url.hash) return;
-
-          // If not actually changing location, ignore
-          if (current.pathname === url.pathname && current.search === url.search && current.hash === url.hash) return;
-
-          // Optional: allow per-link direction via data attribute
-          const dir = a.getAttribute("data-transition"); // "left" or "right"
-          const leaveClass = dir === "right" ? "is-leaving-right" : "is-leaving-left";
-
-          e.preventDefault();
-          page.classList.add(leaveClass);
-
-          window.setTimeout(() => {
-            window.location.href = url.toString();
-          }, 520);
-        });
+        else page.classList.add("is-entered");
       })();
     </script>
   </body>

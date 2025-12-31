@@ -1,0 +1,178 @@
+---
+/**
+ * Three.js cube navigation for Astro.
+ * - User can rotate with OrbitControls
+ * - Click a face to navigate to the corresponding route
+ */
+---
+
+<div class="cube-wrap">
+  <canvas id="cubeCanvas" class="cube-canvas"></canvas>
+</div>
+
+<style>
+  .cube-wrap {
+    width: 100%;
+    height: 100vh;
+    background: #000;
+    overflow: hidden;
+  }
+  .cube-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
+
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+  const canvas = document.getElementById("cubeCanvas");
+
+  // --- Renderer
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+    alpha: false,
+    powerPreference: "high-performance",
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 1);
+
+  // --- Scene + Camera
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0, 4);
+
+  // --- Lights (minimal, technical)
+  const key = new THREE.DirectionalLight(0xffffff, 1.1);
+  key.position.set(2, 2, 3);
+  scene.add(key);
+
+  const fill = new THREE.AmbientLight(0xffffff, 0.35);
+  scene.add(fill);
+
+  // --- Face definitions (6 sides)
+  // You can rename/add routes later.
+  const faces = [
+    { label: "WEB", route: "/web" }, // +X
+    { label: "VFX", route: "/vfx" }, // -X
+    { label: "3D", route: "/3d" }, // +Y
+    { label: "EDIT", route: "/edit" }, // -Y
+    { label: "MOTION", route: "/motion" }, // +Z
+    { label: "TOOLS", route: "/tools" }, // -Z
+  ];
+
+  function makeFaceTexture(text) {
+    const size = 512;
+    const c = document.createElement("canvas");
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext("2d");
+
+    // Background
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, size, size);
+
+    // Border (subtle)
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(18, 18, size - 36, size - 36);
+
+    // Text
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.font =
+      "600 64px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.letterSpacing = "6px"; // not fully supported, but harmless
+    ctx.fillText(text, size / 2, size / 2);
+
+    // Subtext hint
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.font =
+      "400 20px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    ctx.fillText("CLICK", size / 2, size / 2 + 64);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return tex;
+  }
+
+  const materials = faces.map(
+    (f) =>
+      new THREE.MeshStandardMaterial({
+        map: makeFaceTexture(f.label),
+        metalness: 0.1,
+        roughness: 0.65,
+      })
+  );
+
+  const geo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
+  const cube = new THREE.Mesh(geo, materials);
+  scene.add(cube);
+
+  // Optional: thin wireframe edge for technical feel
+  const edges = new THREE.EdgesGeometry(geo);
+  const edgeLines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.25,
+    })
+  );
+  cube.add(edgeLines);
+
+  // --- Controls
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.enablePan = false;
+  controls.minDistance = 2.6;
+  controls.maxDistance = 6.0;
+
+  // --- Resize
+  function resize() {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  // --- Raycast for clicking faces
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function onPointerDown(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    mouse.x = x * 2 - 1;
+    mouse.y = -(y * 2 - 1);
+
+    raycaster.setFromCamera(mouse, camera);
+    const hit = raycaster.intersectObject(cube, false)[0];
+    if (!hit) return;
+
+    // hit.face.materialIndex corresponds to the material on that face
+    const idx = hit.face.materialIndex;
+    const target = faces[idx]?.route;
+    if (target) window.location.href = target;
+  }
+  canvas.addEventListener("pointerdown", onPointerDown);
+
+  // --- Animate
+  function animate() {
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+</script>

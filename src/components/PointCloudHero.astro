@@ -1,0 +1,36 @@
+<div id="pc-wrap">
+  <canvas id="pc-canvas"></canvas>
+
+  <nav id="ui-overlay" aria-label="Primary">
+    <a href="/work" class="ui-hit projects" aria-label="Projects"></a>
+    <a href="/about" class="ui-hit about" aria-label="About"></a>
+    <a href="/contact" class="ui-hit contact" aria-label="Contact"></a>
+  </nav>
+</div>
+
+<script type="module">
+  import { mountPointCloudHero } from "/src/scripts/pointcloud-hero.js";
+
+  let cleanup;
+
+  const mount = async () => {
+    cleanup = await mountPointCloudHero({
+      canvasId: "pc-canvas",
+      wrapId: "pc-wrap",
+    });
+  };
+
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", mount, { once: true });
+  } else {
+    mount();
+  }
+
+  window.addEventListener("astro:before-swap", () => cleanup?.(), {
+    once: true,
+  });
+
+  window.addEventListener("ui-ready", () => {
+    document.body.classList.add("ui-ready");
+  });
+</script>
