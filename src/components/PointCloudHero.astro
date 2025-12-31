@@ -6,9 +6,11 @@
   <canvas id="pc-canvas"></canvas>
 
   <nav id="ui-overlay" aria-label="Primary">
-    <a href="/work" class="ui-hit projects" aria-label="Projects"></a>
-    <a href="/about" class="ui-hit about" aria-label="About"></a>
-    <a href="/contact" class="ui-hit contact" aria-label="Contact"></a>
+    <div class="ui-panel">
+      <a href="/work" class="ui-link">Projects</a>
+      <a href="/about" class="ui-link">About</a>
+      <a href="/contact" class="ui-link">Contact</a>
+    </div>
   </nav>
 </div>
 
@@ -18,9 +20,13 @@
   let cleanup: (() => void) | undefined;
 
   const mount = async () => {
+    // Reset overlay state on entry (useful with view transitions)
+    document.body.classList.remove("ui-ready");
+
     cleanup = await mountPointCloudHero({
       canvasId: "pc-canvas",
       wrapId: "pc-wrap",
+      autoStartDelayMs: 1800,
     });
   };
 
@@ -30,9 +36,14 @@
     mount();
   }
 
-  window.addEventListener("astro:before-swap", () => cleanup?.(), {
-    once: true,
-  });
+  window.addEventListener(
+    "astro:before-swap",
+    () => {
+      document.body.classList.remove("ui-ready");
+      cleanup?.();
+    },
+    { once: true }
+  );
 
   window.addEventListener("ui-ready", () => {
     document.body.classList.add("ui-ready");

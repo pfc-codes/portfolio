@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import PointCloudHero from "../components/PointCloudHero.astro";
 
 const {
   title = "phro.design",
@@ -13,6 +14,13 @@ const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
 <!doctype html>
 <html lang="en">
   <head>
+    <link
+      rel="preload"
+      href="/pointcloud/character.points.bin"
+      as="fetch"
+      type="application/octet-stream"
+      crossorigin="anonymous"
+    />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
@@ -30,14 +38,20 @@ const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
 
       .page {
         min-height: 100vh;
-        transform: translateX(18px);
-        opacity: 0;
+        transform: translateX(0);
+        opacity: 1;
         transition:
           transform 520ms var(--ease-out),
           opacity 520ms var(--ease-out);
         will-change: transform, opacity;
       }
-      .page.is-entered {
+
+      html.js .page {
+        transform: translateX(18px);
+        opacity: 0;
+      }
+
+      html.js .page.is-entered {
         transform: translateX(0);
         opacity: 1;
       }
@@ -51,12 +65,18 @@ const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
       }
     </style>
 
+    <!-- Persistent point-cloud hero backdrop + navs -->
+    <PointCloudHero />
+
+    <!-- Page content lives above the fixed hero -->
     <div id="page" class="page">
       <slot />
     </div>
 
     <script is:inline>
       (() => {
+        document.documentElement.classList.add("js");
+
         const prefersReduced = window.matchMedia(
           "(prefers-reduced-motion: reduce)"
         ).matches;

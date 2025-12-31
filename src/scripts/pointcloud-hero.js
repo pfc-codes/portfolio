@@ -79,6 +79,71 @@ function makeGridTarget(N, width = 3.2, height = 1.4) {
   return out;
 }
 
+function randn() {
+  // Box–Muller transform (mean 0, stddev 1)
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+/**
+ * Procedural "nebula" target (a soft, clustered 3D cloud) intentionally offset
+ * away from the screen center so it doesn't compete with the HTML nav.
+ */
+function makeNebulaTarget(
+  N,
+  {
+    size,
+    // Offset the nebula into the upper-right quadrant (tweak if you want)
+    center = new THREE.Vector3(0, 0, 0),
+    radius = Math.min(size.x, size.y) * 0.7,
+    depth = Math.min(size.x, size.y) * 0,
+    lobes = 6,
+  }
+) {
+  const out = new Float32Array(N * 3);
+
+  // Lobe centers clustered around "center"
+  const lobeCenters = [];
+  const sigmas = [];
+  for (let l = 0; l < lobes; l++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = radius * 0.35 * Math.sqrt(Math.random());
+    lobeCenters.push(
+      new THREE.Vector3(
+        center.x + Math.cos(a) * r,
+        center.y + Math.sin(a) * r,
+        center.z + (Math.random() - 0.5) * depth * 0.15
+      )
+    );
+    sigmas.push(radius * (0.12 + Math.random() * 0.10)); // ~0.12–0.22 * radius
+  }
+
+  // Sample a mixture of Gaussians, reject extreme outliers to keep a soft “blob”
+  for (let i = 0; i < N; i++) {
+    const l = (Math.random() * lobes) | 0;
+    const c = lobeCenters[l];
+    const s = sigmas[l];
+
+    let x, y, z;
+    // reject a few times to avoid very long tails
+    for (let k = 0; k < 6; k++) {
+      x = randn() * s;
+      y = randn() * s;
+      z = randn() * (depth * 0.35);
+      if (x * x + y * y <= (radius * radius) * 1.2) break;
+    }
+
+    out[i * 3] = c.x + x;
+    out[i * 3 + 1] = c.y + y;
+    out[i * 3 + 2] = c.z + z;
+  }
+
+  return out;
+}
+
+
 async function svgToTargetPoints(svgUrl, N) {
   const res = await fetch(svgUrl, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch ${svgUrl}: ${res.status} ${res.statusText}`);
@@ -274,7 +339,12 @@ function mortonSortPositions(pos) {
   return out;
 }
 
-export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc-wrap" } = {}) {
+export async function mountPointCloudHero({
+  canvasId = "pc-canvas",
+  wrapId = "pc-wrap",
+  autoStartDelayMs = 4000,}  = {}) 
+  
+  {
   const canvas = document.getElementById(canvasId);
   const wrap = document.getElementById(wrapId);
 
@@ -284,12 +354,23 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
   if (wrap.__pchMounted) return;
   wrap.__pchMounted = true;
 
+    const prefersReduced =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   const state = {
     disposed: false,
     hasTarget: false,
     morphStarted: false,
     uiReady: false,
+    uiEventQueued: false,
+
+    // used for auto-start gating
+    characterReady: false,
+    characterReadyAt: 0,
   };
+
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   renderer.setClearColor(0x000000, 1);
@@ -311,6 +392,8 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
   const uniforms = {
     uProgress: { value: 0.0 },
     uPointSize: { value: BASE_POINT_SIZE },
+    uTime: { value: 0.0 },
+    uWobbleAmp: { value: 0.0 },
   };
 
   const material = new THREE.ShaderMaterial({
@@ -322,8 +405,32 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
       attribute vec3 aTarget;
       uniform float uProgress;
       uniform float uPointSize;
+      uniform float uTime;
+      uniform float uWobbleAmp;
+
+      // Very lightweight pseudo-noise (no textures, no heavy noise functions)
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+      }
+
       void main() {
         vec3 p = mix(position, aTarget, uProgress);
+
+        // Subtle “alive” motion only after the morph settles
+        float alive = smoothstep(0.88, 1.0, uProgress);
+        float t = uTime * 0.35;
+
+        float n1 = sin(t + dot(p.xy, vec2(1.7, 9.2)));
+        float n2 = cos(t * 1.2 + dot(p.yz, vec2(8.3, 2.8)));
+        float n3 = sin(t * 0.9 + dot(p.zx, vec2(4.1, 6.5)));
+
+        vec3 wobble = vec3(n1, n2, n3) * (uWobbleAmp * alive);
+
+        // Gentle breathing modulation
+        float breathe = 1.0 + (0.012 * alive) * sin(uTime * 0.45);
+
+        p = p * breathe + wobble;
+
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
         gl_PointSize = uPointSize;
@@ -405,22 +512,35 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
   requestAnimationFrame(() => requestAnimationFrame(onResize));
 
   let startT = 0;
-  const DURATION = 2.5;
+  const DURATION = 3;
+  let uiDelayTimer = 0;
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
-  function startMorphOnce() {
-    if (state.morphStarted || state.uiReady) return;
-    if (!state.hasTarget) return;
-    state.morphStarted = true;
-    startT = performance.now();
-    window.removeEventListener("click", startMorphOnce);
-  }
-  window.addEventListener("click", startMorphOnce, { passive: true });
+
 
   function renderFrame() {
+
+    // NEW: auto-start once both source + target are ready, after a hold
+    if (!state.uiReady && !state.morphStarted && state.characterReady && state.hasTarget) {
+      const elapsed = performance.now() - state.characterReadyAt;
+
+      if (prefersReduced) {
+        uniforms.uProgress.value = 1;
+        state.uiReady = true;
+        state.uiEventQueued = true;
+        window.dispatchEvent(new CustomEvent("ui-ready"));
+      } else if (elapsed >= autoStartDelayMs) {
+        state.morphStarted = true;
+        startT = performance.now();
+      }
+    }
+
+
     if (state.disposed) return;
+
+    uniforms.uTime.value = performance.now() * 0.001;
 
     if (state.morphStarted && !state.uiReady) {
       const t = (performance.now() - startT) / (DURATION * 1000);
@@ -429,7 +549,18 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
 
       if (t >= 1) {
         state.uiReady = true;
-        window.dispatchEvent(new CustomEvent("ui-ready"));
+
+        // Fire ui-ready 2s after the morph completes (reduced-motion shows immediately)
+        if (!state.uiEventQueued) {
+          state.uiEventQueued = true;
+          if (prefersReduced) {
+            window.dispatchEvent(new CustomEvent("ui-ready"));
+          } else {
+            uiDelayTimer = window.setTimeout(() => {
+              if (!state.disposed) window.dispatchEvent(new CustomEvent("ui-ready"));
+            }, 2000);
+          }
+        }
       }
     }
 
@@ -444,6 +575,8 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
     try {
       const positions = await loadBinPoints("/pointcloud/character.points.bin");
       if (state.disposed) return;
+
+    uniforms.uTime.value = performance.now() * 0.001;
 
       const N = positions.length / 3;
 
@@ -469,34 +602,40 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
       // Refit once geometry exists
       onResize();
 
+      state.characterReady = true;
+      state.characterReadyAt = performance.now();
+      console.log("[PCH] character ready at", state.characterReadyAt);
+
+
+
       try {
         const size = new THREE.Vector3();
         geom.boundingBox.getSize(size);
 
-        const ui = await svgToTargetPoints("/ui/ui-target.svg", N);
+        // Procedural nebula target (intentionally offset so the center stays clean for HTML nav)
+        const nebula = makeNebulaTarget(N, { size });
 
-        // Scale UI to match character extents
-        const uiW = size.x * 0.9;
-        const uiH = size.y * 0.55;
-        for (let i = 0; i < ui.length; i += 3) {
-          ui[i] *= uiW;
-          ui[i + 1] *= uiH;
-          ui[i + 2] = 0;
-        }
+        // Wobble amplitude scales with the character size (keeps motion subtle at any scale)
+        uniforms.uWobbleAmp.value = Math.min(size.x, size.y) * 0.012;
 
-        const uiSorted = mortonSortPositions(ui);
-        setTarget(geom, uiSorted);
+        const nebulaSorted = mortonSortPositions(nebula);
+        setTarget(geom, nebulaSorted);
         state.hasTarget = true;
+
+        console.log(
+          "[PCH] target (nebula) ready at",
+          performance.now(),
+          "since character:",
+          performance.now() - state.characterReadyAt
+        );
       } catch (e) {
-        console.warn("SVG target failed; falling back to grid target:", e);
+        console.warn("Nebula target failed; falling back to grid target:", e);
 
         const size = new THREE.Vector3();
-        geom.computeBoundingBox();
         geom.boundingBox.getSize(size);
 
-        const grid = makeGridTarget(N, size.x * 0.9, size.y * 0.35);
+        const grid = makeGridTarget(N, size.x * 0.9, size.y * 0.55);
         const gridSorted = mortonSortPositions(grid);
-
         setTarget(geom, gridSorted);
         state.hasTarget = true;
       }
@@ -508,11 +647,11 @@ export async function mountPointCloudHero({ canvasId = "pc-canvas", wrapId = "pc
   return () => {
     state.disposed = true;
 
+    if (uiDelayTimer) window.clearTimeout(uiDelayTimer);
+
     ro?.disconnect();
     window.removeEventListener("resize", onResize);
     if (window.visualViewport) window.visualViewport.removeEventListener("resize", onResize);
-
-    window.removeEventListener("click", startMorphOnce);
 
     scene.remove(points);
     geom.dispose();
