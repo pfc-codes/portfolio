@@ -13,9 +13,18 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   background: #000;
   color: #fff;
+
+  /* allow inner pages to scroll */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* lock scrolling ONLY on the homepage (set this class on /) */
+html.is-hero,
+body.is-hero {
   overflow: hidden;
 }
 
@@ -96,4 +105,25 @@ body.ui-ready #ui-overlay {
 
 #ui-overlay .ui-link:hover {
   opacity: 0.6;
+}
+
+/* ----------------------------
+   Inner-page starfield background
+---------------------------- */
+
+#sf-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure page content sits above the background canvas */
+#page {
+  position: relative;
+  z-index: 1;
 }

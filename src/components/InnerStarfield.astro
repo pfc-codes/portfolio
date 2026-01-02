@@ -1,0 +1,28 @@
+---
+// InnerStarfield.astro
+---
+
+<canvas id="sf-canvas" aria-hidden="true"></canvas>
+
+<script>
+  import { mountInnerStarfield } from "@/scripts/inner-starfield.js";
+
+  let cleanup: (() => void) | undefined;
+
+  const mount = () => {
+    cleanup?.();
+    cleanup = mountInnerStarfield({
+      canvasId: "sf-canvas",
+      seed: "inner-1",
+      density: 0.001,
+    });
+  };
+
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", mount, { once: true });
+  } else {
+    mount();
+  }
+
+  window.addEventListener("pagehide", () => cleanup?.(), { once: true });
+</script>

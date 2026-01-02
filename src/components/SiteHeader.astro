@@ -1,0 +1,97 @@
+---
+const path: string = Astro.url.pathname;
+
+// normalize (handle both /contact and /contact/)
+const norm = (p: string): string => (p.endsWith("/") ? p : p + "/");
+const here: string = norm(path);
+
+const links: Array<{ href: string; label: string }> = [
+  { href: "/projects/", label: "projects" },
+  { href: "/about/", label: "about" },
+  { href: "/contact/", label: "contact" },
+];
+
+const isActive = (href: string): boolean => {
+  const target = norm(href);
+  return here === target;
+};
+---
+
+<header class="site-header" role="banner" aria-label="site">
+  <div class="site-header__inner">
+    <a class="site-title" href="/">phro.design</a>
+
+    <nav class="site-nav" aria-label="primary">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            class:list={["site-nav__link", isActive(l.href) && "is-active"]}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: 24px;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    pointer-events: none; /* allow clicks only on links */
+  }
+
+  .site-header__inner {
+    display: grid;
+    place-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    pointer-events: auto;
+  }
+
+  .site-title {
+    color: #fff;
+    text-decoration: none;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-size: clamp(18px, 2vw, 22px);
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+  }
+
+  .site-nav {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .site-nav__link {
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-size: clamp(13px, 1.6vw, 15px);
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
+    padding-bottom: 2px;
+  }
+
+  .site-nav__link:hover {
+    color: #fff;
+  }
+
+  .site-nav__link.is-active {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+  }
+</style>

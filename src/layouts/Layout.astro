@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
-import PointCloudHero from "../components/PointCloudHero.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import InnerStarfield from "@/components/InnerStarfield.astro";
 
 const {
   title = "phro.design",
@@ -8,7 +9,9 @@ const {
   scroll = "y",
   bodyClass = "",
 } = Astro.props;
+
 const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
+const isHome = Astro.url.pathname === "/";
 ---
 
 <!doctype html>
@@ -65,10 +68,10 @@ const scrollClass = scroll === "x" ? "overflow-hidden" : "overflow-x-hidden";
       }
     </style>
 
-    <!-- Persistent point-cloud hero backdrop + navs -->
-    <PointCloudHero />
+    {!isHome && <InnerStarfield />}
 
-    <!-- Page content lives above the fixed hero -->
+    {!isHome && <SiteHeader />}
+
     <div id="page" class="page">
       <slot />
     </div>

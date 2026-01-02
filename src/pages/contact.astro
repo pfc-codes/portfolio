@@ -1,73 +1,168 @@
 ---
+import Layout from "../layouts/Layout.astro";
+
 const FORM_ENDPOINT = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT || "";
+const actionUrl = FORM_ENDPOINT || "https://formspree.io/f/REPLACE_ME";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Contact</title>
-  </head>
-
-  <body style="font-family: system-ui; max-width: 760px; margin: 0 auto; padding: 32px;">
-    <h1>Contact</h1>
-    <p style="opacity:.85; line-height:1.7;">
-      Tell me what you’re building and your timeline. I’ll respond within 1–2 business days.
+<Layout title="phro.design — contact" description="Contact phro.">
+  <main class="page">
+    <h1>contact</h1>
+    <p class="lede">
+      Tell me what you’re building and your timeline. I’ll respond within 1–2
+      business days.
     </p>
 
-    <form
-      method="POST"
-      action={FORM_ENDPOINT || "https://formspree.io/f/REPLACE_ME"}
-      style="margin-top: 24px; display: grid; gap: 14px;"
-    >
-      <label>
-        <div style="font-size: 14px; margin-bottom: 6px;">Name</div>
-        <input
-          name="name"
-          required
-          autocomplete="name"
-          style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ddd;"
-        />
+    <form method="POST" action={actionUrl} class="form">
+      <label class="field">
+        <div class="label">name</div>
+        <input name="name" required autocomplete="name" class="input" />
       </label>
 
-      <label>
-        <div style="font-size: 14px; margin-bottom: 6px;">Email</div>
+      <label class="field">
+        <div class="label">email</div>
         <input
           type="email"
           name="email"
           required
           autocomplete="email"
-          style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ddd;"
+          class="input"
         />
       </label>
 
-      <label>
-        <div style="font-size: 14px; margin-bottom: 6px;">What are you working on?</div>
-        <textarea
-          name="message"
-          required
-          rows="6"
-          style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ddd; resize: vertical;"
-        ></textarea>
+      <label class="field">
+        <div class="label">what are you working on?</div>
+        <textarea name="message" required rows="6" class="textarea"></textarea>
       </label>
 
       <!-- simple spam deterrent (bots fill hidden fields) -->
-      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+      <input
+        type="text"
+        name="_gotcha"
+        style="display:none"
+        tabindex="-1"
+        autocomplete="off"
+      />
 
       <!-- where to redirect after submit -->
       <input type="hidden" name="_redirect" value="/contact/thanks" />
 
-      <button
-        type="submit"
-        style="padding: 12px 14px; border-radius: 10px; border: 1px solid #111; background:#111; color:#fff; cursor:pointer;"
-      >
-        Send
-      </button>
+      <button type="submit" class="button">send</button>
 
-      <p style="font-size: 13px; opacity:.7;">
-        Prefer email? <a href="mailto:pietrofranciscosta@gmail.com">pietrofranciscosta@gmail.com</a>
+      <p class="meta">
+        Prefer email? <a class="mail" href="mailto:pietrofranciscosta@gmail.com"
+          >pietrofranciscosta@gmail.com</a
+        >
       </p>
     </form>
-  </body>
-</html>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    min-height: 100vh;
+    padding: 200px 20px 64px; /* top padding accounts for fixed header */
+    max-width: 700px;
+    margin: 0 auto;
+    background: #000;
+    color: #fff;
+  }
+
+  h1 {
+    margin: 0 0 14px;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+  }
+
+  .lede {
+    margin: 0 0 26px;
+    max-width: 64ch;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .form {
+    display: grid;
+    gap: 14px;
+    max-width: 720px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .label {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-size: 13px;
+    opacity: 0.75;
+    text-transform: lowercase;
+    letter-spacing: -0.01em;
+  }
+
+  .input,
+  .textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+    outline: none;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  .input:focus,
+  .textarea:focus {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .button {
+    margin-top: 6px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    cursor: pointer;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    text-transform: lowercase;
+    letter-spacing: -0.01em;
+  }
+
+  .button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .meta {
+    margin: 10px 0 0;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .mail {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

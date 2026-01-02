@@ -79,13 +79,44 @@ function makeGridTarget(N, width = 3.2, height = 1.4) {
   return out;
 }
 
-function randn() {
+function xmur3(str) {
+  // string -> 32-bit seed
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return (h ^= h >>> 16) >>> 0;
+  };
+}
+
+function mulberry32(a) {
+  // 32-bit seed -> rng() in [0,1)
+  return function () {
+    let t = (a += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function createRngFromSeed(seedStr) {
+  const seedFn = xmur3(String(seedStr));
+  return mulberry32(seedFn());
+}
+
+
+function randn(rng = Math.random) {
   // Box–Muller transform (mean 0, stddev 1)
   let u = 0, v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
+
 
 /**
  * Procedural "nebula" target (a soft, clustered 3D cloud) intentionally offset
@@ -95,34 +126,35 @@ function makeNebulaTarget(
   N,
   {
     size,
-    // Offset the nebula into the upper-right quadrant (tweak if you want)
     center = new THREE.Vector3(0, 0, 0),
     radius = Math.min(size.x, size.y) * 0.7,
     depth = Math.min(size.x, size.y) * 0,
     lobes = 6,
+    rng = Math.random, // add this
   }
 ) {
+
   const out = new Float32Array(N * 3);
 
   // Lobe centers clustered around "center"
   const lobeCenters = [];
   const sigmas = [];
   for (let l = 0; l < lobes; l++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = radius * 0.35 * Math.sqrt(Math.random());
+    const a = rng() * Math.PI * 2;
+    const r = radius * 0.35 * Math.sqrt(rng());
     lobeCenters.push(
       new THREE.Vector3(
         center.x + Math.cos(a) * r,
         center.y + Math.sin(a) * r,
-        center.z + (Math.random() - 0.5) * depth * 0.15
+        center.z + (rng() - 0.5) * depth * 0.15
       )
     );
-    sigmas.push(radius * (0.12 + Math.random() * 0.10)); // ~0.12–0.22 * radius
+    sigmas.push(radius * (0.12 + rng() * 0.10)); // ~0.12–0.22 * radius
   }
 
   // Sample a mixture of Gaussians, reject extreme outliers to keep a soft “blob”
   for (let i = 0; i < N; i++) {
-    const l = (Math.random() * lobes) | 0;
+    const l = (rng() * lobes) | 0;
     const c = lobeCenters[l];
     const s = sigmas[l];
 
@@ -342,7 +374,7 @@ function mortonSortPositions(pos) {
 export async function mountPointCloudHero({
   canvasId = "pc-canvas",
   wrapId = "pc-wrap",
-  autoStartDelayMs = 4000,}  = {}) 
+  autoStartDelayMs = 1000,}  = {}) 
   
   {
   const canvas = document.getElementById(canvasId);
@@ -370,6 +402,19 @@ export async function mountPointCloudHero({
     characterReady: false,
     characterReadyAt: 0,
   };
+const params = new URLSearchParams(window.location.search);
+const seedParam = params.get("seed");
+
+// Priority: URL seed (if provided) -> localStorage -> default constant
+const stored = window.localStorage.getItem("phroNebulaSeed");
+const nebulaSeed = seedParam ?? stored ?? "1";
+
+
+// If URL seed is provided, persist it so you can remove the query param later
+if (seedParam) window.localStorage.setItem("phroNebulaSeed", seedParam);
+
+const nebulaRng = createRngFromSeed(nebulaSeed);
+console.log("[PCH] nebula seed:", nebulaSeed);
 
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -558,7 +603,7 @@ export async function mountPointCloudHero({
           } else {
             uiDelayTimer = window.setTimeout(() => {
               if (!state.disposed) window.dispatchEvent(new CustomEvent("ui-ready"));
-            }, 2000);
+            }, 250);
           }
         }
       }
@@ -613,7 +658,8 @@ export async function mountPointCloudHero({
         geom.boundingBox.getSize(size);
 
         // Procedural nebula target (intentionally offset so the center stays clean for HTML nav)
-        const nebula = makeNebulaTarget(N, { size });
+        const nebula = makeNebulaTarget(N, { size, rng: nebulaRng });
+
 
         // Wobble amplitude scales with the character size (keeps motion subtle at any scale)
         uniforms.uWobbleAmp.value = Math.min(size.x, size.y) * 0.012;

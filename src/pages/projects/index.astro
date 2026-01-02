@@ -1,0 +1,289 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+const projects = [
+  {
+    slug: "project-one",
+    title: "pietrocosta.com",
+    meta: "web",
+    year: "2024",
+    thumb: "/previews/project-one.png",
+  },
+  {
+    slug: "project-two",
+    title: "luquerstreet.org",
+    meta: "web / logo design",
+    year: "2024",
+    thumb: "/previews/project-two.png",
+  },
+  {
+    slug: "project-three",
+    title: "whitespaceprojectsnapoli.com",
+    meta: "web / design",
+    year: "2025",
+    thumb: "/previews/project-three.png",
+  },
+  {
+    slug: "project-four",
+    title: "bacasitaly.org",
+    meta: "web / logo design",
+    year: "2024-ongoing",
+    thumb: "/previews/project-four.png",
+  },
+];
+---
+
+<Layout title="phro.design — projects" description="Selected projects.">
+  <main class="page">
+    <header class="intro">
+      <h1>projects</h1>
+      <p class="lede">Selected work across web, motion, and vfx.</p>
+    </header>
+
+    <section class="grid" aria-label="project list">
+      {
+        projects.map((p, i) => (
+          <a
+            class="card"
+            href={`/projects/${p.slug}/`}
+            aria-label={`Open ${p.title}`}
+          >
+            <div class="thumb" style={`--i:${i};`}>
+              <img
+                src={p.thumb}
+                alt={`${p.title} thumbnail`}
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="overlay" aria-hidden="true" />
+              <div class="frame" aria-hidden="true" />
+            </div>
+
+            <div class="meta">
+              <div class="row">
+                <span class="title">{p.title}</span>
+                <span class="year">{p.year}</span>
+              </div>
+              <div class="sub">{p.meta}</div>
+            </div>
+          </a>
+        ))
+      }
+    </section>
+  </main>
+
+  <style>
+    /* You said you’re controlling padding per page; keep it here */
+    .page {
+      min-height: 100vh;
+      padding: 200px 20px 80px;
+      max-width: 1100px; /* <- this is the “content width” knob for this page */
+      margin: 0 auto;
+      background: #000;
+      color: #fff;
+    }
+
+    .intro {
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 70ch;
+      line-height: 1.6;
+      opacity: 0.78;
+      font-size: 14px;
+    }
+
+    /* Hybrid: list-like on mobile, grid on desktop */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 760px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+      outline: none;
+    }
+
+    .thumb {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform: translateY(0);
+      transition:
+        transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        background 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.92;
+      transform: scale(1);
+      transition:
+        transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Geometric/parametric overlay: grid + subtle contour bands */
+    .overlay {
+      position: absolute;
+      inset: -20%;
+      opacity: 0;
+      transform: translateY(8px);
+      transition:
+        opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.1) 0px,
+          rgba(255, 255, 255, 0.1) 1px,
+          transparent 1px,
+          transparent 14px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.08) 0px,
+          rgba(255, 255, 255, 0.08) 1px,
+          transparent 1px,
+          transparent 18px
+        ),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.06) 0px,
+          rgba(255, 255, 255, 0.06) 2px,
+          transparent 2px,
+          transparent 22px
+        );
+      mix-blend-mode: screen;
+      filter: blur(0.2px);
+    }
+
+    /* Quiet frame/corner marks */
+    .frame {
+      position: absolute;
+      inset: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+
+    .meta {
+      display: grid;
+      gap: 4px;
+      padding: 0 2px;
+    }
+
+    .row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .title,
+    .year,
+    .sub {
+      font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      text-transform: lowercase;
+      letter-spacing: -0.01em;
+    }
+
+    .title {
+      font-size: 14px;
+      opacity: 0.92;
+    }
+
+    .year {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .sub {
+      font-size: 12px;
+      opacity: 0.6;
+      line-height: 1.4;
+    }
+
+    /* Hover + focus: lift, reveal overlay, slight zoom */
+    .card:hover .thumb,
+    .card:focus-visible .thumb {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .card:hover .thumb img,
+    .card:focus-visible .thumb img {
+      transform: scale(1.03);
+      opacity: 0.98;
+    }
+
+    .card:hover .overlay,
+    .card:focus-visible .overlay {
+      opacity: 0.55;
+      transform: translateY(0);
+    }
+
+    .card:hover .frame,
+    .card:focus-visible .frame {
+      opacity: 1;
+    }
+
+    .card:focus-visible {
+      outline: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .thumb,
+      .thumb img,
+      .overlay,
+      .frame {
+        transition: none !important;
+      }
+    }
+  </style>
+</Layout>
