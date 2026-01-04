@@ -11,26 +11,13 @@ import viewerScriptUrl from "../../../scripts/lab-viewer.js?url";
 
     <div
       class="online_3d_viewer viewer"
-      data-model="/models/Guitar.glb"
+      data-model="/models/test.glb"
       aria-label="3d model viewer"
     ></div>
   </main>
 
-  <script type="module" src={viewerScriptUrl}>
-  import { Init3DViewerElements } from "online-3d-viewer";
+<script type="module" src={viewerScriptUrl}></script>
 
-  window.addEventListener("DOMContentLoaded", () => {
-    // Online3DViewer supports reading model URLs from data attributes
-    // We map data-model -> model attribute before initialization
-    document
-      .querySelectorAll(".online_3d_viewer[data-model]")
-      .forEach((el) => {
-        el.setAttribute("model", el.getAttribute("data-model"));
-      });
-
-    Init3DViewerElements();
-  });
-</script>
 
 </Layout>
 
