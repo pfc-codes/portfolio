@@ -1,0 +1,74 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import viewerScriptUrl from "../../../scripts/lab-viewer.js?url";
+
+---
+
+<Layout title="phro.design — viewer" description="Internal 3D viewer test.">
+  <main class="page">
+    <h1>viewer</h1>
+    <p class="lede">internal tooling. not linked.</p>
+
+    <div
+      class="online_3d_viewer viewer"
+      data-model="/models/Guitar.glb"
+      aria-label="3d model viewer"
+    ></div>
+  </main>
+
+  <script type="module" src={viewerScriptUrl}>
+  import { Init3DViewerElements } from "online-3d-viewer";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    // Online3DViewer supports reading model URLs from data attributes
+    // We map data-model -> model attribute before initialization
+    document
+      .querySelectorAll(".online_3d_viewer[data-model]")
+      .forEach((el) => {
+        el.setAttribute("model", el.getAttribute("data-model"));
+      });
+
+    Init3DViewerElements();
+  });
+</script>
+
+</Layout>
+
+<style>
+  .page {
+    min-height: 100vh;
+    padding: 150px 20px 64px;
+    max-width: 980px;
+    margin: 0 auto;
+    background: #000;
+    color: #fff;
+  }
+
+  h1 {
+    margin: 0 0 14px;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+  }
+
+  .lede {
+    margin: 0 0 22px;
+    max-width: 64ch;
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+
+  /* Viewer container: no fancy UI systems, just a stable frame */
+  .viewer {
+    width: 100%;
+    height: min(68vh, 720px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #000;
+    overflow: hidden;
+  }
+</style>

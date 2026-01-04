@@ -39,7 +39,7 @@ const isActive = (href: string): boolean => {
 <style>
   .site-header {
     position: fixed;
-    top: 24px;
+    top: 0px;
     left: 0;
     right: 0;
     z-index: 50;
@@ -47,12 +47,19 @@ const isActive = (href: string): boolean => {
   }
 
   .site-header__inner {
-    display: grid;
-    place-items: center;
-    gap: 10px;
-    padding: 0 16px;
-    pointer-events: auto;
-  }
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  pointer-events: auto;
+
+  /* background */
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+}
+
 
   .site-title {
     color: #fff;

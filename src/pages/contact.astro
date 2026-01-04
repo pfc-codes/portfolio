@@ -1,8 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const FORM_ENDPOINT = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT || "";
-const actionUrl = FORM_ENDPOINT || "https://formspree.io/f/REPLACE_ME";
+const actionUrl = "https://formspree.io/f/mpqwyjld";
+
 ---
 
 <Layout title="phro.design — contact" description="Contact phro.">
@@ -45,7 +45,8 @@ const actionUrl = FORM_ENDPOINT || "https://formspree.io/f/REPLACE_ME";
       />
 
       <!-- where to redirect after submit -->
-      <input type="hidden" name="_redirect" value="/contact/thanks" />
+      <input type="hidden" name="_redirect" value="/contact/thanks/" />
+
 
       <button type="submit" class="button">send</button>
 
@@ -61,7 +62,7 @@ const actionUrl = FORM_ENDPOINT || "https://formspree.io/f/REPLACE_ME";
 <style>
   .page {
     min-height: 100vh;
-    padding: 200px 20px 64px; /* top padding accounts for fixed header */
+    padding: 150px 20px 64px; /* top padding accounts for fixed header */
     max-width: 700px;
     margin: 0 auto;
     background: #000;
