@@ -1,10 +1,8 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import viewerScriptUrl from "../../../scripts/lab-viewer.js?url";
-
 ---
 
-<Layout title="phro.design — viewer" description="Internal 3D viewer test.">
+<Layout title="phro.design – viewer" description="Internal 3D viewer test.">
   <main class="page">
     <h1>viewer</h1>
     <p class="lede">internal tooling. not linked.</p>
@@ -16,9 +14,28 @@ import viewerScriptUrl from "../../../scripts/lab-viewer.js?url";
     ></div>
   </main>
 
-<script type="module" src={viewerScriptUrl}></script>
+  <script>
+    import { Init3DViewerElements } from "online-3d-viewer";
 
+    function mountLabViewer() {
+      document.querySelectorAll(".online_3d_viewer[data-model]").forEach((el) => {
+        const dataModel = el.getAttribute("data-model");
+        if (dataModel) {
+          el.setAttribute("model", dataModel);
+        }
+      });
 
+      Init3DViewerElements(() => {
+        console.log("3D viewer initialized");
+      });
+    }
+
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", () => mountLabViewer(), { once: true });
+    } else {
+      mountLabViewer();
+    }
+  </script>
 </Layout>
 
 <style>
