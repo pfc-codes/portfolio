@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>p.h.r.o.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bitcount+Single&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+  </head>
+  <body class="theme-void">
+
+    <!-- ========== LANDING PAGE (/) ========== -->
+    <div id="landing" class="landing">
+      <!-- p.h.r.o. Letter Animation -->
+      <div class="landing-intro" id="landing-intro">
+        <div class="landing-letters">
+          <span class="landing-letter" data-index="0">p</span>
+          <span class="landing-dot" data-index="1">.</span>
+          <span class="landing-letter" data-index="2">h</span>
+          <span class="landing-dot" data-index="3">.</span>
+          <span class="landing-letter" data-index="4">r</span>
+          <span class="landing-dot" data-index="5">.</span>
+          <span class="landing-letter" data-index="6">o</span>
+          <span class="landing-dot" data-index="7">.</span>
+        </div>
+      </div>
+
+      <!-- Full-screen Gaussian Splat background -->
+      <div id="landing-splat-container" class="landing-splat-bg"></div>
+
+      <!-- Text + Buttons overlay (shown after animation) -->
+      <div class="landing-content" id="landing-content">
+        <div class="landing-about">
+          <p class="landing-about-text">I explore how bodies, data, and space can be re-authored into clean systems.</p>
+        </div>
+        <div class="segment-control" id="segment-control">
+          <div class="segment-indicator"></div>
+          <button class="segment active" id="btn-full" data-mode="full">FULL 3D</button>
+          <button class="segment" id="btn-standard" data-mode="standard">STANDARD</button>
+        </div>
+        <span class="segment-label">SELECT MODE</span>
+      </div>
+    </div>
+
+    <!-- ========== LITE SITE NAV ========== -->
+    <nav id="lite-nav" class="global-nav hidden">
+      <div class="nav-inner">
+        <a href="/" class="nav-logo">p.h.r.o.</a>
+        <div class="nav-links">
+          <a href="/lite" class="nav-link" data-link data-nav="home">Home</a>
+          <a href="/lite/work" class="nav-link" data-link data-nav="work">Work</a>
+          <a href="/lite/lab" class="nav-link" data-link data-nav="lab">Lab</a>
+          <a href="/lite/contact" class="nav-link" data-link data-nav="contact">Contact</a>
+        </div>
+        <button id="mode-toggle-lite" class="mode-toggle" aria-label="Switch to full mode">
+          <span class="mode-label">Full Mode</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ========== 3D SITE NAV (minimal) ========== -->
+    <nav id="full-nav" class="global-nav hidden">
+      <div class="nav-inner">
+        <span class="nav-logo">p.h.r.o.</span>
+        <div class="nav-links"></div>
+        <button id="mode-toggle-full" class="mode-toggle" aria-label="Switch to lite mode">
+          <span class="mode-label">Lite Mode</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ========== LITE SITE CONTENT ========== -->
+    <main id="app" class="app-container hidden"></main>
+
+    <!-- Overlay Panel (reusable for Work/Lab — Lite Mode) -->
+    <div id="overlay-panel" class="overlay-panel" aria-hidden="true">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-content">
+        <button class="overlay-close" aria-label="Close panel">&times;</button>
+        <div id="overlay-inner"></div>
+      </div>
+    </div>
+
+    <!-- ========== FULL 3D MODE ========== -->
+
+    <!-- WebGL Canvas (3D site) -->
+    <canvas id="webgl" style="display:none;"></canvas>
+
+    <!-- Scroll Spacer -->
+    <div id="scroll-spacer" style="display:none;"></div>
+
+    <!-- Full Mode HTML Overlays -->
+    <div id="full-overlays" style="display:none;">
+      <div class="full-overlay" id="overlay-intro">
+        <div class="bio-box">
+          <h1 class="bio-name">PIETRO FRANCIS</h1>
+          <p class="bio-text">I explore how bodies, data, and space can be re-authored into clean systems.</p>
+        </div>
+      </div>
+
+      <div class="full-overlay" id="overlay-works">
+        <div class="works-hint"><span>Click a project to explore</span></div>
+        <div class="works-detail-panel" id="works-detail-panel" style="display:none;">
+          <button class="panel-close" aria-label="Close">&times;</button>
+          <div id="works-detail-inner"></div>
+        </div>
+      </div>
+
+      <div class="full-overlay" id="overlay-labs">
+        <div class="lab-portal-prompt" id="lab-portal-prompt">
+          <p class="lab-portal-text">A sterile environment for constraint-based experiments, specimens, and technical studies.</p>
+          <button class="lab-enter-btn" id="lab-enter-btn">ENTER LAB</button>
+        </div>
+        <div class="lab-specimens" id="lab-specimens" style="display:none;">
+          <span class="lab-specimens-hint">Click a specimen to inspect</span>
+        </div>
+        <div class="specimen-detail-panel" id="specimen-detail-panel" style="display:none;">
+          <button class="panel-close" aria-label="Close">&times;</button>
+          <div id="specimen-detail-inner"></div>
+        </div>
+      </div>
+
+      <div class="full-overlay" id="overlay-contact">
+        <div class="contact-terminal">
+          <div class="terminal-header">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">terminal</span>
+          </div>
+          <div class="terminal-body" id="terminal-body">
+            <div class="terminal-line" id="terminal-output"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Mode Nav Dots -->
+    <div class="nav-dots" id="full-nav-dots" style="display:none;">
+      <button class="nav-dot active" data-chapter="0" aria-label="Intro">
+        <span class="nav-label">Intro</span>
+      </button>
+      <button class="nav-dot" data-chapter="1" aria-label="Works">
+        <span class="nav-label">Works</span>
+      </button>
+      <button class="nav-dot" data-chapter="2" aria-label="Labs">
+        <span class="nav-label">Labs</span>
+      </button>
+      <button class="nav-dot" data-chapter="3" aria-label="Contact">
+        <span class="nav-label">Contact</span>
+      </button>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

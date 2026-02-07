@@ -1,0 +1,270 @@
+/* ============================================================================
+   LAB THEME STYLES — Dark Lab page (black bg, white elements)
+   ============================================================================ */
+
+.lab-page {
+  min-height: 100vh;
+  padding: calc(60px + var(--section-padding)) var(--gutter) var(--section-padding);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.lab-header {
+  max-width: var(--max-width);
+  margin: 0 auto 3rem;
+}
+
+.lab-kicker {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lab-title {
+  font-family: var(--font-display);
+  font-size: var(--size-h1);
+  font-weight: 700;
+  letter-spacing: var(--ls-tight);
+}
+
+.lab-subtitle {
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ============================================================================
+   SPECIMEN GRID
+   ============================================================================ */
+
+.specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.specimen-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-default);
+}
+
+.specimen-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.specimen-media {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.specimen-media img,
+.specimen-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.specimen-media-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
+
+.specimen-body {
+  padding: 1.25rem;
+}
+
+.specimen-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.specimen-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.specimen-summary {
+  font-size: var(--size-small);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   EXPERIMENT OVERLAY PANEL (Lab theme — now dark)
+   ============================================================================ */
+
+.theme-lab .overlay-content {
+  background: var(--color-bg);
+  border-color: var(--color-hairline);
+}
+
+.theme-lab .overlay-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.experiment-detail {
+  max-width: 100%;
+}
+
+.experiment-media {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.experiment-media img,
+.experiment-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.experiment-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.experiment-title {
+  font-family: var(--font-display);
+  font-size: var(--size-h2);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+.experiment-summary {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  max-width: var(--max-ch);
+}
+
+.experiment-constraints {
+  margin-bottom: 1.5rem;
+}
+
+.experiment-constraints-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.experiment-constraints-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.experiment-constraint {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+.experiment-notes {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-hairline);
+  font-size: var(--size-small);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ============================================================================
+   LAB NAV OVERRIDE — Keep dark theme on lab page
+   ============================================================================ */
+
+.theme-lab .global-nav {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+}
+
+.theme-lab .nav-logo,
+.theme-lab .nav-link {
+  color: var(--color-text);
+}
+
+.theme-lab .nav-link {
+  opacity: 0.6;
+}
+
+.theme-lab .nav-link:hover,
+.theme-lab .nav-link.active {
+  opacity: 1;
+}
+
+.theme-lab .mode-toggle {
+  border-color: var(--color-hairline);
+  color: var(--color-text);
+}
+
+.theme-lab .btn-primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+.theme-lab .btn-primary:hover {
+  background: transparent;
+  color: var(--color-text);
+}
+
+.theme-lab .btn-ghost {
+  border-color: var(--color-hairline);
+  color: var(--color-text);
+}
+
+.theme-lab .btn-ghost:hover {
+  border-color: var(--color-text);
+}
+
+/* ============================================================================
+   RESPONSIVE — LAB
+   ============================================================================ */
+
+@media (max-width: 600px) {
+  .specimen-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Splat Test — Minimal</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    body { background: #000; color: #fff; font-family: monospace; }
+    #status {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+      background: rgba(0,0,0,0.85);
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">loading...</div>
+
+  <script type="module">
+    import * as GaussianSplats3D from '/node_modules/@mkkellogg/gaussian-splats-3d/build/gaussian-splats-3d.module.js';
+
+    const status = document.getElementById('status');
+
+    try {
+      const viewer = new GaussianSplats3D.Viewer({
+        cameraUp: [0, 1, 0],
+        initialCameraPosition: [0, 2, 12],
+        initialCameraLookAt: [0, 0, 0],
+        gpuAcceleratedSort: false,
+        sharedMemoryForWorkers: false,
+        logLevel: 0,
+      });
+
+      status.textContent = 'viewer created, loading splat...';
+
+      viewer.addSplatScene('/models/phro-pfp.splat', {
+        splatAlphaRemovalThreshold: 5,
+        scale: [2.5, 2.5, 2.5],
+      }).then(() => {
+        status.textContent = 'loaded, starting viewer...';
+        console.log('[test] splat loaded, calling start()');
+        viewer.start();
+        status.textContent = 'running! drag to orbit, scroll to zoom.';
+      }).catch((e) => {
+        status.textContent = 'ERROR: ' + e;
+        console.error('[test] error:', e);
+      });
+
+    } catch (e) {
+      status.textContent = 'INIT ERROR: ' + e;
+      console.error('[test] init error:', e);
+    }
+  </script>
+</body>
+</html>

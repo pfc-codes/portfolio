@@ -1,0 +1,12 @@
+Camera position:    0.03798, -0.00825, 0.35526
+Camera look-at:     0.39675, 0.30830, 4.28470
+Camera up:          0.00000, -1.00000, 0.00000
+Camera mode:        Perspective
+Cursor position:   N/A
+FPS:                180
+Rendering::         936045 splats out of 936045 (100.00%)
+Sort time:          9.380 ms
+Render window:      2133 x 1012
+Focal adjustment:   1.000
+Splat scale:        2.200
+Point cloud mode:  true

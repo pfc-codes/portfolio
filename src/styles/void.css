@@ -1,0 +1,569 @@
+/* ============================================================================
+   VOID THEME STYLES — Dark sections (Home, Work, Contact)
+   ============================================================================ */
+
+/* ============================================================================
+   HOME HERO
+   ============================================================================ */
+
+.hero-section {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  padding: calc(60px + var(--section-padding)) var(--gutter) var(--section-padding);
+}
+
+/* Centered hero variant — photo closer to name */
+.hero-centered {
+  grid-template-columns: auto 1fr;
+  justify-items: center;
+  gap: 3rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.hero-centered .hero-portrait {
+  max-width: 320px;
+  width: 100%;
+}
+
+.hero-portrait {
+  position: relative;
+  aspect-ratio: 3/4;
+  max-height: 70vh;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.hero-portrait img,
+.hero-portrait video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Placeholder gradient when no image */
+.hero-portrait-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    #1a1a2e 0%,
+    #16213e 25%,
+    #0f3460 50%,
+    #533483 75%,
+    #e94560 100%
+  );
+}
+
+.hero-content {
+  max-width: 480px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: var(--size-h1);
+  font-weight: 700;
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+  font-size: var(--size-body);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  max-width: var(--max-ch);
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* ============================================================================
+   SIGIL RAIL (Work Preview on Home)
+   ============================================================================ */
+
+.sigil-section {
+  padding: var(--section-padding) 0;
+}
+
+.sigil-section .section-header {
+  padding: 0 var(--gutter);
+  margin-bottom: 2rem;
+}
+
+.sigil-rail-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.sigil-rail {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem var(--gutter);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sigil-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.sigil-card {
+  flex: 0 0 auto;
+  width: 200px;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition: transform var(--transition-default);
+}
+
+.sigil-card:hover {
+  transform: translateY(-4px);
+}
+
+.sigil-icon {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--color-hairline);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  transition: background-color var(--transition-default);
+}
+
+.sigil-card:hover .sigil-icon {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sigil-icon svg {
+  width: 60%;
+  height: 60%;
+  fill: var(--color-text);
+  opacity: 0.8;
+}
+
+.sigil-label {
+  font-size: var(--size-small);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.sigil-role {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
+
+.sigil-cta {
+  padding: 0 var(--gutter);
+  margin-top: 2rem;
+}
+
+/* Centered & monochrome variant for home projects */
+.sigil-section--centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sigil-rail--centered {
+  justify-content: center;
+}
+
+.sigil-card--mono .sigil-icon {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sigil-card--mono:hover .sigil-icon {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sigil-card--mono .sigil-icon svg {
+  opacity: 0.5;
+}
+
+.sigil-card--mono .sigil-label,
+.sigil-card--mono .sigil-role {
+  color: var(--color-text-muted);
+}
+
+/* Contact teaser on home (simple, centered) */
+.contact-home-section {
+  padding: var(--section-padding) var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================================
+   LAB PORTAL BLOCK (on Home)
+   ============================================================================ */
+
+.portal-section {
+  padding: var(--section-padding) var(--gutter);
+}
+
+.lab-portal {
+  position: relative;
+  background: #FAFAFA;
+  border-radius: var(--radius-lg);
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Optional grain texture */
+.lab-portal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  pointer-events: none;
+}
+
+.portal-kicker {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--lab-text-muted);
+  margin-bottom: 1rem;
+}
+
+.portal-title {
+  font-family: var(--font-display);
+  font-size: var(--size-h2);
+  font-weight: 700;
+  color: var(--lab-text);
+  margin-bottom: 1rem;
+}
+
+.portal-text {
+  color: var(--lab-text-muted);
+  max-width: 400px;
+  margin-bottom: 2rem;
+}
+
+.portal-cta {
+  background: var(--lab-text);
+  color: var(--lab-bg);
+  border: 1px solid var(--lab-text);
+}
+
+.portal-cta:hover {
+  background: transparent;
+  color: var(--lab-text);
+}
+
+/* ============================================================================
+   WORK PAGE
+   ============================================================================ */
+
+.work-page {
+  min-height: 100vh;
+  padding-top: 80px;
+}
+
+.work-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: calc(100vh - 80px);
+}
+
+.project-selector {
+  border-right: 1px solid var(--color-hairline);
+  padding: 2rem 0;
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.project-item {
+  display: block;
+  width: 100%;
+  padding: 1.25rem var(--gutter);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-default);
+  color: inherit;
+}
+
+.project-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.project-item.active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.project-item-title {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.project-item-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
+
+.project-panel {
+  padding: 2rem var(--gutter);
+  position: relative;
+}
+
+/* Sigil watermark */
+.project-panel::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.project-media {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16/9;
+  background: var(--color-hairline);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.project-media img,
+.project-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-header {
+  margin-bottom: 1.5rem;
+}
+
+.project-title {
+  font-family: var(--font-display);
+  font-size: var(--size-h2);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.project-role {
+  font-size: var(--size-small);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
+
+.project-summary {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  max-width: var(--max-ch);
+}
+
+.project-bullets {
+  list-style: none;
+  margin-bottom: 1.5rem;
+}
+
+.project-bullets li {
+  position: relative;
+  padding-left: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.project-bullets li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--color-hairline);
+}
+
+.project-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-tool {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--color-hairline);
+  border-radius: var(--radius-sm);
+}
+
+.project-links {
+  display: flex;
+  gap: 1rem;
+}
+
+/* ============================================================================
+   CONTACT PAGE (Simple)
+   ============================================================================ */
+
+.contact-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(60px + var(--section-padding)) var(--gutter) var(--section-padding);
+}
+
+.contact-simple {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+
+.contact-heading {
+  font-family: var(--font-display);
+  font-size: var(--size-h1);
+  font-weight: 700;
+  letter-spacing: var(--ls-tight);
+  margin-bottom: 3rem;
+}
+
+.contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--color-hairline);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity var(--transition-default);
+}
+
+.contact-item:last-child {
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.contact-item:hover {
+  opacity: 0.7;
+}
+
+.contact-item-label {
+  font-size: var(--size-small);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--color-text-muted);
+}
+
+.contact-item-value {
+  font-size: var(--size-body);
+  color: var(--color-text);
+}
+
+.contact-ig-link {
+  gap: 0.75rem;
+  justify-content: flex-start;
+}
+
+.contact-ig-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.contact-ig-link .contact-item-label {
+  color: var(--color-text);
+}
+
+/* ============================================================================
+   RESPONSIVE — VOID SECTIONS
+   ============================================================================ */
+
+@media (max-width: 900px) {
+  .hero-section,
+  .hero-centered {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .hero-portrait,
+  .hero-centered .hero-portrait {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .hero-ctas {
+    justify-content: center;
+  }
+  
+  .work-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-selector {
+    position: relative;
+    top: 0;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-hairline);
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+  }
+  
+  .project-item {
+    flex: 0 0 auto;
+    padding: 1rem 1.5rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .sigil-card {
+    width: 160px;
+  }
+
+  .lab-portal {
+    padding: 3rem 2rem;
+  }
+}

@@ -1,0 +1,493 @@
+/* ============================================================================
+   FULL MODE STYLES — 3D scroll experience overlays and UI
+   ============================================================================ */
+
+#webgl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#webgl.visible {
+  opacity: 1;
+}
+
+/* -------------------------
+   Bio Box (Intro section)
+------------------------- */
+.bio-box {
+  position: fixed;
+  left: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 380px;
+  z-index: 15;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.bio-box.visible {
+  opacity: 1;
+}
+
+.bio-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+.bio-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+/* -------------------------
+   Nav Dots
+------------------------- */
+.nav-dots {
+  position: fixed;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.nav-dots.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-dot {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.nav-dot::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--color-text);
+  transform: scale(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-dot:hover {
+  border-color: var(--color-text);
+}
+
+.nav-dot.active::before {
+  transform: scale(1);
+}
+
+.nav-dot.active {
+  border-color: var(--color-text);
+}
+
+.nav-label {
+  position: absolute;
+  right: calc(100% + 1rem);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  pointer-events: none;
+}
+
+.nav-dot:hover .nav-label,
+.nav-dot.active .nav-label {
+  opacity: 1;
+}
+
+.nav-dot.active .nav-label {
+  color: var(--color-text);
+}
+
+/* -------------------------
+   Scroll Spacer
+------------------------- */
+#scroll-spacer {
+  position: relative;
+  width: 100%;
+  height: 400vh;
+  pointer-events: none;
+}
+
+/* -------------------------
+   Full Mode Overlays
+------------------------- */
+#full-overlays {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.full-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.full-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Intro overlay bio-box is already styled above */
+#overlay-intro .bio-box {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Works Chapter */
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.works-hint {
+  position: fixed;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.works-detail-panel,
+.specimen-detail-panel {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%) translateX(20px);
+  width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.works-detail-panel.visible,
+.specimen-detail-panel.visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.panel-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.panel-close:hover {
+  color: var(--color-text);
+}
+
+/* Project detail inside panel */
+.project-detail-full .project-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.project-detail-full .project-role {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.project-detail-full .project-summary {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  color: var(--color-text);
+}
+
+.project-detail-full .project-bullets {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.25rem;
+}
+
+.project-detail-full .project-bullets li {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  padding-left: 1rem;
+  position: relative;
+}
+
+.project-detail-full .project-bullets li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--color-text-muted);
+}
+
+.project-detail-full .project-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.tool-tag,
+.constraint-tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+}
+
+.project-detail-full .project-links a {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  transition: border-color 0.2s;
+}
+
+.project-detail-full .project-links a:hover {
+  border-color: var(--color-text);
+}
+
+/* Specimen detail */
+.specimen-detail-full .specimen-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.specimen-detail-full .specimen-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.specimen-detail-full .specimen-summary {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  color: var(--color-text);
+}
+
+.specimen-detail-full .specimen-constraints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.specimen-detail-full .specimen-notes {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+/* Labs Chapter */
+.lab-portal-prompt {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  max-width: 420px;
+}
+
+.lab-portal-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+}
+
+.lab-enter-btn {
+  background: none;
+  border: 1px solid var(--color-text);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  padding: 0.8rem 2.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.lab-enter-btn:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.lab-specimens-hint {
+  position: fixed;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* -------------------------
+   Contact Terminal
+------------------------- */
+.contact-terminal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 480px;
+  max-width: calc(100vw - 4rem);
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  pointer-events: auto;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.terminal-dot:nth-child(1) { background: #ff5f56; }
+.terminal-dot:nth-child(2) { background: #ffbd2e; }
+.terminal-dot:nth-child(3) { background: #27c93f; }
+
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.terminal-body {
+  padding: 1.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  min-height: 200px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.terminal-line-item {
+  min-height: 1.2em;
+}
+
+.terminal-line-item.cmd {
+  color: var(--color-text);
+}
+
+.terminal-line-item.response {
+  color: var(--color-text-muted);
+  padding-left: 0.5rem;
+}
+
+.terminal-link {
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: border-color 0.2s;
+}
+
+.terminal-link:hover {
+  border-color: var(--color-text);
+}
+
+/* -------------------------
+   Responsive
+------------------------- */
+@media (max-width: 600px) {
+  .bio-box {
+    left: 1.5rem;
+    right: 1.5rem;
+    max-width: none;
+  }
+
+  .works-detail-panel,
+  .specimen-detail-panel {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+
+  .contact-terminal {
+    width: calc(100vw - 2rem);
+  }
+}
