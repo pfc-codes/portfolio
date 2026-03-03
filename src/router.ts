@@ -7,28 +7,27 @@ export type RouteHandler = () => Promise<string> | string;
 interface Route {
   path: string;
   handler: RouteHandler;
-  theme: 'void' | 'lab';
 }
 
 class Router {
   private routes: Route[] = [];
   private currentPath: string = '/';
   private appContainer: HTMLElement | null = null;
-  private onRouteChange: ((path: string, theme: 'void' | 'lab') => void) | null = null;
+  private onRouteChange: ((path: string) => void) | null = null;
 
   constructor() {
     window.addEventListener('popstate', () => this.handleRoute());
   }
 
-  init(container: HTMLElement, callback?: (path: string, theme: 'void' | 'lab') => void): void {
+  init(container: HTMLElement, callback?: (path: string) => void): void {
     this.appContainer = container;
     this.onRouteChange = callback || null;
-    
+
     // Handle all link clicks
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a[data-link]');
-      
+
       if (link) {
         e.preventDefault();
         const href = link.getAttribute('href');
@@ -42,13 +41,13 @@ class Router {
     this.handleRoute();
   }
 
-  addRoute(path: string, handler: RouteHandler, theme: 'void' | 'lab' = 'void'): void {
-    this.routes.push({ path, handler, theme });
+  addRoute(path: string, handler: RouteHandler): void {
+    this.routes.push({ path, handler });
   }
 
   navigate(path: string): void {
     if (path === this.currentPath) return;
-    
+
     history.pushState(null, '', path);
     this.handleRoute();
   }
@@ -59,22 +58,22 @@ class Router {
 
     // Find matching route
     let route = this.routes.find(r => r.path === path);
-    
-    // Handle work deep links like /lite/work?project=p03
-    if (!route && path.startsWith('/lite/work')) {
-      route = this.routes.find(r => r.path === '/lite/work');
+
+    // Handle work deep links like /work?project=p03
+    if (!route && path.startsWith('/work')) {
+      route = this.routes.find(r => r.path === '/work');
     }
 
-    // Default to lite home if no match
+    // Default to home if no match
     if (!route) {
-      route = this.routes.find(r => r.path === '/lite');
+      route = this.routes.find(r => r.path === '/');
     }
 
     if (!route || !this.appContainer) return;
 
-    // Notify about route change (for theme switching, etc.)
+    // Notify about route change
     if (this.onRouteChange) {
-      this.onRouteChange(path, route.theme);
+      this.onRouteChange(path);
     }
 
     // Fade out current content
@@ -111,9 +110,9 @@ class Router {
       const navKey = link.getAttribute('data-nav');
       let isActive = false;
 
-      if (navKey === 'home' && (path === '/lite' || path === '/')) {
+      if (navKey === 'home' && path === '/') {
         isActive = true;
-      } else if (navKey && path.startsWith(`/lite/${navKey}`)) {
+      } else if (navKey && path.startsWith(`/${navKey}`)) {
         isActive = true;
       }
 

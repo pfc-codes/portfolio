@@ -52,9 +52,9 @@ export function showWorksDetail(projectId: string): void {
       <div class="project-tools">
         ${project.tools.map(t => `<span class="tool-tag">${t}</span>`).join('')}
       </div>
-      ${project.links.length > 0 ? `
+      ${(project.links as Array<{label: string; href: string}>).length > 0 ? `
         <div class="project-links">
-          ${project.links.map(l => `<a href="${l.href}" target="_blank" rel="noopener">${l.label} &rarr;</a>`).join('')}
+          ${(project.links as Array<{label: string; href: string}>).map(l => `<a href="${l.href}" target="_blank" rel="noopener">${l.label} &rarr;</a>`).join('')}
         </div>
       ` : ''}
     </div>
@@ -137,12 +137,6 @@ function playTerminalSequence(): void {
       cls: 'response',
     })),
     { text: '', delay: 3000 + content.contact.links.length * 400 + 200, cls: '' },
-    { text: '> resume', delay: 3000 + content.contact.links.length * 400 + 400, cls: 'cmd' },
-    {
-      text: `<a href="${content.contact.resumeUrl}" target="_blank" rel="noopener" class="terminal-link">Download PDF &darr;</a>`,
-      delay: 3000 + content.contact.links.length * 400 + 800,
-      cls: 'response',
-    },
   ];
 
   for (const line of lines) {

@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code
+.claude/
+
+# Project notes (private)
+*.txt
+context.md
+CLAUDE_INSTRUCTIONS.md
+session-notes.md

@@ -7,130 +7,94 @@
     "ctaTertiary": { "label": "Contact", "href": "/contact" }
   },
   "work": {
-    "heading": "Selected Client Work",
-    "subheading": "5 projects • curated"
+    "heading": "Work",
+    "subheading": "Selected projects"
   },
   "lab": {
     "heading": "Lab",
     "subheading": "Experiments • specimens • constraints"
   },
-  "contact": {
-    "heading": "Terminal",
-    "hint": "Click a command or type it."
-  },
   "projects": [
     {
-      "id": "p01",
-      "title": "Project 01",
+      "id": "websites",
+      "title": "Websites",
       "year": "2024",
-      "roleLine": "Creative Direction / 3D Design",
-      "summary": "Immersive brand experience translating physical retail into a navigable digital space.",
-      "bullets": [
-        "Led visual direction across 3D and motion",
-        "Developed custom WebGL interaction system",
-        "Optimized for cross-device performance"
+      "roleLine": "Design / Development",
+      "summary": "Design-driven websites built for creative practices and cultural spaces.",
+      "items": [
+        {
+          "title": "pietrocosta.com",
+          "href": "https://pietrocosta.com"
+        },
+        {
+          "title": "whitespaceprojectsnapoli.com",
+          "href": "https://whitespaceprojectsnapoli.com"
+        },
+        {
+          "title": "bacasitaly.org",
+          "href": "https://bacasitaly.org/about"
+        }
       ],
-      "tools": ["Three.js", "Blender", "GSAP"],
-      "media": [{ "type": "image", "src": "/media/p01-hero.webp", "alt": "Project 01 hero" }],
-      "links": [{ "label": "View Live", "href": "#" }]
-    },
-    {
-      "id": "p02",
-      "title": "Project 02",
-      "year": "2024",
-      "roleLine": "3D Animation / Rendering",
-      "summary": "Product visualization campaign featuring photorealistic materials and cinematic lighting.",
-      "bullets": [
-        "Created 12 hero renders for launch",
-        "Developed shader library for brand materials",
-        "Directed post-production pipeline"
-      ],
-      "tools": ["Cinema 4D", "Octane", "After Effects"],
-      "media": [{ "type": "image", "src": "/media/p02-hero.webp", "alt": "Project 02 hero" }],
+      "bullets": [],
+      "tools": [],
+      "media": [],
       "links": []
     },
     {
-      "id": "p03",
-      "title": "Project 03",
-      "year": "2023",
-      "roleLine": "Web Development / Design",
-      "summary": "Editorial platform redesign with custom CMS integration and motion-first interactions.",
-      "bullets": [
-        "Architected component-based design system",
-        "Implemented page transitions and scroll effects",
-        "Integrated headless CMS workflow"
-      ],
-      "tools": ["Next.js", "Sanity", "Framer Motion"],
-      "media": [{ "type": "image", "src": "/media/p03-hero.webp", "alt": "Project 03 hero" }],
-      "links": [{ "label": "View Live", "href": "#" }]
-    },
-    {
-      "id": "p04",
-      "title": "Project 04",
-      "year": "2023",
-      "roleLine": "Data Visualization / Development",
-      "summary": "Interactive data dashboard transforming complex datasets into intuitive visual narratives.",
-      "bullets": [
-        "Designed visualization language for financial data",
-        "Built real-time data streaming integration",
-        "Created accessible chart components"
-      ],
-      "tools": ["D3.js", "React", "Node.js"],
-      "media": [{ "type": "image", "src": "/media/p04-hero.webp", "alt": "Project 04 hero" }],
+      "id": "renders",
+      "title": "Artist Renderings",
+      "year": "2024",
+      "roleLine": "3D Visualization",
+      "summary": "Photorealistic and stylized architectural and artistic renderings.",
+      "items": [],
+      "bullets": [],
+      "tools": [],
+      "media": [],
       "links": []
-    },
-    {
-      "id": "p05",
-      "title": "Project 05",
-      "year": "2022",
-      "roleLine": "Motion Design / Brand",
-      "summary": "Brand identity system with generative motion elements for digital and environmental applications.",
-      "bullets": [
-        "Developed parametric logo animation system",
-        "Created motion guidelines documentation",
-        "Produced launch campaign assets"
-      ],
-      "tools": ["After Effects", "Houdini", "Figma"],
-      "media": [{ "type": "image", "src": "/media/p05-hero.webp", "alt": "Project 05 hero" }],
-      "links": [{ "label": "Case Study", "href": "#" }]
     }
   ],
   "experiments": [
     {
       "id": "e01",
-      "title": "Depth → Point Cloud",
-      "label": "SPECIMEN E01 • REALTIME LOD",
-      "summary": "Depth-map derived point cloud study exploring the threshold between form and dispersion. Real-time LOD system maintains performance across varying point densities.",
-      "constraints": ["Loop 6s", "LOD enabled", "Single concept"],
-      "media": [{ "type": "image", "src": "/media/e01.webp", "poster": "/media/e01-poster.jpg", "alt": "Experiment E01" }],
-      "notes": "Point count dynamically adjusts based on camera distance and device capability."
+      "title": "Depth Map Displacement",
+      "label": "SPECIMEN E01 • DEPTH",
+      "summary": "Depth-map derived displacement study exploring the threshold between flat image and volumetric form through real-time vertex manipulation.",
+      "constraints": [],
+      "media": [],
+      "notes": ""
     },
     {
       "id": "e02",
-      "title": "Point Sorting Morph",
-      "label": "SPECIMEN E02 • ORDERED DISPERSION",
-      "summary": "Investigating emergent order from chaos through deterministic sorting algorithms applied to particle systems. Each frame represents a step toward or away from entropy.",
-      "constraints": ["Deterministic seed", "GPU-friendly output"],
-      "media": [{ "type": "image", "src": "/media/e02.webp", "alt": "Experiment E02" }],
+      "title": "3D Gaussian Splatting",
+      "label": "SPECIMEN E02 • 3DGS",
+      "summary": "Experiments with 3D Gaussian splat capture and rendering — exploring real-time volumetric reconstruction from photogrammetry data.",
+      "constraints": [],
+      "media": [],
       "notes": ""
     },
     {
       "id": "e03",
-      "title": "Volumetric Slice",
-      "label": "SPECIMEN E03 • STERILE SCAN",
-      "summary": "High-key scan aesthetic exploring slice-based composition. Forms are revealed through sequential planar cuts, suggesting medical imaging and archaeological cross-sections.",
-      "constraints": ["Off-white world", "Soft shadows"],
-      "media": [{ "type": "image", "src": "/media/e03.webp", "alt": "Experiment E03" }],
+      "title": "Particle Morphing",
+      "label": "SPECIMEN E03 • PARTICLES",
+      "summary": "Particle systems driven by sorting and morphing algorithms — investigating emergent form through deterministic transitions between states.",
+      "constraints": [],
+      "media": [],
+      "notes": ""
+    },
+    {
+      "id": "e04",
+      "title": "Audio Visual Effects",
+      "label": "SPECIMEN E04 • AV",
+      "summary": "Audio-reactive visual systems translating sound data into real-time generative visuals and spatial compositions.",
+      "constraints": [],
+      "media": [],
       "notes": ""
     }
   ],
   "contact": {
-    "email": "pietro@domain.com",
+    "email": "pietrofranciscosta@gmail.com",
     "links": [
-      { "label": "Instagram", "href": "https://instagram.com" },
-      { "label": "GitHub", "href": "https://github.com" },
-      { "label": "LinkedIn", "href": "https://linkedin.com" }
-    ],
-    "resumeUrl": "/resume.pdf"
+      { "label": "Instagram", "href": "https://instagram.com/p_h_r_o_" }
+    ]
   }
 }

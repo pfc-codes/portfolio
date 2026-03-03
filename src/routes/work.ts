@@ -1,5 +1,5 @@
 // ============================================================================
-// WORK ROUTE — Client projects with selector + panel layout
+// WORK ROUTE — Project cards with overlay detail
 // ============================================================================
 
 import content from '../content/content.json';
@@ -8,68 +8,77 @@ import { state } from '../state';
 const { projects } = content;
 
 export function renderWork(): string {
-  const currentState = state.getState();
-  const activeId = new URLSearchParams(window.location.search).get('project') || currentState.activeProjectId;
-  
   return `
     <div class="work-page">
-      <div class="work-layout">
-        <!-- Project Selector (Left) -->
-        <nav class="project-selector" aria-label="Project list">
-          ${projects.map(project => `
-            <button 
-              class="project-item ${project.id === activeId ? 'active' : ''}" 
-              data-project-select="${project.id}"
-              aria-pressed="${project.id === activeId}"
-            >
-              <div class="project-item-title">${project.title}</div>
-              <div class="project-item-meta">${project.roleLine} • ${project.year}</div>
-            </button>
-          `).join('')}
-        </nav>
+      <div class="grid-container">
+        <header class="work-header">
+          <span class="kicker">Portfolio</span>
+          <h1 class="h1">Work</h1>
+        </header>
 
-        <!-- Project Panel (Right) -->
-        <div class="project-panel" id="project-panel">
-          ${renderProjectPanel(activeId)}
+        <div class="work-grid">
+          ${projects.map(project => `
+            <article class="work-card" data-project="${project.id}" tabindex="0" role="button" aria-label="View ${project.title}">
+              <div class="work-card-image">
+                <span class="work-card-id">${project.id.toUpperCase()}</span>
+              </div>
+              <div class="work-card-body">
+                <h2 class="work-card-title">${project.title}</h2>
+                <span class="work-card-meta">${project.roleLine}</span>
+              </div>
+            </article>
+          `).join('')}
         </div>
       </div>
     </div>
   `;
 }
 
-function renderProjectPanel(projectId: string): string {
-  const project = projects.find(p => p.id === projectId) || projects[0];
-  
+function renderProjectOverlay(projectId: string): string {
+  const project = projects.find(p => p.id === projectId);
+  if (!project) return '';
+
   return `
-    <article class="project-detail" data-project-id="${project.id}">
-      <div class="project-media">
-        <div class="specimen-media-placeholder">Media Placeholder</div>
+    <article class="project-detail">
+      <div class="project-detail-media">
+        <span class="project-detail-id">${project.id.toUpperCase()}</span>
       </div>
-      
-      <header class="project-header">
-        <h1 class="project-title">${project.title}</h1>
-        <p class="project-role">${project.roleLine} • ${project.year}</p>
+
+      <header class="project-detail-header">
+        <h2 class="h2">${project.title}</h2>
+        <span class="project-detail-meta">${project.roleLine}</span>
       </header>
-      
-      <p class="project-summary">${project.summary}</p>
-      
+
+      <p class="project-detail-summary">${project.summary}</p>
+
+      ${project.items && project.items.length ? `
+        <div class="project-detail-items">
+          ${project.items.map(item => `
+            <a href="${item.href}" class="project-detail-item" target="_blank" rel="noopener">
+              <span class="project-detail-item-title">${item.title}</span>
+              <span class="project-detail-item-arrow">&nearr;</span>
+            </a>
+          `).join('')}
+        </div>
+      ` : ''}
+
       ${project.bullets.length ? `
-        <ul class="project-bullets">
+        <ul class="project-detail-bullets">
           ${project.bullets.map(b => `<li>${b}</li>`).join('')}
         </ul>
       ` : ''}
-      
+
       ${project.tools.length ? `
-        <div class="project-tools">
-          ${project.tools.map(t => `<span class="project-tool">${t}</span>`).join('')}
+        <div class="project-detail-tools">
+          ${project.tools.map(t => `<span class="tool-tag">${t}</span>`).join('')}
         </div>
       ` : ''}
-      
-      ${project.links.length ? `
-        <div class="project-links">
-          ${project.links.map(link => `
+
+      ${(project.links as Array<{label: string; href: string}>).length ? `
+        <div class="project-detail-links">
+          ${(project.links as Array<{label: string; href: string}>).map(link => `
             <a href="${link.href}" class="btn btn-ghost" target="_blank" rel="noopener">
-              ${link.label} ↗
+              ${link.label} &nearr;
             </a>
           `).join('')}
         </div>
@@ -79,45 +88,54 @@ function renderProjectPanel(projectId: string): string {
 }
 
 export function initWorkInteractions(): void {
-  const selector = document.querySelector('.project-selector');
-  const panel = document.getElementById('project-panel');
+  const grid = document.querySelector('.work-grid');
+  const overlay = document.getElementById('overlay-panel');
+  const overlayInner = document.getElementById('overlay-inner');
+  const overlayBackdrop = overlay?.querySelector('.overlay-backdrop');
+  const overlayClose = overlay?.querySelector('.overlay-close');
 
-  if (!selector || !panel) return;
+  if (!grid || !overlay || !overlayInner) return;
 
-  selector.addEventListener('click', (e) => {
-    const button = (e.target as HTMLElement).closest('[data-project-select]');
-    if (!button) return;
+  // Check for deep link
+  const urlProject = new URLSearchParams(window.location.search).get('project');
+  if (urlProject) {
+    openProject(urlProject);
+  }
 
-    const projectId = button.getAttribute('data-project-select');
-    if (!projectId) return;
-
-    // Update active state
+  function openProject(projectId: string) {
     state.setActiveProject(projectId);
+    overlayInner!.innerHTML = renderProjectOverlay(projectId);
+    overlay!.classList.add('open');
+    overlay!.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    (overlayClose as HTMLElement)?.focus();
+  }
 
-    // Update URL without navigation
-    const url = new URL(window.location.href);
-    url.searchParams.set('project', projectId);
-    history.replaceState(null, '', url.toString());
+  function closeProject() {
+    overlay!.classList.remove('open');
+    overlay!.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
 
-    // Update button states
-    selector.querySelectorAll('.project-item').forEach(item => {
-      const isActive = item.getAttribute('data-project-select') === projectId;
-      item.classList.toggle('active', isActive);
-      item.setAttribute('aria-pressed', String(isActive));
-    });
-
-    // Fade out panel
-    panel.style.opacity = '0';
-    
-    setTimeout(() => {
-      // Update panel content
-      panel.innerHTML = renderProjectPanel(projectId);
-      
-      // Fade in
-      panel.style.opacity = '1';
-    }, 180);
+  grid.addEventListener('click', (e) => {
+    const card = (e.target as HTMLElement).closest('[data-project]');
+    if (!card) return;
+    const projectId = card.getAttribute('data-project');
+    if (projectId) openProject(projectId);
   });
 
-  // Add transition style
-  panel.style.transition = 'opacity 180ms ease';
+  grid.addEventListener('keydown', (e: Event) => {
+    const ke = e as KeyboardEvent;
+    if (ke.key === 'Enter' || ke.key === ' ') {
+      const card = ke.target as HTMLElement;
+      if (card.hasAttribute('data-project')) {
+        ke.preventDefault();
+        const projectId = card.getAttribute('data-project');
+        if (projectId) openProject(projectId);
+      }
+    }
+  });
+
+  overlayBackdrop?.addEventListener('click', closeProject);
+  overlayClose?.addEventListener('click', closeProject);
 }
