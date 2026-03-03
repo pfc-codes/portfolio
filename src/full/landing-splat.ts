@@ -4,7 +4,7 @@
 
 import { Viewer, SceneRevealMode } from '@mkkellogg/gaussian-splats-3d';
 
-const SPLAT_PATH = '/models/phro-pfp.splat';
+const SPLAT_PATH = '/models/converted_file.ksplat';
 
 let viewer: Viewer | null = null;
 
