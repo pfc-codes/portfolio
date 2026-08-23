@@ -33,10 +33,21 @@
       <!-- Full-screen Gaussian Splat background -->
       <div id="landing-splat-container" class="landing-splat-bg"></div>
 
-      <!-- Tagline + hint (shown after animation) -->
+      <!-- Interaction hints (shown after animation) -->
       <div class="landing-content" id="landing-content">
-        <p class="landing-tagline">I explore how bodies, data, and space can be re-authored into clean systems.</p>
-        <span class="landing-hint">Click anywhere to enter</span>
+        <p class="landing-instruction">Click and drag to rotate</p>
+        <p class="landing-instruction">Double click to see socials</p>
+      </div>
+
+      <!-- Socials Overlay (frosted, shown on double-click) -->
+      <div id="landing-social-overlay" class="landing-social-overlay" aria-hidden="true">
+        <button id="landing-social-close" class="landing-social-close" aria-label="Close">&times;</button>
+        <div class="landing-social-links">
+          <a href="https://www.instagram.com/p_h_r_o_/" target="_blank" rel="noopener noreferrer" class="landing-social-link">Instagram</a>
+          <a href="https://www.tiktok.com/@phrodesign" target="_blank" rel="noopener noreferrer" class="landing-social-link">TikTok</a>
+          <a href="https://www.youtube.com/@p_h_r_o" target="_blank" rel="noopener noreferrer" class="landing-social-link">YouTube</a>
+          <a href="mailto:pietrofranciscosta@gmail.com" class="landing-social-link">Email</a>
+        </div>
       </div>
     </div>
 

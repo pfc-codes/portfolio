@@ -12,7 +12,7 @@ import { renderHome } from './routes/home';
 import { renderWork, initWorkInteractions } from './routes/work';
 import { renderLab, initLabInteractions, cleanupLab } from './routes/lab';
 import { renderContact } from './routes/contact';
-import { initLandingSplat, disposeLandingSplat } from './full/landing-splat';
+import { initLandingSplat } from './full/landing-splat';
 
 // ============================================================================
 // ROUTE DEFINITIONS
@@ -103,45 +103,28 @@ function animateLetters(): void {
       document.getElementById('landing-splat-container')?.classList.add('visible');
       if (content) content.classList.add('visible');
 
-      // Listen for click anywhere to enter portfolio
-      document.addEventListener('click', handleLandingClick);
+      // Double click anywhere on the landing splat to reveal socials
+      document.getElementById('landing')?.addEventListener('dblclick', handleLandingDoubleClick);
+      document.getElementById('landing-social-close')?.addEventListener('click', closeSocialOverlay);
     }, 400);
   }, totalDelay);
 }
 
-function handleLandingClick(e: MouseEvent): void {
-  // Ignore if clicking interactive elements
+function handleLandingDoubleClick(e: MouseEvent): void {
   const target = e.target as HTMLElement;
   if (target.closest('a, button')) return;
 
-  document.removeEventListener('click', handleLandingClick);
-  enterPortfolio();
+  openSocialOverlay();
 }
 
-function enterPortfolio(): void {
-  if (landingDismissed) return;
-  landingDismissed = true;
+function openSocialOverlay(): void {
+  document.getElementById('landing-social-overlay')?.classList.add('open');
+  document.getElementById('landing-social-overlay')?.setAttribute('aria-hidden', 'false');
+}
 
-  // Dismiss landing
-  const landing = document.getElementById('landing');
-  if (landing) {
-    landing.classList.add('dismissed');
-    setTimeout(() => { landing.style.display = 'none'; }, 600);
-  }
-  disposeLandingSplat();
-
-  // Show app + nav
-  const app = document.getElementById('app');
-  if (app) {
-    app.style.display = '';
-    app.classList.remove('hidden');
-  }
-  document.getElementById('site-nav')?.classList.remove('hidden');
-
-  // Init router
-  router.init(app!, (path) => {
-    state.setState({ currentRoute: path });
-  });
+function closeSocialOverlay(): void {
+  document.getElementById('landing-social-overlay')?.classList.remove('open');
+  document.getElementById('landing-social-overlay')?.setAttribute('aria-hidden', 'true');
 }
 
 // ============================================================================
