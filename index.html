@@ -1,81 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>p.h.r.o.</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/src/styles/base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f1f0e9" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!--page-head-->
+    <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
-
-    <!-- ========== LANDING PAGE (/) ========== -->
-    <div id="landing" class="landing">
-      <!-- p.h.r.o. Letter Animation -->
-      <div class="landing-intro" id="landing-intro">
-        <div class="landing-letters">
-          <span class="landing-letter" data-index="0">p</span>
-          <span class="landing-dot" data-index="1">.</span>
-          <span class="landing-letter" data-index="2">h</span>
-          <span class="landing-dot" data-index="3">.</span>
-          <span class="landing-letter" data-index="4">r</span>
-          <span class="landing-dot" data-index="5">.</span>
-          <span class="landing-letter" data-index="6">o</span>
-          <span class="landing-dot" data-index="7">.</span>
-        </div>
-      </div>
-
-      <!-- Full-screen Gaussian Splat background -->
-      <div id="landing-splat-container" class="landing-splat-bg"></div>
-
-      <!-- Interaction hints (shown after animation) -->
-      <div class="landing-content" id="landing-content">
-        <p class="landing-instruction">Click and drag to rotate</p>
-        <p class="landing-instruction">Double click to see socials</p>
-      </div>
-
-      <!-- Socials Overlay (frosted, shown on double-click) -->
-      <div id="landing-social-overlay" class="landing-social-overlay" aria-hidden="true">
-        <button id="landing-social-close" class="landing-social-close" aria-label="Close">&times;</button>
-        <div class="landing-social-links">
-          <a href="https://www.instagram.com/p_h_r_o_/" target="_blank" rel="noopener noreferrer" class="landing-social-link">Instagram</a>
-          <a href="https://www.tiktok.com/@phrodesign" target="_blank" rel="noopener noreferrer" class="landing-social-link">TikTok</a>
-          <a href="https://www.youtube.com/@p_h_r_o" target="_blank" rel="noopener noreferrer" class="landing-social-link">YouTube</a>
-          <a href="mailto:pietrofranciscosta@gmail.com" class="landing-social-link">Email</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========== SITE NAV ========== -->
-    <nav id="site-nav" class="global-nav hidden">
-      <div class="nav-inner">
-        <a href="/" class="nav-logo" data-link>p.h.r.o.</a>
-        <div class="nav-links">
-          <a href="/" class="nav-link" data-link data-nav="home">Home</a>
-          <a href="/work" class="nav-link" data-link data-nav="work">Work</a>
-          <a href="/lab" class="nav-link" data-link data-nav="lab">Lab</a>
-          <a href="/contact" class="nav-link" data-link data-nav="contact">Contact</a>
-        </div>
-      </div>
-    </nav>
-
-    <!-- ========== SITE CONTENT ========== -->
-    <main id="app" class="app-container hidden"></main>
-
-    <!-- Overlay Panel (reusable for Work/Lab) -->
-    <div id="overlay-panel" class="overlay-panel" aria-hidden="true">
-      <div class="overlay-backdrop"></div>
-      <div class="overlay-content">
-        <button class="overlay-close" aria-label="Close panel">&times;</button>
-        <div id="overlay-inner"></div>
-      </div>
-    </div>
-
-    <script type="module" src="/src/main.ts"></script>
+    <div id="app"><!--page-body--></div>
   </body>
 </html>

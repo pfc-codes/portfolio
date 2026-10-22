@@ -1,17 +1,7 @@
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-  server: {
-    port: 5173,
-    open: true,
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-    },
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: true
-  },
-  assetsInclude: ['**/*.ply', '**/*.glb', '**/*.gltf']
-});
+import { defineConfig } from "vite";
+export default defineConfig(({ isSsrBuild }) => ({
+  server: { host: "0.0.0.0", port: 5173, allowedHosts: ["terminal.local"] },
+  preview: { host: "0.0.0.0", allowedHosts: ["terminal.local"] },
+  build: { outDir: "dist", sourcemap: false, copyPublicDir: !isSsrBuild },
+  assetsInclude: ["**/*.ply", "**/*.glb", "**/*.gltf", "**/*.ksplat"],
+}));

@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.prerender
+.openai
 *.local
 
 # Editor directories and files
@@ -28,6 +30,7 @@ dist-ssr
 
 # Project notes (private)
 *.txt
+!public/robots.txt
 context.md
 CLAUDE_INSTRUCTIONS.md
 session-notes.md
