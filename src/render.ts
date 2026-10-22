@@ -26,7 +26,7 @@ const card = (p: Project, eager = false) => `<article class='project-card'>
 function header(path: string) {
   return `<a class='skip-link' href='#main'>Skip to content</a>
   <header class='site-header wrap'>
-    <a class='wordmark' href='/' aria-label='PHROGRAPHICA home'>phro<span class='brand-dot'>.</span><span class='wordmark-tail'>graphica</span></a>
+    <a class='wordmark' href='/' aria-label='phro.design home'>phro<span class='brand-dot'>.</span><span class='wordmark-tail'>design</span></a>
     <button class='menu-toggle' type='button' data-menu-toggle aria-expanded='false' aria-controls='site-nav' hidden>Menu <span aria-hidden='true'>+</span></button>
     <nav class='site-nav' id='site-nav' aria-label='Main navigation'>${[
       "Work",
@@ -44,7 +44,7 @@ function header(path: string) {
 
 const footer = () => `<footer class='site-footer wrap'>
   <div class='footer-top'><p>Have something<br>in mind?</p><a class='contact-link' href='/contact/'>Let's make it tangible. ${arrow}</a></div>
-  <div class='footer-bottom'><a class='footer-brand' href='/'>PHROGRAPHICA</a><span>Creative technology & spatial media</span><div><a href='${site.instagram}'>Instagram ${arrow}</a><a href='mailto:${site.email}'>Email ${arrow}</a></div><a class='back-top' href='#top'>Back to top ↑</a></div>
+  <div class='footer-bottom'><a class='footer-brand' href='/'>phro.design</a><span>Creative technology & spatial media</span><div><a href='${site.instagram}'>Instagram ${arrow}</a><a href='mailto:${site.email}'>Email ${arrow}</a></div><a class='back-top' href='#top'>Back to top ↑</a></div>
 </footer>`;
 
 function home() {
@@ -109,10 +109,10 @@ function lab() {
 function spatialStudy() {
   return `<section class='experiment-intro wrap'>${label(`<a href='/lab/'>Lab</a> / 02`, "Spatial study")}<h1>A point of view<span class='title-period'>.</span></h1><p>A scene assembled from points. Move around it and watch its structure shift.</p></section>
   <section class='wrap experiment-space' aria-labelledby='viewer-heading'><h2 id='viewer-heading' class='sr-only'>Interactive 3D reconstruction</h2>
-  <div class='spatial-stage' data-splat-stage><div class='splat-mount' data-splat-mount aria-label='3D scene viewport' tabindex='0'></div><div class='splat-cover' data-splat-cover><span class='point-glyph' aria-hidden='true'>✳</span><span class='mono'>Spatial reconstruction / Gaussian splats</span><p>The original PHRO scene, ready to explore.</p><button class='button button-light' data-splat-load type='button' hidden>Load the 3D scene <span aria-hidden='true'>↗</span></button><span class='download-note'>22.6 MB · Loads when you choose</span><noscript><p>Enable JavaScript to explore 3D, or <a href='/work/'>watch the project films</a>.</p></noscript></div></div>
+  <div class='spatial-stage' data-splat-stage><div class='splat-mount' data-splat-mount aria-label='3D scene viewport' tabindex='0'></div><div class='splat-cover' data-splat-cover><span class='point-glyph' aria-hidden='true'>✳</span><span class='mono'>Spatial reconstruction / Gaussian splats</span><p>The original phro.design scene, ready to explore.</p><button class='button button-light' data-splat-load type='button' hidden>Load the 3D scene <span aria-hidden='true'>↗</span></button><span class='download-note'>22.6 MB · Loads when you choose</span><noscript><p>Enable JavaScript to explore 3D, or <a href='/work/'>watch the project films</a>.</p></noscript></div></div>
   <div class='viewer-controls' data-splat-controls hidden><button type='button' data-orbit='left' aria-label='Rotate scene left'>← Rotate</button><button type='button' data-orbit='right' aria-label='Rotate scene right'>Rotate →</button><button type='button' data-zoom='in'>Zoom in +</button><button type='button' data-zoom='out'>Zoom out −</button><button type='button' data-splat-reset>Reset view</button><button type='button' data-splat-close>Close scene</button></div>
   <p class='experiment-status' data-splat-status role='status' aria-live='polite'>3D is optional. The scene stays unloaded until you open it.</p>
-  <div class='experiment-notes'><div><h2>Find your perspective.</h2><p>Drag to orbit. Scroll or pinch to zoom. You can also use the buttons below the scene, or focus the viewport and use the arrow keys and + / −.</p></div><div><h2>About this scene.</h2><p>This is the Gaussian splat reconstruction from the original PHRO homepage, preserved as an interactive study. The scene uses points in space to form an image that changes with your viewpoint.</p><p>If 3D is unavailable on your device, <a href='/lab/frame-study/'>explore the frame study</a> or <a href='/work/'>watch the project films</a>.</p></div></div>
+  <div class='experiment-notes'><div><h2>Find your perspective.</h2><p>Drag to orbit. Scroll or pinch to zoom. You can also use the buttons below the scene, or focus the viewport and use the arrow keys and + / −.</p></div><div><h2>About this scene.</h2><p>This is the Gaussian splat reconstruction from the original phro.design homepage, preserved as an interactive study. The scene uses points in space to form an image that changes with your viewpoint.</p><p>If 3D is unavailable on your device, <a href='/lab/frame-study/'>explore the frame study</a> or <a href='/work/'>watch the project films</a>.</p></div></div>
   </section>`;
 }
 
@@ -128,7 +128,7 @@ function frameStudy() {
 }
 
 function about() {
-  return `<section class='page-intro wrap'>${label("About / The practice", "Pietro Francis Costa")}<h1>Image.<br>Space. <em>Possibility.</em></h1><div class='intro-bottom'><p>I'm Pietro, the creative technologist behind PHROGRAPHICA. I work across moving image, digital design, and interactive experiences.</p></div></section>
+  return `<section class='page-intro wrap'>${label("About / The practice", "Pietro Francis Costa")}<h1>Image.<br>Space. <em>Possibility.</em></h1><div class='intro-bottom'><p>I'm Pietro, the creative technologist behind phro.design. I work across moving image, digital design, and interactive experiences.</p></div></section>
   <section class='wrap about-practice'>${label("A practice across mediums")}<div><h2>I make things<br>that make me <em>look again.</em></h2><p>My practice brings together creative technology, experimental video, spatial media, and temporal manipulation. I work with 3D reconstruction, Blender tools, and code to investigate the space between an image and an experience.</p><p>Time Block and Depth Echo are part of that exploration: studies in how a moving image can become something spatial, layered, and open to another point of view.</p><a class='text-link' href='/work/'>Explore the work ${arrow}</a></div></section>
   <section class='wrap practice-areas' aria-labelledby='areas-title'><div class='section-heading'><h2 id='areas-title'>Ways of working.</h2><span class='mono'>Connected by curiosity</span></div>${[
     [
@@ -187,36 +187,36 @@ export function render(pathname: string) {
                   ? contact()
                   : missing();
   const titles: Record<string, string> = {
-    "/": "PHROGRAPHICA — Time, given form",
-    "/work/": "Work — PHROGRAPHICA",
-    "/lab/": "Lab — PHROGRAPHICA",
-    "/lab/spatial-study/": "A point of view — PHROGRAPHICA Lab",
-    "/lab/frame-study/": "Between frames — PHROGRAPHICA Lab",
-    "/about/": "About Pietro — PHROGRAPHICA",
-    "/contact/": "Contact — PHROGRAPHICA",
+    "/": "phro.design — Time, given form",
+    "/work/": "Work — phro.design",
+    "/lab/": "Lab — phro.design",
+    "/lab/spatial-study/": "A point of view — phro.design Lab",
+    "/lab/frame-study/": "Between frames — phro.design Lab",
+    "/about/": "About Pietro — phro.design",
+    "/contact/": "Contact — phro.design",
   };
   const title = p
-    ? `${p.title}: ${p.study} — PHROGRAPHICA`
-    : titles[path] || "Page not found — PHROGRAPHICA";
+    ? `${p.title}: ${p.study} — phro.design`
+    : titles[path] || "Page not found — phro.design";
   const descriptions: Record<string, string> = {
     "/": "Pietro Francis Costa explores image, time, and space through creative technology, experimental video, spatial media, and interactive experiences.",
     "/work/":
       "Explore Time Block and Depth Echo: moving-image studies in temporal manipulation, experimental video, and spatial media by Pietro Francis Costa.",
     "/lab/":
-      "Interactive studies from PHROGRAPHICA. Explore moving images frame by frame or step inside a Gaussian splat reconstruction.",
+      "Interactive studies from phro.design. Explore moving images frame by frame or step inside a Gaussian splat reconstruction.",
     "/lab/spatial-study/":
-      "Rotate, zoom, and explore the original PHRO Gaussian splat reconstruction in an optional interactive 3D viewer.",
+      "Rotate, zoom, and explore the original phro.design Gaussian splat reconstruction in an optional interactive 3D viewer.",
     "/lab/frame-study/":
       "Explore Time Block and Depth Echo frame by frame with an interactive film study tool.",
     "/about/":
-      "Meet Pietro Francis Costa, the creative technologist behind PHROGRAPHICA, working across moving image, spatial media, Blender tools, and digital design.",
+      "Meet Pietro Francis Costa, the creative technologist behind phro.design, working across moving image, spatial media, Blender tools, and digital design.",
     "/contact/":
-      "Get in touch with Pietro Francis Costa at PHROGRAPHICA for creative technology, moving image, spatial media, and digital design collaborations.",
+      "Get in touch with Pietro Francis Costa at phro.design for creative technology, moving image, spatial media, and digital design collaborations.",
   };
   const description =
     p?.summary ||
     descriptions[path] ||
-    "This page could not be found. Explore the work at PHROGRAPHICA.";
+    "This page could not be found. Explore the work at phro.design.";
   const canonical = `${site.origin}${known ? path : "/404.html"}`;
   const socialImage = `${site.origin}${p?.poster || projects[0].poster}`;
   const schema = p
@@ -240,7 +240,7 @@ export function render(pathname: string) {
   <meta name='description' content='${escape(description)}'>
   <link rel='canonical' href='${canonical}'>
   ${!known || path === "/404.html" ? "<meta name='robots' content='noindex'>" : ""}
-  <meta property='og:type' content='website'><meta property='og:title' content='${escape(title)}'><meta property='og:description' content='${escape(description)}'><meta property='og:url' content='${canonical}'><meta property='og:image' content='${socialImage}'><meta property='og:image:alt' content='${escape((p || projects[0]).visualDescription)}'><meta property='og:site_name' content='PHROGRAPHICA'><meta name='twitter:card' content='summary_large_image'>
+  <meta property='og:type' content='website'><meta property='og:title' content='${escape(title)}'><meta property='og:description' content='${escape(description)}'><meta property='og:url' content='${canonical}'><meta property='og:image' content='${socialImage}'><meta property='og:image:alt' content='${escape((p || projects[0]).visualDescription)}'><meta property='og:site_name' content='${site.name}'><meta name='twitter:card' content='summary_large_image'>
   <script type='application/ld+json'>${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`;
   return {
     title,

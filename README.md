@@ -1,4 +1,4 @@
-# PHROGRAPHICA — Temporal Atlas
+# phro.design — Temporal Atlas
 
 Pietro Francis Costa's portfolio, built with Vite, TypeScript, and static HTML.
 Cloudflare Pages continues to serve `dist/`; this change does not introduce a

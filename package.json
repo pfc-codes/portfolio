@@ -1,7 +1,7 @@
 {
   "name": "phro-temporal-atlas",
   "version": "1.0.0",
-  "description": "PHROGRAPHICA \u2014 creative technology, moving image, and spatial media",
+  "description": "phro.design \u2014 creative technology, moving image, and spatial media",
   "type": "module",
   "scripts": {
     "dev": "vite",

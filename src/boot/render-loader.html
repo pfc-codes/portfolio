@@ -1,0 +1,348 @@
+<style id="pcl-style">
+html.pcl-on{background:#000!important;overflow:hidden!important}
+html.pcl-on body>*:not(#pcl){visibility:hidden!important}
+#pcl{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;
+  box-sizing:border-box;background:#000;color:#ededed;
+  font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px));
+  transition:opacity .7s ease;-webkit-font-smoothing:antialiased}
+#pcl *{box-sizing:border-box}
+#pcl.pcl-out{opacity:0;pointer-events:none}
+#pcl .pcl-win{display:flex;flex-direction:column;gap:8px;max-width:100%}
+#pcl .pcl-head{display:flex;flex-wrap:wrap;align-content:flex-end;gap:0 10px;min-height:3.2em;color:#939393}
+#pcl .pcl-head span{white-space:nowrap}
+#pcl .pcl-head span+span::before{content:"| ";color:#4a4a4a}
+#pcl canvas{display:block;width:100%;height:auto;image-rendering:crisp-edges;image-rendering:pixelated;
+  outline:1px solid #242424}
+#pcl .pcl-bar{position:relative;height:1px;background:#242424}
+#pcl .pcl-bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ededed}
+#pcl .pcl-foot{display:flex;justify-content:space-between;gap:12px;color:#939393}
+@media (prefers-reduced-motion:reduce){#pcl{transition:opacity .2s linear}}
+</style>
+<script>
+/* phro.design render loader: the first visit loads like a Cycles frame.
+   Bucket tiles spiral out from the centre, each resolving from sample noise
+   into an ordered dither of the Time Block poster. Plays once per session,
+   never blocks for more than maxMs, and is skipped without JavaScript. */
+(function () {
+  var CFG = {
+    word: 'phro.design',
+    title: 'Pietro Francis Costa',
+    filename: 'phro_design_0001.png',
+    image: '/media/time-block/poster.webp',
+    crop: [40, 590, 880, 430],      // subject region of the poster: x, y, w, h
+    imageWaitMs: 700,               // after this, render the fallback sphere
+    samples: 32,
+    threads: 4,
+    minMs: 2600,
+    maxMs: 9000,
+    oncePerSession: true,
+    bg: [0, 0, 0],
+    ink: [237, 237, 237],
+    dot: [36, 36, 36]
+  };
+
+  var root = document.documentElement;
+  try { if (/[?&]noloader\b/.test(location.search)) return; } catch (e) {}
+  try { if (CFG.oncePerSession && sessionStorage.getItem('pcl-seen')) return; } catch (e) {}
+  if (navigator.webdriver) return;
+  var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (reduce) CFG.minMs = 700;
+  root.classList.add('pcl-on');
+
+  var t0 = performance.now();
+  var loaded = document.readyState === 'complete';
+  var ended = false, el = null;
+  window.addEventListener('load', function () { loaded = true; });
+  var hard = setTimeout(function () { finish(true); }, CFG.maxMs);
+
+  function pack(c) { return ((255 << 24) | (c[2] << 16) | (c[1] << 8) | c[0]) >>> 0; }
+  var INK = pack(CFG.ink), BG = pack(CFG.bg), DOT = pack(CFG.dot);
+  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(function (v) { return (v + 0.5) / 16; });
+
+  var W, H, T, S, ctx, img, px, lum, fin, tiles, queue, active, done, tileMs, last, phase, compStart, prepStart;
+  var hd, bar, pct, peak = 0, shownSample = 1, source = null, sourceFailed = false;
+
+  var pic = new Image();
+  pic.decoding = 'async';
+  pic.onload = function () { source = pic; };
+  pic.onerror = function () { sourceFailed = true; };
+  pic.src = CFG.image;
+
+  function mount() {
+    if (ended) return;
+    if (!document.body) { requestAnimationFrame(mount); return; }
+    try { init(); } catch (e) { finish(true); }
+  }
+  mount();
+
+  function init() {
+    var narrow = window.innerWidth < window.innerHeight;
+    W = narrow ? 176 : 320;
+    H = narrow ? 168 : 180;
+    T = narrow ? 22 : 32;
+    S = CFG.samples;
+
+    el = document.createElement('div');
+    el.id = 'pcl';
+    el.setAttribute('role', 'progressbar');
+    el.setAttribute('aria-label', 'Loading phro.design');
+    el.setAttribute('aria-valuemin', '0');
+    el.setAttribute('aria-valuemax', '100');
+    el.innerHTML = '<div class="pcl-win"><div class="pcl-head"></div><canvas></canvas>' +
+      '<div class="pcl-bar"><i></i></div><div class="pcl-foot"><span></span><span></span></div></div>';
+    document.body.appendChild(el);
+
+    el.firstChild.style.width = 'min(88vw, 960px, ' + (62 * W / H).toFixed(1) + 'vh)';
+    var cv = el.querySelector('canvas');
+    cv.width = W; cv.height = H;
+    ctx = cv.getContext('2d');
+    img = ctx.createImageData(W, H);
+    px = new Uint32Array(img.data.buffer);
+    hd = el.querySelector('.pcl-head');
+    bar = el.querySelector('.pcl-bar i');
+    var foot = el.querySelectorAll('.pcl-foot span');
+    foot[0].textContent = CFG.title;
+    pct = foot[1];
+
+    // Unrendered state: black with a faint point grid.
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++)
+      px[y * W + x] = (x % 4 === 2 && y % 4 === 2) ? DOT : BG;
+
+    phase = 'prep';
+    prepStart = last = performance.now();
+    requestAnimationFrame(frame);
+  }
+
+  // Called once the poster has loaded or the wait has run out.
+  function start() {
+    buildTarget();
+
+    fin = new Uint32Array(W * H);
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      var i = y * W + x;
+      fin[i] = lum[i] > BAYER[(y & 3) * 4 + (x & 3)] ? INK : BG;
+    }
+
+    // Bucket tiles in square rings spiralling out from the centre.
+    tiles = [];
+    for (var ty = 0; ty < H; ty += T) for (var tx = 0; tx < W; tx += T) {
+      var t = { x0: tx, y0: ty, x1: Math.min(tx + T, W), y1: Math.min(ty + T, H) };
+      var mx = (t.x0 + t.x1) / 2 - W / 2, my = (t.y0 + t.y1) / 2 - H / 2;
+      t.ring = Math.round(Math.max(Math.abs(mx), Math.abs(my)) / T);
+      t.ang = Math.atan2(my, mx);
+      tiles.push(t);
+    }
+    tiles.sort(function (a, b) { return (a.ring - b.ring) || (a.ang - b.ang); });
+
+    queue = tiles.slice();
+    active = [];
+    done = 0;
+    var budget = Math.max(900, CFG.minMs - (performance.now() - t0)) * 0.82;
+    tileMs = budget * CFG.threads / tiles.length;
+    for (var k = 0; k < CFG.threads && queue.length; k++)
+      active.push({ t: queue.shift(), p: -k / CFG.threads });
+
+    phase = 'render';
+    if (reduce) {
+      px.set(fin);
+      done = tiles.length; queue = []; active = [];
+      phase = 'composite'; compStart = performance.now();
+    }
+  }
+
+  function buildTarget() {
+    var off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    var g = off.getContext('2d');
+    g.fillStyle = '#000';
+    g.fillRect(0, 0, W, H);
+
+    var areaH = H * 0.74;
+    var drewImage = false;
+    if (source) {
+      try {
+        var c = CFG.crop;
+        var s = Math.min((W * 0.94) / c[2], (areaH * 0.94) / c[3]);
+        var dw = c[2] * s, dh = c[3] * s;
+        g.drawImage(source, c[0], c[1], c[2], c[3], (W - dw) / 2, (areaH - dh) / 2 + H * 0.02, dw, dh);
+        drewImage = true;
+      } catch (e) { drewImage = false; }
+    }
+    if (!drewImage) sphere(g, W / 2, areaH * 0.52, Math.min(W, areaH) * 0.34, areaH);
+
+    // Tone-map the frame so dark footage still dithers into a readable image.
+    var d = g.getImageData(0, 0, W, H).data;
+    lum = new Float32Array(W * H);
+    var hist = new Uint32Array(256), n = 0, yLimit = Math.floor(areaH) * W;
+    for (var i = 0; i < yLimit; i++) {
+      var l = (d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114) | 0;
+      if (l > 6) { hist[l]++; n++; }
+    }
+    var white = 255, acc = 0;
+    for (var v = 255; v > 0; v--) { acc += hist[v]; if (acc > n * 0.02) { white = v; break; } }
+    white = Math.max(white, 60);
+    for (i = 0; i < W * H; i++) {
+      var y0 = (d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114) / white;
+      lum[i] = Math.pow(Math.min(1, y0), 0.8);
+    }
+
+    // The wordmark, set in solid ink below the subject.
+    var face = 'ui-monospace,SFMono-Regular,Consolas,monospace';
+    var fs = Math.floor(H * 0.12);
+    g.font = '600 ' + fs + 'px ' + face;
+    while (g.measureText(CFG.word).width > W * 0.8 && fs > 8) { fs--; g.font = '600 ' + fs + 'px ' + face; }
+    g.clearRect(0, areaH, W, H - areaH);
+    g.fillStyle = '#000'; g.fillRect(0, areaH, W, H - areaH);
+    g.fillStyle = '#fff';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(CFG.word, W / 2, areaH + (H - areaH) * 0.5);
+    var t = g.getImageData(0, Math.floor(areaH), W, H - Math.floor(areaH)).data;
+    for (i = 0; i < t.length / 4; i++) lum[Math.floor(areaH) * W + i] = t[i * 4] / 255;
+  }
+
+  function sphere(g, cx, cy, r, areaH) {
+    var fl = g.createLinearGradient(0, cy + r * 0.7, 0, areaH);
+    fl.addColorStop(0, '#2a2a2a'); fl.addColorStop(1, '#0c0c0c');
+    g.fillStyle = fl;
+    g.fillRect(0, cy + r * 0.7, W, areaH - (cy + r * 0.7));
+    var sg = g.createRadialGradient(cx - r * 0.38, cy - r * 0.42, r * 0.04, cx, cy, r);
+    sg.addColorStop(0, '#e0e0e0'); sg.addColorStop(0.5, '#555'); sg.addColorStop(1, '#0d0d0d');
+    g.fillStyle = sg;
+    g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+  }
+
+  function paint(t, s) {
+    var amp = s >= S ? 0 : 0.95 / Math.sqrt(s);
+    for (var y = t.y0; y < t.y1; y++) {
+      var row = (y & 3) * 4;
+      for (var x = t.x0; x < t.x1; x++) {
+        var i = y * W + x;
+        var v = amp ? lum[i] + (Math.random() - 0.5) * amp : lum[i];
+        px[i] = v > BAYER[row + (x & 3)] ? INK : BG;
+      }
+    }
+  }
+
+  function bracket(t) {
+    var L = Math.min(6, (t.x1 - t.x0) >> 1, (t.y1 - t.y0) >> 1);
+    var xr = t.x1 - 1, yb = t.y1 - 1;
+    for (var k = 0; k < L; k++) {
+      px[t.y0 * W + t.x0 + k] = INK; px[(t.y0 + k) * W + t.x0] = INK;
+      px[t.y0 * W + xr - k] = INK;   px[(t.y0 + k) * W + xr] = INK;
+      px[yb * W + t.x0 + k] = INK;   px[(yb - k) * W + t.x0] = INK;
+      px[yb * W + xr - k] = INK;     px[(yb - k) * W + xr] = INK;
+    }
+  }
+
+  function fmt(ms) {
+    var s = Math.max(0, ms) / 1000, m = Math.floor(s / 60);
+    s -= m * 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s.toFixed(2);
+  }
+
+  function setHead(arr) {
+    while (hd.children.length < arr.length) hd.appendChild(document.createElement('span'));
+    while (hd.children.length > arr.length) hd.removeChild(hd.lastChild);
+    for (var i = 0; i < arr.length; i++)
+      if (hd.children[i].textContent !== arr[i]) hd.children[i].textContent = arr[i];
+  }
+
+  function frame(now) {
+    if (ended) return;
+    try {
+      var dt = Math.min(64, now - last);
+      last = now;
+      var elapsed = now - t0, prog = 0, partial = 0, status;
+
+      if (phase === 'prep') {
+        if (source || sourceFailed || reduce || now - prepStart > CFG.imageWaitMs) start();
+        else {
+          ctx.putImageData(img, 0, 0);
+          setHead(['Frame:1', 'Time:' + fmt(elapsed), 'Loading render kernels' + '...'.slice(0, 1 + Math.floor(now / 300) % 3)]);
+          pct.textContent = '0%';
+          requestAnimationFrame(frame);
+          return;
+        }
+      }
+
+      if (phase === 'render') {
+        var next = [], first = true;
+        for (var i = 0; i < active.length; i++) {
+          var a = active[i];
+          a.p += dt / tileMs;
+          if (a.p < 0) { next.push(a); continue; }
+          if (a.p >= 1) {
+            paint(a.t, S);
+            done++;
+            if (queue.length) next.push({ t: queue.shift(), p: a.p - 1 });
+            continue;
+          }
+          var s = 1 + Math.floor((S - 1) * a.p * a.p);
+          paint(a.t, s);
+          bracket(a.t);
+          partial += a.p;
+          if (first) { shownSample = s; first = false; }
+          next.push(a);
+        }
+        active = next;
+        if (!active.length && !queue.length) { phase = 'composite'; compStart = now; px.set(fin); }
+      } else if (phase === 'composite') {
+        // Waiting on the page: hold the finished frame and sweep a scanline.
+        px.set(fin);
+        var held = now - compStart;
+        if (held > 300) {
+          var row = Math.floor(((held - 300) / 900 % 1) * H);
+          for (var x = 0; x < W; x++) { var j = row * W + x; px[j] = px[j] === INK ? BG : INK; }
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+
+      var total = tiles.length;
+      prog = phase === 'render' ? (done + partial) / total : 1;
+      var mem = 96 + prog * 88 + Math.random() * 1.5;
+      peak = Math.max(peak, mem);
+      if (phase === 'render') {
+        var rate = prog / Math.max(1, elapsed);
+        status = 'Remaining:' + fmt(prog > 0.02 ? (1 - prog) / rate : CFG.minMs);
+      } else {
+        status = 'Compositing' + '...'.slice(0, 1 + Math.floor(now / 300) % 3);
+      }
+      setHead([
+        'Frame:1',
+        'Time:' + fmt(elapsed),
+        status,
+        'Mem:' + mem.toFixed(2) + 'M, Peak:' + peak.toFixed(2) + 'M',
+        'Path Tracing Tile ' + Math.min(done + 1, total) + '/' + total + ', Sample ' + (phase === 'render' ? shownSample : S) + '/' + S
+      ]);
+      bar.style.width = (prog * 100).toFixed(2) + '%';
+      var p = Math.floor(prog * 100);
+      if (pct.textContent !== p + '%') { pct.textContent = p + '%'; el.setAttribute('aria-valuenow', p); }
+
+      if (phase === 'composite' && loaded && elapsed >= CFG.minMs) { finish(false); return; }
+      requestAnimationFrame(frame);
+    } catch (e) { finish(true); }
+  }
+
+  function finish(force) {
+    if (ended) return;
+    ended = true;
+    clearTimeout(hard);
+    try { sessionStorage.setItem('pcl-seen', '1'); } catch (e) {}
+    if (!el) { root.classList.remove('pcl-on'); return; }
+    if (!force && fin) {
+      px.set(fin);
+      ctx.putImageData(img, 0, 0);
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      setHead(['Frame:1', 'Time:' + fmt(performance.now() - t0), 'Saved: \u201C' + CFG.filename + '\u201D']);
+    }
+    setTimeout(function () {
+      root.classList.remove('pcl-on');
+      el.classList.add('pcl-out');
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 800);
+    }, force ? 0 : 520);
+  }
+})();
+</script>

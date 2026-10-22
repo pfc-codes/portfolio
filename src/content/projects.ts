@@ -83,7 +83,7 @@ export const projects: Project[] = [
 ];
 
 export const site = {
-  name: "PHROGRAPHICA",
+  name: "phro.design",
   origin: "https://phro.design",
   email: "pietrofranciscosta@gmail.com",
   instagram: "https://www.instagram.com/p_h_r_o_/",
