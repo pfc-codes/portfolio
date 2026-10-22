@@ -76,7 +76,9 @@ controls supplement drag/pinch interactions. Reduced motion skips the reveal.
 
 The render intro in `src/boot/render-loader.html` is inlined by the Vite plugin
 into every page. Keep the `<!--render-loader-->` marker in `index.html`. It runs
-once per session, respects reduced motion, and has a timed fallback.
+once per session and respects reduced motion. The render takes 50% longer than
+the original intro, then holds on a small "Click to enter" button. Its animation
+deadline also reveals the entry button; script or canvas errors reveal the page.
 
 ## Validation and release
 

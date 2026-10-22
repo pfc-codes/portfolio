@@ -17,13 +17,18 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
 #pcl .pcl-bar{position:relative;height:1px;background:#242424}
 #pcl .pcl-bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ededed}
 #pcl .pcl-foot{display:flex;justify-content:space-between;gap:12px;color:#939393}
+#pcl .pcl-enter{align-self:center;margin-top:8px;min-height:44px;padding:10px 20px;
+  border:0;background:transparent;color:#939393;font:inherit;letter-spacing:inherit;cursor:pointer;touch-action:manipulation}
+#pcl .pcl-enter[hidden]{display:none}
+#pcl .pcl-enter:hover,#pcl .pcl-enter:focus-visible{color:#ededed}
+#pcl .pcl-enter:focus-visible{outline:1px solid #939393;outline-offset:4px}
 @media (prefers-reduced-motion:reduce){#pcl{transition:opacity .2s linear}}
 </style>
 <script>
 /* phro.design render loader: the first visit loads like a Cycles frame.
    Bucket tiles spiral out from the centre, each resolving from sample noise
    into an ordered dither of the Time Block poster. Plays once per session,
-   never blocks for more than maxMs, and is skipped without JavaScript. */
+   renders for at most maxMs, then waits for entry. Errors reveal the page. */
 (function () {
   var CFG = {
     word: 'phro.design',
@@ -34,8 +39,8 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     imageWaitMs: 700,               // after this, render the fallback sphere
     samples: 32,
     threads: 4,
-    minMs: 2600,
-    maxMs: 9000,
+    minMs: 3900,                   // 1.5 times the original render duration
+    maxMs: 13500,
     oncePerSession: true,
     bg: [0, 0, 0],
     ink: [237, 237, 237],
@@ -52,9 +57,9 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
 
   var t0 = performance.now();
   var loaded = document.readyState === 'complete';
-  var ended = false, el = null;
+  var ended = false, ready = false, el = null, enter = null;
   window.addEventListener('load', function () { loaded = true; });
-  var hard = setTimeout(function () { finish(true); }, CFG.maxMs);
+  var hard = setTimeout(complete, CFG.maxMs);
 
   function pack(c) { return ((255 << 24) | (c[2] << 16) | (c[1] << 8) | c[0]) >>> 0; }
   var INK = pack(CFG.ink), BG = pack(CFG.bg), DOT = pack(CFG.dot);
@@ -90,8 +95,11 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     el.setAttribute('aria-valuemin', '0');
     el.setAttribute('aria-valuemax', '100');
     el.innerHTML = '<div class="pcl-win"><div class="pcl-head"></div><canvas></canvas>' +
-      '<div class="pcl-bar"><i></i></div><div class="pcl-foot"><span></span><span></span></div></div>';
+      '<div class="pcl-bar"><i></i></div><div class="pcl-foot"><span></span><span></span></div>' +
+      '<button class="pcl-enter" type="button" hidden>Click to enter</button></div>';
     document.body.appendChild(el);
+    enter = el.querySelector('.pcl-enter');
+    enter.addEventListener('click', function () { if (ready) finish(false); });
 
     el.firstChild.style.width = 'min(88vw, 960px, ' + (62 * W / H).toFixed(1) + 'vh)';
     var cv = el.querySelector('canvas');
@@ -138,7 +146,7 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     queue = tiles.slice();
     active = [];
     done = 0;
-    var budget = Math.max(900, CFG.minMs - (performance.now() - t0)) * 0.82;
+    var budget = Math.max(1350, CFG.minMs - (performance.now() - t0)) * 0.82;
     tileMs = budget * CFG.threads / tiles.length;
     for (var k = 0; k < CFG.threads && queue.length; k++)
       active.push({ t: queue.shift(), p: -k / CFG.threads });
@@ -250,7 +258,7 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
   }
 
   function frame(now) {
-    if (ended) return;
+    if (ended || ready) return;
     try {
       var dt = Math.min(64, now - last);
       last = now;
@@ -320,8 +328,33 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
       var p = Math.floor(prog * 100);
       if (pct.textContent !== p + '%') { pct.textContent = p + '%'; el.setAttribute('aria-valuenow', p); }
 
-      if (phase === 'composite' && loaded && elapsed >= CFG.minMs) { finish(false); return; }
+      if (phase === 'composite' && loaded && elapsed >= CFG.minMs) { complete(); return; }
       requestAnimationFrame(frame);
+    } catch (e) { finish(true); }
+  }
+
+  function complete() {
+    if (ended || ready) return;
+    try {
+      if (!el || !enter || !ctx) { finish(true); return; }
+      if (!fin) start();
+      px.set(fin);
+      ctx.putImageData(img, 0, 0);
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      setHead(['Frame:1', 'Time:' + fmt(performance.now() - t0), 'Saved: \u201C' + CFG.filename + '\u201D']);
+      ready = true;
+      clearTimeout(hard);
+      // The completed render becomes a dialog; its button must not be inside
+      // a progressbar, whose descendants are hidden from assistive technology.
+      el.setAttribute('role', 'dialog');
+      el.setAttribute('aria-label', 'Enter phro.design');
+      el.setAttribute('aria-modal', 'true');
+      el.removeAttribute('aria-valuemin');
+      el.removeAttribute('aria-valuemax');
+      el.removeAttribute('aria-valuenow');
+      enter.hidden = false;
+      enter.focus({ preventScroll: true });
     } catch (e) { finish(true); }
   }
 
@@ -330,19 +363,16 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     ended = true;
     clearTimeout(hard);
     try { sessionStorage.setItem('pcl-seen', '1'); } catch (e) {}
-    if (!el) { root.classList.remove('pcl-on'); return; }
-    if (!force && fin) {
-      px.set(fin);
-      ctx.putImageData(img, 0, 0);
-      bar.style.width = '100%';
-      pct.textContent = '100%';
-      setHead(['Frame:1', 'Time:' + fmt(performance.now() - t0), 'Saved: \u201C' + CFG.filename + '\u201D']);
+    root.classList.remove('pcl-on');
+    if (!el) return;
+    if (enter) enter.disabled = true;
+    if (!force) {
+      var main = document.getElementById('main');
+      if (main) main.focus({ preventScroll: true });
     }
-    setTimeout(function () {
-      root.classList.remove('pcl-on');
-      el.classList.add('pcl-out');
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 800);
-    }, force ? 0 : 520);
+    el.setAttribute('aria-hidden', 'true');
+    el.classList.add('pcl-out');
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, reduce ? 200 : 800);
   }
 })();
 </script>
