@@ -66,7 +66,7 @@ function work() {
     <section class='wrap work-index' aria-labelledby='work-title'><h2 id='work-title' class='sr-only'>Project index</h2><div class='project-grid'>${projects.map((p, i) => card(p, i === 0)).join("")}</div></section>
     <section class='wrap adjacent-work'>${label("Elsewhere / Digital design")}<h2>Across the web.</h2><div class='external-list'>${[
       ["Pietro Costa", "https://pietrocosta.com"],
-      ["Whitespace Projects", "https://whitespaceprojectsnapoli.com"],
+      ["Whitespace Projects", "https://whitespaceprojectsnapoli.org"],
       ["BACAS", "https://bacasitaly.org/about"],
     ]
       .map(
