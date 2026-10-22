@@ -65,6 +65,8 @@ declare module '@mkkellogg/gaussian-splats-3d' {
     addSplatScene(path: string, options?: SplatSceneOptions): Promise<void>;
     start(): void;
     stop(): void;
+    forceRenderNextFrame(): void;
+    keyDownListener: ((event: KeyboardEvent) => void) | null;
     dispose(): Promise<void>;
     getSplatMesh(): SplatMesh;
     setOrthographicMode(orthographic: boolean): void;
@@ -73,6 +75,7 @@ declare module '@mkkellogg/gaussian-splats-3d' {
       target: THREE.Vector3;
       enabled: boolean;
       update(): void;
+      stopListenToKeyEvents(): void;
     };
   }
 

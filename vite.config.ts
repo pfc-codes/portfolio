@@ -1,17 +1,23 @@
-import { defineConfig } from 'vite';
+import { readFileSync } from "node:fs";
+import { defineConfig, type Plugin } from "vite";
 
-export default defineConfig({
-  server: {
-    port: 5173,
-    open: true,
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-    },
+// Inlines the render loader at the top of <head> on every page, before the
+// stylesheet and module script, so the first paint is the loader rather than
+// a flash of the page.
+const renderLoader = (): Plugin => ({
+  name: "phro-render-loader",
+  transformIndexHtml(html) {
+    const partial = readFileSync("src/boot/render-loader.html", "utf8").trim();
+    if (!html.includes("<!--render-loader-->"))
+      throw new Error("index.html is missing the <!--render-loader--> marker.");
+    return html.replace("<!--render-loader-->", partial);
   },
-  build: {
-    outDir: 'dist',
-    sourcemap: true
-  },
-  assetsInclude: ['**/*.ply', '**/*.glb', '**/*.gltf']
 });
+
+export default defineConfig(({ isSsrBuild }) => ({
+  plugins: [renderLoader()],
+  server: { host: "0.0.0.0", port: 5173, allowedHosts: ["terminal.local"] },
+  preview: { host: "0.0.0.0", allowedHosts: ["terminal.local"] },
+  build: { outDir: "dist", sourcemap: false, copyPublicDir: !isSsrBuild },
+  assetsInclude: ["**/*.ply", "**/*.glb", "**/*.gltf", "**/*.ksplat"],
+}));
