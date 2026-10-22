@@ -78,10 +78,6 @@ async function init() {
     const { setupSpatialStudy } = await import("./features/spatial-study");
     setupSpatialStudy();
   }
-  if (document.querySelector("[data-frame-experiment]")) {
-    const { setupFrameStudy } = await import("./features/frame-study");
-    setupFrameStudy();
-  }
 }
 
 void init();

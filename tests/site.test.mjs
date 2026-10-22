@@ -46,6 +46,16 @@ test("every route ships readable content, navigation, unique metadata, and a sin
 test("all internal navigation, fragments, and media paths resolve in the production build", async () => {
   for (const route of routes) {
     const html = await read(route);
+    assert.doesNotMatch(
+      html,
+      /\bhref=['"]\/lab[/?'"]/,
+      `${route}: Lab is retired`,
+    );
+    assert.equal(
+      html.includes("data-splat-load"),
+      route === "/about/",
+      `${route}: point cloud belongs on About`,
+    );
     for (const match of html.matchAll(
       /\b(?:href|src|poster)=['"]([^'"]+)['"]/g,
     )) {
@@ -67,7 +77,7 @@ test("all internal navigation, fragments, and media paths resolve in the product
   }
 });
 
-test("provided films are mapped correctly and remain user-initiated, described, and uncropped", async () => {
+test("provided films are mapped correctly and remain user-initiated, labelled, and uncropped", async () => {
   assert.equal(
     projects.find((p) => p.slug === "depth-echo").study,
     "Water Dance",
@@ -92,6 +102,11 @@ test("provided films are mapped correctly and remain user-initiated, described, 
     }
   }
   for (const p of projects) {
+    const html = await read(`/work/${p.slug}/`);
+    assert.doesNotMatch(
+      html,
+      /class='(?:project-summary|project-notes|visual-description)'/,
+    );
     const bytes = await readFile(join("dist", p.video));
     assert.ok(
       bytes.indexOf("moov") >= 0 &&
@@ -112,6 +127,21 @@ test("unknown URLs have a useful, non-indexed 404 and valid paths normalize cons
   assert.match(await read("/404.html"), /Explore the work/);
   const sitemap = await readFile("dist/sitemap.xml", "utf8");
   assert.ok(!sitemap.includes("404.html"));
+  assert.ok(!sitemap.includes("/lab/"));
+  for (const retired of [
+    "/lab/",
+    "/lab/spatial-study/",
+    "/lab/frame-study/",
+  ]) {
+    assert.equal(render(retired).status, 404);
+    await assert.rejects(
+      access(fileFor(retired)),
+      `${retired}: no retired page in build`,
+    );
+  }
+  const redirects = await readFile("dist/_redirects", "utf8");
+  assert.match(redirects, /^\/lab\/spatial-study\/ \/about\/ 302$/m);
+  assert.match(redirects, /^\/lab\/frame-study\/ \/work\/ 302$/m);
   assert.equal((sitemap.match(/<loc>/g) || []).length, routes.length - 1);
 });
 

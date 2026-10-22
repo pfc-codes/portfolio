@@ -1,3 +1,9 @@
 /work.html /work/ 301
-/lab.html /lab/ 301
+/lab.html /about/ 302
+/lab /about/ 302
+/lab/ /about/ 302
+/lab/spatial-study /about/ 302
+/lab/spatial-study/ /about/ 302
+/lab/frame-study /work/ 302
+/lab/frame-study/ /work/ 302
 /contact.html /contact/ 301

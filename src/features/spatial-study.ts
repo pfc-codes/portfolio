@@ -44,6 +44,7 @@ export function setupSpatialStudy() {
     resize?.disconnect();
     oldViewer?.stop();
     controls.hidden = true;
+    mount.tabIndex = -1;
     cover.hidden = false;
     load.disabled = true;
     status.textContent = message;
@@ -73,7 +74,7 @@ export function setupSpatialStudy() {
     const context = probe.getContext("webgl2");
     if (!context) {
       close(
-        "3D is unavailable on this device. You can still explore the project films and frame study below.",
+        "3D is unavailable on this device. You can still watch the films on the Work page.",
       );
       return;
     }
@@ -94,7 +95,7 @@ export function setupSpatialStudy() {
       } = await import("./splat-engine");
       if (request !== generation) return;
       // Own the renderer explicitly: the library's default dispose assumes its
-      // root is a direct child of body. This viewer lives inside the Lab layout.
+      // root is a direct child of body. This viewer lives inside the About page.
       renderer = new Renderer({
         antialias: false,
         alpha: true,
@@ -102,7 +103,7 @@ export function setupSpatialStudy() {
       });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
       renderer.setSize(mount.clientWidth, mount.clientHeight);
-      renderer.setClearColor(0x080809, 1);
+      renderer.setClearColor(0x000000, 1);
       mount.appendChild(renderer.domElement);
       viewer = new SplatViewer({
         rootElement: mount,
@@ -158,6 +159,7 @@ export function setupSpatialStudy() {
       ready = true;
       cover.hidden = true;
       controls.hidden = false;
+      mount.tabIndex = 0;
       status.textContent =
         "Scene ready. Drag to rotate, pinch to zoom, or use the controls below.";
       sync();
@@ -165,7 +167,7 @@ export function setupSpatialStudy() {
     } catch {
       if (request === generation)
         close(
-          "The 3D scene could not load. Try again, or explore the project films and frame study below.",
+          "The 3D scene could not load. Try again, or watch the films on the Work page.",
         );
     }
   });

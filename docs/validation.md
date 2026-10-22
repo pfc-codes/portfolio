@@ -9,7 +9,25 @@ Cloudflare dashboard change, or replacement of the original model is included.
 Confirmed media mapping: `water_dance_2_HQ.mp4` → **Depth Echo / Water Dance**;
 `jordan_render_instagram.mp4` → **Time Block / Jordan**.
 
-## Completed checks
+## Current revision
+
+The monochrome design and render intro remain in place. Project descriptions,
+Lab pages, and Lab links are removed. About now contains Pietro's supplied text
+and the original point cloud. Retired Lab URLs temporarily redirect to About or
+Work; there are six content pages plus the 404.
+
+- TypeScript and Vite production build pass; seven HTML pages and sitemap generated.
+- All five automated test groups pass, including retired routes, redirects,
+  removal of Lab navigation, and the point cloud appearing only on About.
+- Original model matches main byte-for-byte in Git (blob
+  `f963a58bbebe47c3695748b845bdea351e03c390`, 22,571,332 bytes). Camera, model scale,
+  and point-cloud settings remain those of the live site's original viewer.
+- Entry JavaScript is 3.85 kB minified / 1.66 kB gzip. The frame-study tool is no
+  longer bundled. Styles are 22.87 kB / 5.52 kB; About viewer controls are
+  4.76 kB / 2.13 kB; the optional 3D engine is 744.24 kB / 189.89 kB.
+- `git diff --check` passes. Preview browser checks are recorded on the draft PR.
+
+## Earlier baseline checks
 
 - TypeScript and Vite production build pass; ten HTML pages and sitemap generated.
 - Five automated test groups pass: route/metadata structure, internal navigation
@@ -35,7 +53,7 @@ Confirmed media mapping: `water_dance_2_HQ.mp4` → **Depth Echo / Water Dance**
 - Original model is unchanged in Git and remains 22,571,332 bytes.
 - `git diff --check` passes.
 
-## Build measurements
+## Earlier baseline measurements
 
 | Resource | Minified | Gzip |
 | --- | ---: | ---: |
@@ -52,8 +70,8 @@ build measurements, not Lighthouse scores or measured Core Web Vitals.
 
 ## Before approving production
 
-- Review the art direction, observational project copy, and bio. Supply actual
-  process details, credits, dates, and tool/download links where desired.
+- Review the current art direction, media presentation, and About layout.
+  Supply credits, dates, and tool/download links where desired.
 - Test the 3D scene in a GPU-enabled browser: initial camera, visual fidelity,
   keyboard/button controls, drag/pinch, reset, close/reopen, and resource cleanup.
 - Exercise an interrupted model download and WebGL context loss on supported
@@ -64,4 +82,4 @@ build measurements, not Lighthouse scores or measured Core Web Vitals.
 - Confirm Cloudflare's production branch and resolve the existing separate
   Workers check if it still runs. Do not merge until the owner approves.
 
-![Selected work in the production build](temporal-atlas-work.jpg)
+![Selected work in the earlier baseline build](temporal-atlas-work.jpg)

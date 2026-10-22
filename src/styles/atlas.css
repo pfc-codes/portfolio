@@ -675,7 +675,9 @@ em {
 }
 .frames-section {
   border-top: 1px solid var(--line);
+  margin-top: 64px;
   padding-top: 25px;
+  padding-bottom: 80px;
 }
 .frames-grid {
   display: grid;
@@ -931,26 +933,41 @@ em {
 .frame-controls > .button {
   justify-self: start;
 }
-.about-practice {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 60px;
+.about-intro h1 {
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.about-copy {
+  max-width: 770px;
+  margin-left: auto;
+  padding-bottom: 80px;
+}
+.about-copy p {
+  font-size: 19px;
+  line-height: 1.75;
+}
+.about-copy p + p {
+  margin-top: 28px;
+}
+.about-scene {
   border-top: 1px solid var(--line);
-  padding-block: 30px 85px;
+  padding-block: 25px 90px;
 }
-.about-practice > .section-label {
-  display: block;
+.viewer-help {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
 }
-.about-practice h2 {
-  font-size: clamp(35px, 4vw, 60px);
-  line-height: 1.15;
-  letter-spacing: -0.055em;
-  margin-bottom: 30px;
+.viewer-help p {
+  max-width: 600px;
+  font-size: 12px;
+  color: var(--gray);
 }
-.about-practice p {
-  font-size: 15px;
-  max-width: 610px;
-  margin-bottom: 24px;
+.viewer-help a {
+  white-space: nowrap;
 }
 .practice-areas {
   padding-bottom: 100px;
@@ -1335,6 +1352,10 @@ em {
   .frames-section > .section-heading {
     align-items: flex-start;
   }
+  .frames-section {
+    margin-top: 40px;
+    padding-bottom: 50px;
+  }
   .frames-section > .section-heading > .mono {
     font-size: 9px;
     text-align: right;
@@ -1447,11 +1468,19 @@ em {
     padding-inline: 10px;
     font-size: 11px;
   }
-  .about-practice {
-    padding-top: 30px;
+  .about-copy {
+    padding-bottom: 50px;
   }
-  .about-practice p {
-    font-size: 14px;
+  .about-copy p {
+    font-size: 16px;
+  }
+  .about-scene {
+    padding-bottom: 60px;
+  }
+  .viewer-help {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
   .practice-areas {
     padding-bottom: 60px;
