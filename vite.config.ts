@@ -9,8 +9,12 @@ import { DITHER, whitePoint, toneMap } from "./src/media/dither.ts";
 const renderLoader = (): Plugin => ({
   name: "phro-render-loader",
   transformIndexHtml(html) {
-    const partial = readFileSync("src/boot/render-loader.html", "utf8").trim()
-      .replace("/*shared-dither*/", `var DITHER = ${JSON.stringify(DITHER)}; var whitePoint = ${whitePoint.toString()}; var toneMap = ${toneMap.toString()};`);
+    const partial = readFileSync("src/boot/render-loader.html", "utf8")
+      .trim()
+      .replace(
+        "/*shared-dither*/",
+        `var DITHER = ${JSON.stringify(DITHER)}; var whitePoint = ${whitePoint.toString()}; var toneMap = ${toneMap.toString()};`,
+      );
     if (!html.includes("<!--render-loader-->"))
       throw new Error("index.html is missing the <!--render-loader--> marker.");
     return html.replace("<!--render-loader-->", partial);
@@ -20,7 +24,13 @@ const renderLoader = (): Plugin => ({
 export default defineConfig(({ isSsrBuild, mode, command }) => ({
   define: {
     __PREVIEW__: JSON.stringify(command === "serve" || mode === "preview"),
-    __HD_MEDIA__: JSON.stringify(entries.flatMap(p => p.media.film ? [p.media.film.src.replace(/\.mp4$/, "-1080.mp4")] : []).filter(path => existsSync(`public${path}`))),
+    __HD_MEDIA__: JSON.stringify(
+      entries
+        .flatMap((p) =>
+          p.media.film ? [p.media.film.src.replace(/\.mp4$/, "-1080.mp4")] : [],
+        )
+        .filter((path) => existsSync(`public${path}`)),
+    ),
   },
   plugins: [renderLoader()],
   server: { host: "0.0.0.0", port: 5173, allowedHosts: ["terminal.local"] },

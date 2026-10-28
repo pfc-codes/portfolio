@@ -286,7 +286,7 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
         // Waiting on the page: hold the finished frame and sweep a scanline.
         px.set(fin);
         var held = now - compStart;
-        if (held > 300) {
+        if (held > 300 && !reduce) {
           var row = Math.floor(((held - 300) / 900 % 1) * H);
           for (var x = 0; x < W; x++) { var j = row * W + x; px[j] = px[j] === INK ? BG : INK; }
         }
