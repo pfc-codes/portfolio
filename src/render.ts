@@ -1,198 +1,136 @@
-import { projects, routes, site, type Project } from "./content/projects";
+import { categories, entries, visibleEntries, routeList, site, pointCloudPoster, type Entry, type Still, type Film } from './content/work';
+import { fallbackPath } from './media/dither';
 
-export { routes, projects };
-export const escape = (value: string) =>
-  value.replace(
-    /[&<>"']/g,
-    (char) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        char
-      ]!,
-  );
-const arrow = `<span aria-hidden='true'>↗</span>`;
-const label = (left: string, right = "") =>
-  `<div class='section-label'><span>${left}</span>${right ? `<span>${right}</span>` : ""}</div>`;
-const image = (p: Project, eager = false) =>
-  `<img src='${p.poster}' alt='${escape(p.posterAlt)}' width='900' height='1600' ${eager ? "fetchpriority='high' loading='eager'" : "loading='lazy'"} decoding='async'>`;
-const card = (p: Project, eager = false) => `<article class='project-card'>
-  <a class='project-link' href='/work/${p.slug}/'>
-    <div class='project-image'>${image(p, eager)}<span class='media-caption'>${p.study} <span>${p.duration.toFixed(2)} s</span></span><span class='project-open' aria-hidden='true'>↗</span></div>
-    <div class='project-heading'><span class='index'>${p.number}</span><h3>${p.title}</h3><span class='project-arrow' aria-hidden='true'>↗</span></div>
-    <p class='project-category'>${p.category}</p>
-  </a>
-</article>`;
+export { entries, categories };
+export const previewBuild = __PREVIEW__;
+export const productionRoutes = routeList(false);
+export const routes = routeList(previewBuild);
+export const escape = (value: string | number) => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+const external = `<span aria-hidden='true'>↗</span>`;
+const categoryFor = (entry: Entry) => categories.find(c => c.slug === entry.category)!;
+const copySlot = (text: string, preview: boolean) => preview ? `<p class='copy-slot' data-copy-needed>${escape(text)}</p>` : '';
+const focus = (point: readonly [number, number] = [50, 50]) => `${point[0]}% ${point[1]}%`;
+
+function media(still: Still, options: { loop?: Film; hero?: boolean; entryFocus?: readonly [number, number] } = {}) {
+  const { loop, hero } = options;
+  return `<div class='media-tile${hero ? ' hero-media' : ''}' data-dither${hero ? " data-hero" : ''} style='--focus:${escape(focus(still.focus || options.entryFocus))}'>
+    <img class='dither-poster' src='${escape(fallbackPath(still.src))}' data-clean-src='${escape(still.src)}' alt='${escape(still.alt)}' width='${still.width}' height='${still.height}' ${hero ? "fetchpriority='high' loading='eager'" : "loading='lazy'"} decoding='async'>
+    <img class='clean-poster' src='${escape(still.src)}' alt='' aria-hidden='true' width='${still.width}' height='${still.height}' loading='${hero ? 'eager' : 'lazy'}' decoding='async'>
+    ${loop ? `<video data-loop${hero ? ' data-hero-video autoplay' : ''} data-src='${escape(loop.src)}' muted loop playsinline preload='none' poster='${escape(fallbackPath(still.src))}' width='${loop.width}' height='${loop.height}' aria-hidden='true' tabindex='-1'></video>` : ''}
+  </div>`;
+}
+
+function card(p: Entry, preview: boolean) {
+  return `<article class='work-card${p.draft ? ' draft-card' : ''}'>
+    <a class='work-card-link' href='/work/${escape(p.slug)}/'>
+      ${p.media.poster ? media(p.media.poster, { loop: p.media.loop, entryFocus: p.focus }) : `<div class='media-placeholder'><span>Draft / media needed</span></div>`}
+      <div class='card-caption'><h3>${escape(p.title)}</h3><span>${p.draft ? 'Preview only' : escape(p.medium.join(' / '))}</span></div>
+    </a>
+    ${p.draft ? copySlot(p.needed?.[0] || 'Project details needed.', preview) : ''}
+  </article>`;
+}
 
 function header(path: string) {
   return `<a class='skip-link' href='#main'>Skip to content</a>
-  <header class='site-header wrap'>
-    <a class='wordmark' href='/' aria-label='phro.design home'>phro<span class='brand-dot'>.</span><span class='wordmark-tail'>design</span></a>
-    <button class='menu-toggle' type='button' data-menu-toggle aria-expanded='false' aria-controls='site-nav' hidden>Menu <span aria-hidden='true'>+</span></button>
-    <nav class='site-nav' id='site-nav' aria-label='Main navigation'>${[
-      "Work",
-      "About",
-      "Contact",
-    ]
-      .map((name) => {
-        const href = `/${name.toLowerCase()}/`;
-        return `<a href='${href}' ${path.startsWith(href) ? "aria-current='page'" : ""}>${name}${name === "Contact" ? arrow : ""}</a>`;
-      })
-      .join("")}</nav>
+  <header class='site-header'>
+    <a class='wordmark' href='/' aria-label='phro.design home'>phro.design</a>
+    <div class='header-actions'><button type='button' data-motion-toggle hidden>Pause motion</button><button class='menu-toggle' type='button' data-menu-toggle aria-expanded='false' aria-controls='site-nav' hidden>Menu +</button></div>
+    <nav class='site-nav' id='site-nav' aria-label='Main navigation'>${['Work', 'About', 'Contact'].map(name => {
+      const href = `/${name.toLowerCase()}/`;
+      return `<a href='${href}'${path === href ? " aria-current='page'" : path.startsWith(href) ? " class='in-section'" : ''}>${name}</a>`;
+    }).join('')}</nav>
   </header>`;
 }
 
-const footer = () => `<footer class='site-footer wrap'>
-  <div class='footer-top'><p>Have something<br>in mind?</p><a class='contact-link' href='/contact/'>Let's make it tangible. ${arrow}</a></div>
-  <div class='footer-bottom'><a class='footer-brand' href='/'>phro.design</a><span>Creative technology & spatial media</span><div><a href='${site.instagram}'>Instagram ${arrow}</a><a href='mailto:${site.email}'>Email ${arrow}</a></div><a class='back-top' href='#top'>Back to top ↑</a></div>
-</footer>`;
+const footer = () => `<footer class='site-footer wrap'><a class='footer-email' href='mailto:${escape(site.email)}'>${escape(site.email)}</a><div class='footer-bottom'><span>phro.design</span><a href='${escape(site.instagram)}'>Instagram ${external}</a></div></footer>`;
 
-function home() {
-  return `<section class='hero wrap'>
-    ${label("Pietro Francis Costa", "Creative technology / Moving image / Spatial media")}
-    <h1>Time, given <em>form.</em></h1>
-    <div class='hero-bottom'><p>Experiments at the edges<br>of image, time, and space.</p><a class='text-link' href='#selected-work'>Explore selected work <span aria-hidden='true'>↓</span></a></div>
-    <div class='time-ruler' aria-hidden='true'><span>00:00</span><span>00:04</span><span>00:08</span><span>00:12</span></div>
+function home(preview: boolean) {
+  const jordan = entries.find(p => p.slug === 'jordan')!;
+  return `<section class='hero' aria-label='Jordan — Time Block film'>
+    ${media(jordan.media.poster!, { loop: jordan.media.loop, hero: true })}
+    <div class='hero-caption'><a href='/work/jordan/'>Jordan / Time Block</a><button type='button' data-hero-play hidden>Play film</button><a href='/work/'>View work</a></div>
+    <noscript><a class='hero-static-play' href='/work/jordan/'>Play Jordan</a></noscript>
   </section>
-  <section class='selected-work wrap' id='selected-work' aria-labelledby='selected-title'>
-    <div class='section-heading'><h2 id='selected-title'>Selected work</h2><a class='text-link' href='/work/'>View the index ${arrow}</a></div>
-    <div class='project-grid staggered'>${projects.map((p, i) => card(p, i === 0)).join("")}</div>
-  </section>
-  <section class='practice-strip wrap'>${label("The practice", "01 — Observe / 02 — Reconstruct / 03 — Reimagine")}
-    <p>I work with moving images, spatial media, and code to explore how we <em>experience time.</em></p><a class='text-link' href='/about/'>About the practice ${arrow}</a>
-  </section>`;
+  <section class='identity wrap'><h1>${escape(site.identity)}</h1></section>
+  <section class='home-work wrap' aria-labelledby='selected-title'><div class='section-heading'><h2 id='selected-title'>Selected work</h2><a href='/work/'>Full index</a></div><div class='work-grid'>${[entries.find(p => p.slug === 'water-dance')!, entries.find(p => p.slug === 'ozzy')!].map(p => card(p, preview)).join('')}</div></section>
+  <div class='home-tool wrap'><a href='/work/time-block-addon/'>Time Block — the Blender add-on</a><span>Tool &amp; practice</span></div>`;
 }
 
-function work() {
-  return `<section class='page-intro wrap'>${label("Index / Work", "02 selected projects")}<h1>Time in<br><em>another dimension.</em></h1><div class='intro-bottom'><p>Studies in temporal manipulation, experimental video, and spatial media.</p><span class='mono'>Moving image → Spatial object</span></div></section>
-    <section class='wrap work-index' aria-labelledby='work-title'><h2 id='work-title' class='sr-only'>Project index</h2><div class='project-grid'>${projects.map((p, i) => card(p, i === 0)).join("")}</div></section>
-    <section class='wrap adjacent-work'>${label("Elsewhere / Digital design")}<h2>Across the web.</h2><div class='external-list'>${[
-      ["Pietro Costa", "https://pietrocosta.com"],
-      ["Whitespace Projects", "https://whitespaceprojectsnapoli.org"],
-      ["BACAS", "https://bacasitaly.org/about"],
-    ]
-      .map(
-        ([name, url]) =>
-          `<a href='${url}'><span>${name}</span><span class='mono'>Visit website ${arrow}</span></a>`,
-      )
-      .join("")}</div></section>`;
+function work(preview: boolean) {
+  const projects = visibleEntries(preview);
+  return `<section class='page-intro wrap'><h1>Work</h1><p>Moving image, tools, objects.</p>
+    <nav class='category-nav' aria-label='Work disciplines'>${categories.map(c => `<a href='#${escape(c.slug)}'>${escape(c.title)}</a>`).join('')}</nav></section>
+    <div class='work-index wrap'>${categories.map(c => `<section class='category-section' id='${escape(c.slug)}' aria-labelledby='heading-${escape(c.slug)}'>
+      <div class='category-heading'><h2 id='heading-${escape(c.slug)}'>${escape(c.title)}</h2>${c.descriptionDraft ? copySlot(c.description, preview) : `<p>${escape(c.description)}</p>`}</div>
+      <div class='work-grid'>${projects.filter(p => p.category === c.slug).map(p => card(p, preview)).join('')}</div>
+      ${c.related?.map(slug => { const p = entries.find(e => e.slug === slug)!; return `<p class='cross-reference'>Also: <a href='/work/${escape(p.slug)}/'>${escape(p.title)}</a> — depth workflow, listed under VFX.</p>`; }).join('') || ''}
+    </section>`).join('')}</div>`;
 }
 
-function film(p: Project) {
-  return `<figure class='film'>
-    <div class='film-stage'><video controls playsinline preload='none' width='720' height='1280' poster='${p.poster}' aria-label='${p.title}: ${p.study}, silent film' src='${p.video}' data-project-video><p>Your browser cannot play this film. <a href='${p.video}'>Open the MP4.</a></p></video></div>
-    <figcaption><span>${p.study} / ${p.title}</span><span>${p.duration.toFixed(2)} s · ${p.fps} fps · Silent</span><a href='${p.video}'>Open film ${arrow}</a></figcaption>
-    <p class='media-error' data-video-error hidden>The film could not load. <a href='${p.video}'>Open the MP4 directly</a>, or explore the stills below.</p>
-  </figure>`;
+function film(p: Entry) {
+  const f = p.media.film!;
+  const candidate = f.src.replace(/\.mp4$/, "-1080.mp4");
+  const hd = f.hd || (__HD_MEDIA__.includes(candidate) ? candidate : undefined);
+  return `<figure class='film'><video controls playsinline preload='none' width='${f.width}' height='${f.height}' poster='${escape(p.media.poster!.src)}' aria-label='${escape(p.title)}, silent film' data-project-video>
+    ${hd ? `<source src='${escape(hd)}' type='video/mp4' media='(min-width: 701px)'>` : ''}<source src='${escape(f.src)}' type='video/mp4'>
+    <p>Your browser cannot play this film. <a href='${escape(f.src)}'>Open the MP4</a>.</p></video>
+    <figcaption><span>${escape(p.title)}</span><span>${f.duration ? `${f.duration.toFixed(2)} s · ` : ''}${f.fps ? `${f.fps} fps · ` : ''}Silent</span><a href='${escape(f.src)}'>Open film</a></figcaption>
+    <p class='media-error' data-video-error hidden>The film could not load. <a href='${escape(f.src)}'>Open the MP4</a>.</p></figure>`;
 }
 
-function projectPage(p: Project) {
-  const next = projects[(projects.indexOf(p) + 1) % projects.length];
-  return `<section class='project-intro wrap'>${label(`<a href='/work/'>Work</a> / ${p.number}`, p.category)}<h1>${p.title}<span class='title-period'>.</span></h1><div class='project-deck'><span class='mono'>Study / ${p.study}</span></div></section>
-  <section class='wrap project-film' aria-label='${p.title} film'>${film(p)}</section>
-  <section class='wrap frames-section' aria-labelledby='frames-title'><div class='section-heading'><h2 id='frames-title'>Selected frames</h2><span class='mono'>${p.study}</span></div><div class='frames-grid'>${p.frames.map((f) => `<figure><img src='${f.src}' alt='${f.alt}' width='480' height='853' loading='lazy'><figcaption>${p.study}<span>${f.time}</span></figcaption></figure>`).join("")}</div></section>
-  <a class='next-project wrap' href='/work/${next.slug}/'><span class='mono'>Next project / ${next.number}</span><span>${next.title} ${arrow}</span></a>`;
+function youtube(p: Entry) {
+  return `<div class='youtube-facade' data-youtube='${escape(p.media.youtubeId!)}' data-video-title='${escape(p.title)}'>
+    ${media(p.media.poster!)}<button class='youtube-play' data-youtube-load type='button' hidden><span aria-hidden='true'>▶</span> Play full video</button>
+    <noscript><a class='youtube-play' href='${escape(p.links!.video!)}'>Watch on YouTube ${external}</a></noscript>
+  </div><p class='film-note'>Full music video · VFX by Pietro Francis Costa. <a href='${escape(p.links!.video!)}'>YouTube ${external}</a></p>`;
+}
+
+function projectPage(p: Entry, preview: boolean) {
+  const c = categoryFor(p);
+  return `<section class='project-intro wrap'><a class='breadcrumb' href='/work/#${escape(c.slug)}'>${escape(c.title)}</a><h1>${escape(p.title)}</h1>
+    <div class='project-meta'><span>${escape(p.medium.join(' / '))}</span>${p.year ? `<span>${p.year}</span>` : ''}${p.tools.length ? `<span>${escape(p.tools.join(' / '))}</span>` : ''}</div>
+    ${p.draft ? `<p class='draft-badge'>Draft / preview only</p>` : ''}
+    ${p.description ? p.descriptionDraft ? copySlot(p.description, preview) : `<p class='project-description'>${escape(p.description)}</p>` : copySlot('[Copy needed: project description.]', preview)}</section>
+    <section class='project-media wrap' aria-label='${escape(p.title)} media'>${p.media.film ? film(p) : p.media.youtubeId ? youtube(p) : p.media.poster ? `<figure>${media(p.media.poster)}${p.media.poster.caption ? `<figcaption>${escape(p.media.poster.caption)}</figcaption>` : ''}</figure>` : `<div class='media-placeholder'><span>Draft / media needed</span></div>`}</section>
+    ${p.tool ? `<section class='tool-details wrap' aria-label='Add-on details'><dl><div><dt>Version listed on Gumroad</dt><dd>${escape(p.tool.version)}</dd></div><div><dt>Price</dt><dd>${escape(p.tool.price)}</dd></div><div><dt>License</dt><dd>${escape(p.tool.license)}</dd></div></dl><p class='film-note'>Store details checked ${escape(p.tool.checked)}.</p><a class='button' href='${escape(p.links!.store!)}'>Get Time Block on Gumroad ${external}</a><p><a href='/work/#time-block-work'>See work made with Time Block</a></p></section>` : ''}
+    ${p.credits?.length ? `<section class='credits wrap' aria-label='Credits'><dl>${p.credits.map(credit => `<div><dt>${escape(credit.role)}</dt><dd>${escape(credit.artist)}</dd></div>`).join('')}</dl></section>` : ''}
+    ${p.media.stills?.length ? `<section class='stills-section wrap' aria-labelledby='stills-heading'><h2 id='stills-heading'>Stills</h2><div class='stills-grid'>${p.media.stills.map(s => `<figure tabindex='0'>${media(s, { entryFocus: p.focus })}<figcaption>${escape(s.caption || p.title)}</figcaption></figure>`).join('')}</div></section>` : ''}
+    ${p.process?.length ? `<section class='process-section wrap' aria-labelledby='process-heading'><h2 id='process-heading'>Process</h2><div class='process-grid'>${p.process.map(m => `<figure tabindex='0'>${media(m.still, { loop: m.video })}<figcaption>${escape(m.label)}</figcaption></figure>`).join('')}</div></section>` : ''}
+    ${preview && p.needed?.length ? `<aside class='media-checklist wrap' aria-labelledby='needed-heading'><h2 id='needed-heading'>To supply / preview only</h2><ul>${p.needed.map(n => `<li>${escape(n)}</li>`).join('')}</ul></aside>` : ''}
+    <div class='project-return wrap'><a href='/work/'>All work</a></div>`;
 }
 
 function pointCloud() {
-  return `<section class='wrap about-scene' aria-labelledby='viewer-heading'>
-  <div class='section-heading'><h2 id='viewer-heading'>Point cloud.</h2><span class='mono'>Interactive / 3D</span></div>
-  <div class='spatial-stage' data-splat-stage><div class='splat-mount' data-splat-mount aria-label='3D scene viewport' aria-describedby='viewer-help' tabindex='-1'></div><div class='splat-cover' data-splat-cover><span class='point-glyph' aria-hidden='true'>✳</span><button class='button button-light' data-splat-load type='button' hidden>Load the 3D scene <span aria-hidden='true'>↗</span></button><span class='download-note'>22.6 MB · Loads when you choose</span><noscript><p>Enable JavaScript to explore the point cloud, or <a href='/work/'>watch the project films</a>.</p></noscript></div></div>
-  <div class='viewer-controls' data-splat-controls hidden><button type='button' data-orbit='left' aria-label='Rotate scene left'>← Rotate</button><button type='button' data-orbit='right' aria-label='Rotate scene right'>Rotate →</button><button type='button' data-zoom='in'>Zoom in +</button><button type='button' data-zoom='out'>Zoom out −</button><button type='button' data-splat-reset>Reset view</button><button type='button' data-splat-close>Close scene</button></div>
-  <p class='experiment-status' data-splat-status role='status' aria-live='polite'></p>
-  <div class='viewer-help'><p id='viewer-help'>Drag to orbit. Scroll or pinch to zoom. With the scene focused, use the arrow keys and + / −.</p><a class='text-link' href='/work/'>View the work ${arrow}</a></div>
-  </section>`;
+  return `<section class='about-scene wrap' aria-labelledby='viewer-heading'><h2 id='viewer-heading'>Point cloud</h2>
+    <div class='spatial-stage' data-splat-stage><div class='splat-mount' data-splat-mount aria-label='3D scene viewport' aria-describedby='viewer-help' tabindex='-1'></div>
+    <div class='splat-cover' data-splat-cover>${media(pointCloudPoster)}<div class='splat-gate'><button class='button' data-splat-load type='button' hidden>Explore the point cloud</button><span class='download-note'>22.6 MB · Load on request</span><noscript><p>Enable JavaScript to explore the capture in 3D.</p></noscript></div></div></div>
+    <div class='viewer-controls' data-splat-controls hidden><button type='button' data-orbit='left' aria-label='Rotate scene left'>Rotate left</button><button type='button' data-orbit='right' aria-label='Rotate scene right'>Rotate right</button><button type='button' data-zoom='in'>Zoom in</button><button type='button' data-zoom='out'>Zoom out</button><button type='button' data-splat-reset>Reset view</button><button type='button' data-splat-close>Close scene</button></div>
+    <p class='experiment-status' data-splat-status role='status' aria-live='polite'></p><p id='viewer-help' class='film-note'>Drag to orbit. Scroll or pinch to zoom. With the scene focused, use the arrow keys and + / −.</p></section>`;
 }
 
-function about() {
-  return `<section class='page-intro about-intro wrap'>${label("About", "Pietro Francis Costa")}<h1>I turn moving images into <em>places.</em></h1></section>
-  <div class='wrap'><div class='about-copy'><p>Using video, depth, sound, and real-world captures, I build digital objects that show how they were made: semi-volumetric forms where the structure stays visible in the points, the dither, and the artifacts the process leaves behind. Rather than layering effects onto footage, I transform it, pulling a flat image into something you can walk around, slice through, or see from an angle it was never meant to be seen from.</p><p>Time Block and Depth Echo come out of that practice. They’re tools I built in Blender and code to treat time as a material, so a clip can become a volume and a single frame can open into space.</p></div></div>
-  ${pointCloud()}`;
+function about(preview: boolean) {
+  return `<section class='page-intro wrap'><h1>About</h1><p>${escape(site.identity)}</p></section><div class='about-copy wrap'><p>I work with video, depth and real-world captures to build objects that show how they were made.</p>${copySlot('[Copy needed: final biography and practice statement.]', preview)}</div>${pointCloud()}`;
 }
-
 function contact() {
-  return `<section class='page-intro contact-intro wrap'>${label("Contact", "A conversation is a good place to start")}<h1>What are<br>you <em>imagining?</em></h1><div class='intro-bottom'><p>For projects, collaborations, or an interesting question about images, spaces, and time.</p></div><a class='email-link' href='mailto:${site.email}'>${site.email} ${arrow}</a><button class='copy-email text-link' data-copy-email='${site.email}' type='button' hidden>Copy email address</button><p class='copy-status' data-copy-status role='status' aria-live='polite'></p></section>
-  <section class='wrap contact-elsewhere'>${label("Find me elsewhere")}<div class='external-list'>${[
-    ["Instagram", site.instagram],
-    ["YouTube", site.youtube],
-    ["TikTok", site.tiktok],
-  ]
-    .map(([name, url]) => `<a href='${url}'><span>${name}</span>${arrow}</a>`)
-    .join("")}</div></section>`;
+  return `<section class='page-intro contact-intro wrap'><h1>Contact</h1><a class='email-link' href='mailto:${escape(site.email)}'>${escape(site.email)}</a><button class='copy-email' data-copy-email='${escape(site.email)}' type='button' hidden>Copy email address</button><p data-copy-status role='status' aria-live='polite'></p></section><nav class='contact-links wrap' aria-label='Elsewhere'>${[['Instagram', site.instagram], ['YouTube', site.youtube], ['TikTok', site.tiktok]].map(([name, url]) => `<a href='${escape(url)}'>${escape(name)} ${external}</a>`).join('')}</nav>`;
 }
+const missing = () => `<section class='page-intro not-found wrap'><h1>Page not found</h1><p>This address is outside the index.</p><a class='button' href='/work/'>Explore the work</a></section>`;
 
-function missing() {
-  return `<section class='page-intro wrap not-found'>${label("404 / Outside the frame")}<h1>A moment<br><em>out of place.</em></h1><p>This page isn't here. The work is a good place to pick up the thread.</p><a class='button button-dark' href='/work/'>Explore the work ${arrow}</a></section>`;
-}
-
-export function render(pathname: string) {
-  const path =
-    pathname === "/404.html"
-      ? pathname
-      : `/${pathname.split("/").filter(Boolean).join("/")}${pathname === "/" ? "" : "/"}`;
-  const p = projects.find((item) => path === `/work/${item.slug}/`);
-  const known = routes.includes(path);
-  const page = p
-    ? projectPage(p)
-    : path === "/"
-      ? home()
-      : path === "/work/"
-        ? work()
-        : path === "/about/"
-          ? about()
-          : path === "/contact/"
-            ? contact()
-            : missing();
-  const titles: Record<string, string> = {
-    "/": "phro.design — Time, given form",
-    "/work/": "Work — phro.design",
-    "/about/": "About Pietro — phro.design",
-    "/contact/": "Contact — phro.design",
-  };
-  const title = p
-    ? `${p.title}: ${p.study} — phro.design`
-    : titles[path] || "Page not found — phro.design";
-  const descriptions: Record<string, string> = {
-    "/": "Pietro Francis Costa explores image, time, and space through creative technology, experimental video, spatial media, and interactive experiences.",
-    "/work/":
-      "Explore Time Block and Depth Echo: moving-image studies in temporal manipulation, experimental video, and spatial media by Pietro Francis Costa.",
-    "/about/":
-      "I turn moving images into places. Using video, depth, sound, and real-world captures, I build digital objects that show how they were made.",
-    "/contact/":
-      "Get in touch with Pietro Francis Costa at phro.design for creative technology, moving image, spatial media, and digital design collaborations.",
-  };
-  const description = p
-    ? `${p.title}: ${p.study}. ${p.duration.toFixed(2)}-second silent film by Pietro Francis Costa.`
-    : descriptions[path] ||
-      "This page could not be found. Explore the work at phro.design.";
-  const canonical = `${site.origin}${known ? path : "/404.html"}`;
-  const socialImage = `${site.origin}${p?.poster || projects[0].poster}`;
-  const schema = p
-    ? {
-        "@context": "https://schema.org",
-        "@type": "CreativeWork",
-        name: p.title,
-        description,
-        url: canonical,
-        image: socialImage,
-        creator: { "@type": "Person", name: "Pietro Francis Costa" },
-      }
-    : {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: site.name,
-        url: site.origin,
-        description: descriptions["/"],
-      };
-  const head = `<title>${escape(title)}</title>
-  <meta name='description' content='${escape(description)}'>
-  <link rel='canonical' href='${canonical}'>
-  ${!known || path === "/404.html" ? "<meta name='robots' content='noindex'>" : ""}
-  <meta property='og:type' content='website'><meta property='og:title' content='${escape(title)}'><meta property='og:description' content='${escape(description)}'><meta property='og:url' content='${canonical}'><meta property='og:image' content='${socialImage}'><meta property='og:image:alt' content='${escape((p || projects[0]).posterAlt)}'><meta property='og:site_name' content='${site.name}'><meta name='twitter:card' content='summary_large_image'>
-  <script type='application/ld+json'>${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`;
-  return {
-    title,
-    description,
-    head,
-    body: `<div id='top'></div>${header(path)}<main id='main' tabindex='-1'>${page}</main>${footer()}`,
-    status: known && path !== "/404.html" ? 200 : 404,
-  };
+export function render(pathname: string, preview = previewBuild) {
+  const path = pathname === '/404.html' ? pathname : '/' + pathname.split('/').filter(Boolean).join('/') + (pathname.split('/').join('') ? '/' : '');
+  const p = visibleEntries(preview).find(e => path === `/work/${e.slug}/`);
+  const known = routeList(preview).includes(path) && path !== '/404.html';
+  const titles: Record<string, string> = { '/': site.identity + ' — phro.design', '/work/': 'Work — phro.design', '/about/': 'About — phro.design', '/contact/': 'Contact — phro.design' };
+  const descriptions: Record<string, string> = { '/': site.identity, '/work/': 'Films, tools and objects by Pietro Francis Costa, grouped by discipline.', '/about/': 'The moving image practice of Pietro Francis Costa.', '/contact/': 'Contact Pietro Francis Costa at phro.design.' };
+  const title = p ? `${p.title}${p.category === 'time-block-addon' ? ' — Blender add-on' : ''} — phro.design` : titles[path] || 'Page not found — phro.design';
+  const description = p ? p.description || `${p.title}. ${categoryFor(p).title} by Pietro Francis Costa.` : descriptions[path] || 'This page could not be found. Explore the work at phro.design.';
+  const canonical = site.origin + (known ? path : '/404.html');
+  const poster = p?.media.poster || entries.find(e => e.slug === 'jordan')!.media.poster!;
+  const schema = { '@context': 'https://schema.org', '@type': p ? 'CreativeWork' : 'WebSite', name: p?.title || site.name, url: canonical, description, image: site.origin + poster.src };
+  const head = `<title>${escape(title)}</title><meta name='description' content='${escape(description)}'><link rel='canonical' href='${escape(canonical)}'>
+    ${!known || preview ? "<meta name='robots' content='noindex'>" : ''}
+    <meta property='og:type' content='${p ? 'video.other' : 'website'}'><meta property='og:title' content='${escape(title)}'><meta property='og:description' content='${escape(description)}'><meta property='og:url' content='${escape(canonical)}'><meta property='og:image' content='${escape(site.origin + poster.src)}'><meta property='og:image:alt' content='${escape(poster.alt)}'><meta property='og:site_name' content='${escape(site.name)}'><meta name='twitter:card' content='summary_large_image'>
+    <script type='application/ld+json'>${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>`;
+  const page = p ? projectPage(p, preview) : path === '/' ? home(preview) : path === '/work/' ? work(preview) : path === '/about/' ? about(preview) : path === '/contact/' ? contact() : missing();
+  return { title, description, head, body: `${header(path)}<main id='main' tabindex='-1'>${page}</main>${footer()}`, status: known ? 200 : 404 };
 }

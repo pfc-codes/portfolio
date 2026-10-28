@@ -3,11 +3,13 @@ html.pcl-on{background:#000!important;overflow:hidden!important}
 html.pcl-on body>*:not(#pcl){visibility:hidden!important}
 #pcl{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;
   box-sizing:border-box;background:#000;color:#ededed;
-  font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  font:11px/1.6 'Departure Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em;
   padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px));
   transition:opacity .7s ease;-webkit-font-smoothing:antialiased}
 #pcl *{box-sizing:border-box}
 #pcl.pcl-out{opacity:0;pointer-events:none}
+#pcl.pcl-flight{background:transparent;pointer-events:none}
+#pcl.pcl-flight .pcl-head,#pcl.pcl-flight .pcl-bar,#pcl.pcl-flight .pcl-foot{visibility:hidden}
 #pcl .pcl-win{display:flex;flex-direction:column;gap:8px;max-width:100%}
 #pcl .pcl-head{display:flex;flex-wrap:wrap;align-content:flex-end;gap:0 10px;min-height:3.2em;color:#939393}
 #pcl .pcl-head span{white-space:nowrap}
@@ -25,27 +27,27 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
    into an ordered dither of the Time Block poster. Plays once per session,
    never blocks for more than maxMs, and is skipped without JavaScript. */
 (function () {
+  /*shared-dither*/
   var CFG = {
     word: 'phro.design',
     title: 'Pietro Francis Costa',
     filename: 'phro_design_0001.png',
     image: '/media/time-block/poster.webp',
-    crop: [40, 590, 880, 430],      // subject region of the poster: x, y, w, h
+    crop: DITHER.heroCrop,      // subject region of the poster: x, y, w, h
     imageWaitMs: 700,               // after this, render the fallback sphere
     samples: 32,
     threads: 4,
     minMs: 2600,
     maxMs: 9000,
     oncePerSession: true,
-    bg: [0, 0, 0],
-    ink: [237, 237, 237],
-    dot: [36, 36, 36]
+    bg: DITHER.bg,
+    ink: DITHER.ink,
+    dot: DITHER.dot
   };
 
   var root = document.documentElement;
   try { if (/[?&]noloader\b/.test(location.search)) return; } catch (e) {}
   try { if (CFG.oncePerSession && sessionStorage.getItem('pcl-seen')) return; } catch (e) {}
-  if (navigator.webdriver) return;
   var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   if (reduce) CFG.minMs = 700;
   root.classList.add('pcl-on');
@@ -58,9 +60,10 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
 
   function pack(c) { return ((255 << 24) | (c[2] << 16) | (c[1] << 8) | c[0]) >>> 0; }
   var INK = pack(CFG.ink), BG = pack(CFG.bg), DOT = pack(CFG.dot);
-  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(function (v) { return (v + 0.5) / 16; });
+  var BAYER = DITHER.matrix.map(function (v) { return (v + 0.5) / 16; });
 
   var W, H, T, S, ctx, img, px, lum, fin, tiles, queue, active, done, tileMs, last, phase, compStart, prepStart;
+  var drawn = null, handingOff = false;
   var hd, bar, pct, peak = 0, shownSample = 1, source = null, sourceFailed = false;
 
   var pic = new Image();
@@ -165,7 +168,8 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
         var c = CFG.crop;
         var s = Math.min((W * 0.94) / c[2], (areaH * 0.94) / c[3]);
         var dw = c[2] * s, dh = c[3] * s;
-        g.drawImage(source, c[0], c[1], c[2], c[3], (W - dw) / 2, (areaH - dh) / 2 + H * 0.02, dw, dh);
+        drawn = [(W - dw) / 2, (areaH - dh) / 2 + H * 0.02, dw, dh];
+        g.drawImage(source, c[0], c[1], c[2], c[3], drawn[0], drawn[1], dw, dh);
         drewImage = true;
       } catch (e) { drewImage = false; }
     }
@@ -174,21 +178,11 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     // Tone-map the frame so dark footage still dithers into a readable image.
     var d = g.getImageData(0, 0, W, H).data;
     lum = new Float32Array(W * H);
-    var hist = new Uint32Array(256), n = 0, yLimit = Math.floor(areaH) * W;
-    for (var i = 0; i < yLimit; i++) {
-      var l = (d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114) | 0;
-      if (l > 6) { hist[l]++; n++; }
-    }
-    var white = 255, acc = 0;
-    for (var v = 255; v > 0; v--) { acc += hist[v]; if (acc > n * 0.02) { white = v; break; } }
-    white = Math.max(white, 60);
-    for (i = 0; i < W * H; i++) {
-      var y0 = (d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114) / white;
-      lum[i] = Math.pow(Math.min(1, y0), 0.8);
-    }
+    var white = whitePoint(d, Math.floor(areaH) * W);
+    for (var i = 0; i < W * H; i++) lum[i] = toneMap(d[i * 4], d[i * 4 + 1], d[i * 4 + 2], white);
 
     // The wordmark, set in solid ink below the subject.
-    var face = 'ui-monospace,SFMono-Regular,Consolas,monospace';
+    var face = 'Departure Mono,monospace';
     var fs = Math.floor(H * 0.12);
     g.font = '600 ' + fs + 'px ' + face;
     while (g.measureText(CFG.word).width > W * 0.8 && fs > 8) { fs--; g.font = '600 ' + fs + 'px ' + face; }
@@ -327,6 +321,15 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
 
   function finish(force) {
     if (ended) return;
+    if (!force && !handingOff && !reduce && location.pathname === '/' && source && drawn) {
+      px.set(fin); ctx.putImageData(img, 0, 0);
+      var handoff = new CustomEvent('pcl:handoff', { cancelable: true, detail: {
+        canvas: el.querySelector('canvas'), crop: CFG.crop, drawn: drawn, deadline: t0 + CFG.maxMs,
+        complete: function () { finish(true); }
+      }});
+      handingOff = true;
+      if (!window.dispatchEvent(handoff)) return;
+    }
     ended = true;
     clearTimeout(hard);
     try { sessionStorage.setItem('pcl-seen', '1'); } catch (e) {}
@@ -340,6 +343,7 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     }
     setTimeout(function () {
       root.classList.remove('pcl-on');
+      window.dispatchEvent(new Event('pcl:done'));
       el.classList.add('pcl-out');
       setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 800);
     }, force ? 0 : 520);

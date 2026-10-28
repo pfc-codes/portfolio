@@ -58,7 +58,7 @@ export function setupSpatialStudy() {
         oldRenderer?.forceContextLoss();
         mount.replaceChildren();
         load.disabled = false;
-        load.textContent = "Load the 3D scene ↗";
+        load.textContent = "Explore the point cloud";
         if (focus) load.focus();
       }
     })();
