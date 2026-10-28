@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-`npm run build` creates a production build. `npm test` checks that build. `npm run build:preview` includes clearly marked drafts. On Cloudflare, `CF_PAGES_BRANCH` selects preview mode for any branch other than `main`; use `npm run build -- --mode production` to force production. Previews are noindex; draft URLs never enter the sitemap.
+`npm run build` creates a production build. `npm test` checks that build and needs ffmpeg for the frame-zero check. `npm run build:preview` includes clearly marked drafts. On Cloudflare, `CF_PAGES_BRANCH` selects preview mode for any branch other than `main`; use `npm run build -- --mode production` to force production. Previews are noindex; draft URLs never enter the sitemap.
 
 ## Add work
 
