@@ -7,9 +7,8 @@ import { routes, entries } from "../../.prerender/render.js";
 
 test("all pages at 1440px and 390px", async ({ page }) => {
   test.setTimeout(180000);
-  // A full-page screenshot stretches the fixed WebGL canvas beyond normal
-  // viewport/texture limits on the long index. Capture the static Bayer layout;
-  // separate tests exercise the live canvas at real viewport sizes.
+  // Capture the complete static Bayer layout. Separate tests exercise the
+  // bounded live canvas at real viewport sizes while scrolling.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await mkdir("test-results/screenshots", { recursive: true });
   for (const width of [1440, 390]) {
