@@ -8,7 +8,9 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4173",
     viewport: { width: 1440, height: 900 },
     launchOptions: {
-      args: [
+      // Windows SwiftShader stalls when releasing the large capture. Exercise
+      // native ANGLE there; Linux CI keeps its reproducible software renderer.
+      args: process.platform === "win32" ? ["--use-angle=default", "--enable-webgl"] : [
         "--use-angle=swiftshader",
         "--enable-webgl",
         "--enable-unsafe-swiftshader",
