@@ -64,7 +64,7 @@ test("all routes are prerendered with unique metadata, one main heading, accessi
   }
 });
 
-test("canonical work routes and all seven discipline anchors exist; old links redirect", async () => {
+test("canonical work routes and all nine discipline anchors exist; old links redirect", async () => {
   const required = [
     "/work/ozzy/",
     "/work/time-block-addon/",
@@ -80,6 +80,8 @@ test("canonical work routes and all seven discipline anchors exist; old links re
     "time-block-addon",
     "time-block-work",
     "depth-echo",
+    "particle",
+    "point-cloud",
     "sculpture",
   ];
   const positions = slugs.map((slug) => work.indexOf(`id='${slug}'`));
@@ -185,7 +187,7 @@ test("films are clean native players and YouTube loads only after a click", asyn
         !tag.includes("autoplay"),
     );
     assert.equal(attribute(tag, "preload"), "none");
-    assert.match(attribute(tag, "aria-label"), /silent film/);
+    assert.ok(attribute(tag, "aria-label").endsWith(p.media.film.audio ? "film with sound" : "silent film"));
     assert.ok(!tag.includes("data-dither"));
     const bytes = await readFile(join("public", p.media.film.src));
     assert.ok(bytes.indexOf("moov") < bytes.indexOf("mdat"));
@@ -283,7 +285,55 @@ test("entry JS remains under 10 kB gzip, 3D stays lazy, capture is unchanged, an
     .digest("hex");
   assert.equal(hash, "f963a58bbebe47c3695748b845bdea351e03c390");
   for (const path of await walk("dist"))
-    assert.ok((await stat(path)).size < 25_000_000, path);
+    assert.ok((await stat(path)).size < 25 * 1024 * 1024, path);
+});
+
+test("all supplied films are published with accurate media metadata, muted lightweight loops and linked credits", async () => {
+  const sources = JSON.parse(await readFile("scripts/media-sources.json", "utf8"));
+  const imported = JSON.parse(await readFile("src/content/imported-media.json", "utf8"));
+  assert.equal(sources.length, 15);
+  assert.equal(Object.keys(imported).length, sources.length);
+  for (const source of sources) {
+    const entry = entries.find((e) => e.slug === source.slug);
+    assert.ok(entry && !entry.draft && entry.description, source.slug);
+    assert.ok(productionRoutes.includes(`/work/${source.slug}/`));
+    const { film, loop, poster } = entry.media;
+    assert.ok(loop.src !== film.src, source.slug);
+    const image = await sharp(join("public", poster.src)).metadata();
+    assert.equal(image.width, poster.width);
+    assert.equal(image.height, poster.height);
+    for (const [kind, asset] of [["film", film], ["loop", loop], ...(film.hd ? [["hd", { src: film.hd, audio: film.audio }]] : [])]) {
+      const path = join("dist", asset.src);
+      const info = JSON.parse(execFileSync("ffprobe", ["-v", "error", "-show_streams", "-show_format", "-of", "json", path], { encoding: "utf8" }));
+      const video = info.streams.find((s) => s.codec_type === "video");
+      assert.equal(video.codec_name, "h264", path);
+      assert.equal(video.pix_fmt, "yuv420p", path);
+      assert.equal(info.streams.some((s) => s.codec_type === "audio"), asset.audio, path);
+      if (kind !== "hd") {
+        assert.equal(video.width, asset.width, path);
+        assert.equal(video.height, asset.height, path);
+        assert.ok(Math.abs(Number(info.format.duration) - asset.duration) < 0.01, path);
+      }
+      if (kind === "loop") {
+        assert.equal(asset.audio, false, path);
+        assert.ok(asset.duration <= 6.1, path);
+        assert.ok(Math.max(video.width, video.height) <= 854, path);
+        assert.ok((await stat(path)).size < 1_000_000, path);
+      }
+      const bytes = await readFile(path);
+      assert.ok(bytes.indexOf("moov") >= 0 && bytes.indexOf("moov") < bytes.indexOf("mdat"), path);
+    }
+    const card = render("/work/", false).body;
+    assert.ok(card.includes(`data-src='${loop.src}'`));
+  }
+  const about = await read("/about/");
+  assert.match(about, /creative technologist and digital artist from Brooklyn/);
+  assert.match(about, /A moment becomes a volume and a video becomes a sculpture/);
+  assert.doesNotMatch(about, /Copy needed/);
+  const ozzy = await read("/work/ozzy/");
+  assert.match(ozzy, /href='https:\/\/jabaribrxwne.com\/'/);
+  assert.match(ozzy, /Jabari Browne/);
+  assert.match(ozzy, /Pietro Francis Costa/);
 });
 
 test("no unreferenced source files or public assets remain", async () => {

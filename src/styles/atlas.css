@@ -589,6 +589,9 @@ dd {
   max-width: 62ch;
   font-size: 16px;
 }
+.about-copy > p + p {
+  margin-top: 24px;
+}
 .about-scene > h2 {
   margin-bottom: 30px;
 }

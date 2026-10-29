@@ -1,3 +1,5 @@
+import importedMedia from "./imported-media.json" with { type: "json" };
+
 export type CategorySlug =
   | "vfx-music-videos"
   | "audio-visual"
@@ -5,6 +7,8 @@ export type CategorySlug =
   | "time-block-addon"
   | "time-block-work"
   | "depth-echo"
+  | "particle"
+  | "point-cloud"
   | "sculpture";
 export interface Category {
   slug: CategorySlug;
@@ -28,6 +32,7 @@ export interface Film {
   height: number;
   duration?: number;
   fps?: number;
+  audio?: boolean;
 }
 export interface ProcessMedia {
   label: string;
@@ -44,7 +49,7 @@ export interface Entry {
   description?: string;
   descriptionDraft?: boolean;
   draft?: boolean;
-  credits?: { artist: string; role: string }[];
+  credits?: { artist: string; role: string; url?: string }[];
   links?: { video?: string; store?: string };
   media: {
     poster?: Still;
@@ -69,19 +74,18 @@ export interface Entry {
 export const categories: Category[] = [
   {
     slug: "vfx-music-videos",
-    title: "VFX for music videos",
-    description: "Visual effects for music videos.",
+    title: "VFX & music videos",
+    description: "Visual effects, procedural experiments and music videos.",
   },
   {
     slug: "audio-visual",
     title: "Audio-visual animations",
-    description: "[Copy needed: one line about audio-visual work.]",
-    descriptionDraft: true,
+    description: "Music translated into points, rings and three-dimensional spectrograms.",
   },
   {
     slug: "semi-volumetric",
-    title: "Semi-volumetric camera work",
-    description: "LiDAR capture and monocular depth estimation.",
+    title: "Volumetric video",
+    description: "LiDAR capture, depth maps and semi-volumetric video.",
     related: ["ozzy"],
   },
   {
@@ -97,8 +101,17 @@ export const categories: Category[] = [
   {
     slug: "depth-echo",
     title: "Depth Echo",
-    description: "[Copy needed: one line about Depth Echo.]",
-    descriptionDraft: true,
+    description: "Depth, subject masks and video layered through time in 3D space.",
+  },
+  {
+    slug: "particle",
+    title: "Particle",
+    description: "Particle studies of gravity, accretion and motion in Blender.",
+  },
+  {
+    slug: "point-cloud",
+    title: "Point Cloud",
+    description: "Real-world scans and transformations between captured objects.",
   },
   {
     slug: "sculpture",
@@ -121,6 +134,10 @@ const waterFilm: Film = {
   duration: 11.88,
   fps: 25,
 };
+const suppliedMedia = (slug: keyof typeof importedMedia, alt: string): Entry["media"] => {
+  const media = importedMedia[slug];
+  return { ...media, poster: { ...media.poster, alt } };
+};
 export const entries: Entry[] = [
   {
     slug: "ozzy",
@@ -128,9 +145,12 @@ export const entries: Entry[] = [
     category: "vfx-music-videos",
     year: null,
     medium: ["Music video", "VFX", "Monocular depth"],
-    tools: [],
+    tools: ["Video Depth Anything", "Blender"],
+    description:
+      "Depth-map displacement of Sero Flame and Phoenix for Ozzy. Video Depth Anything generates depth maps that displace 2D planes in Blender.",
     credits: [
       { artist: "Sero Flame", role: "Artist" },
+      { artist: "Jabari Browne", role: "VFX", url: "https://jabaribrxwne.com/" },
       { artist: "Pietro Francis Costa", role: "VFX" },
     ],
     links: { video: "https://www.youtube.com/watch?v=aOJ1GtodHKo" },
@@ -144,42 +164,78 @@ export const entries: Entry[] = [
       },
     },
     needed: [
-      "Release year and confirmed tools.",
+      "Release year.",
       "Approved Ozzy poster; VFX shot clips, before/after pairs, stills and captions.",
       "Source clip → depth map → output, or a node-graph crop.",
-      "Short project description and any additional approved credits.",
     ],
   },
   {
-    slug: "audio-visual-placeholder",
-    title: "[Audio-visual project needed]",
+    slug: "god-particle-found-footage",
+    title: "God Particle — found footage",
+    category: "vfx-music-videos",
+    year: null,
+    medium: ["VFX", "Moving image"],
+    tools: ["Blender"],
+    description:
+      "A God Particle rendered as found footage. Modeling, texturing, lighting, compositing, camera tracking and Geometry Nodes were all done in Blender.",
+    media: suppliedMedia("god-particle-found-footage", "A glowing blue particle form suspended in a filmed living room."),
+  },
+  {
+    slug: "god-particle",
+    title: "God Particle",
+    category: "vfx-music-videos",
+    year: null,
+    medium: ["VFX", "Procedural animation"],
+    tools: ["Blender", "Geometry Nodes"],
+    description:
+      "A procedural God Particle inspired by the television series Dark, created with Geometry Nodes in Blender.",
+    media: suppliedMedia("god-particle", "A tangled dark particle form with a blue center against a pale background."),
+  },
+  {
+    slug: "chet-baker-mel-bands",
+    title: "Chet Baker — mel bands",
     category: "audio-visual",
-    draft: true,
     year: null,
-    medium: [],
+    medium: ["Audio visualization", "Moving image"],
     tools: [],
-    media: {},
-    needed: [
-      "Title, year, medium, tools and one-line description.",
-      "Loop, full film, poster, stills and alt text.",
-      "Music/artist credits and links.",
-      "Process clip or node-graph crop.",
-    ],
+    description:
+      "A three-dimensional visualization of a Chet Baker song. Each of 128 mel-frequency bands maps to a horizontal ring of points.",
+    credits: [{ artist: "Chet Baker", role: "Music source" }],
+    media: suppliedMedia("chet-baker-mel-bands", "Horizontal rings of points stacked into a three-dimensional music visualization."),
   },
   {
-    slug: "semi-volumetric-placeholder",
-    title: "[Camera project needed]",
-    category: "semi-volumetric",
-    draft: true,
+    slug: "james-blake-spherical-spectrogram",
+    title: "James Blake — spherical spectrogram",
+    category: "audio-visual",
     year: null,
-    medium: [],
-    tools: [],
-    media: {},
-    needed: [
-      "Title, year, capture/depth method, tools and description.",
-      "Source footage, depth map and resulting camera move.",
-      "Poster, stills, captions and approved credits.",
-    ],
+    medium: ["Audio visualization", "Moving image"],
+    tools: ["Blender", "Geometry Nodes"],
+    description:
+      "A James Blake spectrogram translated into a three-dimensional sphere using Geometry Nodes in Blender.",
+    credits: [{ artist: "James Blake", role: "Music source" }],
+    media: suppliedMedia("james-blake-spherical-spectrogram", "A spherical spectrogram formed from dark, closely spaced strands on a pale background."),
+  },
+  {
+    slug: "volumetric-compositor",
+    title: "Volumetric video — compositor",
+    category: "semi-volumetric",
+    year: null,
+    medium: ["LiDAR", "Semi-volumetric video"],
+    tools: ["Blender", "Compositor"],
+    description:
+      "Semi-volumetric video captured with LiDAR, then manipulated in Blender using the compositor.",
+    media: suppliedMedia("volumetric-compositor", "A captured face fragmented into red and orange points in the Blender compositor."),
+  },
+  {
+    slug: "iphone-lidar",
+    title: "iPhone LiDAR — depth capture",
+    category: "semi-volumetric",
+    year: null,
+    medium: ["Depth capture", "Moving image"],
+    tools: ["iPhone front camera"],
+    description:
+      "Real-time depth maps captured using the iPhone front camera.",
+    media: suppliedMedia("iphone-lidar", "A color-coded depth map beside the original camera view of a face and upper body."),
   },
   {
     slug: "time-block-addon",
@@ -221,6 +277,8 @@ export const entries: Entry[] = [
     year: null,
     medium: ["Moving image"],
     tools: ["Time Block", "Blender"],
+    description:
+      "A basketball image becomes a volume of time, with repeated forms extending from the video plane. Made with Time Block in Blender.",
     media: {
       film: jordanFilm,
       loop: jordanFilm,
@@ -248,10 +306,33 @@ export const entries: Entry[] = [
       ],
     },
     needed: [
-      "Release year, final description and any approved source-footage credits.",
+      "Release year and any approved source-footage credits.",
       "Original jordan_render_instagram.mp4 for the 1080 × 1920 encode.",
       "Source/result or node-graph process media.",
     ],
+  },
+  {
+    slug: "time-block-viral",
+    title: "Time Block — viral video",
+    category: "time-block-work",
+    year: null,
+    medium: ["Moving image", "Video sculpture"],
+    tools: ["Time Block", "Blender"],
+    description:
+      "The Instagram video that started the online 3D/4D block trend, reaching over 100 million views across the internet. Video frames become a volume that can be explored through time.",
+    media: suppliedMedia("time-block-viral", "A video plane stretches into a three-dimensional block of successive frames."),
+  },
+  {
+    slug: "roberto-carlos",
+    title: "Roberto Carlos — free kick",
+    category: "time-block-work",
+    year: null,
+    medium: ["Moving image", "Video sculpture"],
+    tools: ["Time Block", "Blender"],
+    description:
+      "A video cube captures the movement of Roberto Carlos’ famous free-kick goal, made with my Time Block add-on for Blender.",
+    credits: [{ artist: "Roberto Carlos — free-kick goal", role: "Source footage subject" }],
+    media: suppliedMedia("roberto-carlos", "Football footage extended into a video cube with a trail tracing the ball’s movement."),
   },
   {
     slug: "water-dance",
@@ -260,6 +341,8 @@ export const entries: Entry[] = [
     year: null,
     medium: ["Moving image"],
     tools: ["Depth Echo"],
+    description:
+      "A moving figure unfolds into overlapping traces through time in Depth Echo.",
     media: {
       film: waterFilm,
       loop: waterFilm,
@@ -287,10 +370,89 @@ export const entries: Entry[] = [
       ],
     },
     needed: [
-      "Release year, final description, tools and approved performer/source credits.",
+      "Release year and approved performer/source credits.",
       "Original water_dance_2_HQ.mp4 for the 1080 × 1920 encode.",
       "Source → depth map → output process media.",
     ],
+  },
+  {
+    slug: "cellophane",
+    title: "FKA twigs — cellophane",
+    category: "depth-echo",
+    year: null,
+    medium: ["Depth capture", "Moving image"],
+    tools: ["Depth Echo"],
+    description:
+      "Movement from FKA twigs’ cellophane music video, captured and reconstructed with the local Depth Echo app. Depth, a subject mask and the original RGB video combine in 3D space.",
+    credits: [{ artist: "FKA twigs — cellophane music video", role: "Source footage" }],
+    media: suppliedMedia("cellophane", "A dancer’s captured movement suspended in layered depth traces."),
+  },
+  {
+    slug: "back-on-74",
+    title: "Jungle — Back on 74",
+    category: "depth-echo",
+    year: null,
+    medium: ["Depth capture", "Moving image"],
+    tools: ["Depth Echo"],
+    description:
+      "Movement from the choreography in Jungle’s Back on 74, given temporal depth using the local Depth Echo app.",
+    credits: [{ artist: "Jungle — Back on 74 music video", role: "Source footage" }],
+    media: suppliedMedia("back-on-74", "Dancers from Back on 74 repeated through a volume of captured movement."),
+  },
+  {
+    slug: "jordan-simone",
+    title: "Jordan Simone",
+    category: "depth-echo",
+    year: null,
+    medium: ["Dance collaboration", "Moving image"],
+    tools: ["Depth Echo"],
+    description:
+      "A collaboration with dancer Jordan Simone, capturing movement from her pole-dancing routine with Depth Echo.",
+    credits: [{ artist: "Jordan Simone", role: "Dancer / collaborator" }],
+    media: suppliedMedia("jordan-simone", "Jordan Simone’s pole-dance movement extended into a layered three-dimensional trace."),
+  },
+  {
+    slug: "accretion-disk",
+    title: "Accretion Disk",
+    category: "particle",
+    year: null,
+    medium: ["Particle simulation", "Moving image"],
+    tools: ["Blender", "Geometry Nodes"],
+    description:
+      "A semi-accurate representation of an accretion disk, created using Geometry Nodes in Blender.",
+    media: suppliedMedia("accretion-disk", "A luminous particle sphere surrounded by a broad ring of orbiting points."),
+  },
+  {
+    slug: "motion-blur",
+    title: "Motion Blur",
+    category: "particle",
+    year: null,
+    medium: ["Particle simulation", "Moving image"],
+    tools: ["Blender", "Geometry Nodes"],
+    description:
+      "A stylized gravitational pull created with Geometry Nodes in Blender, drawing particles into blurred trails of motion.",
+    media: suppliedMedia("motion-blur", "Dark particle trails sweep around a spherical center against a pale background."),
+  },
+  {
+    slug: "apartment",
+    title: "Apartment",
+    category: "point-cloud",
+    year: null,
+    medium: ["3D scan", "Point cloud"],
+    tools: [],
+    description: "A three-dimensional scan of my (messy) apartment.",
+    media: suppliedMedia("apartment", "A point-cloud scan of an apartment, with furniture and everyday objects visible as colored points."),
+  },
+  {
+    slug: "san-gennaro-morph",
+    title: "Treasure of San Gennaro — morph",
+    category: "point-cloud",
+    year: null,
+    medium: ["Point cloud", "Moving image"],
+    tools: [],
+    description:
+      "Point clouds morph into one another using captures of the Treasure of San Gennaro in Napoli.",
+    media: suppliedMedia("san-gennaro-morph", "An ornate object from the Treasure of San Gennaro dissolves into a morphing cloud of points."),
   },
   {
     slug: "sculpture-placeholder",
@@ -325,6 +487,10 @@ export const site = {
   youtube: "https://www.youtube.com/@p_h_r_o",
   tiktok: "https://www.tiktok.com/@phrodesign",
 };
+export const aboutCopy = [
+  "Pietro Francis Costa is a creative technologist and digital artist from Brooklyn. His work asks what time does to the things around us: how it moves through people, places, and objects, and what it leaves behind.",
+  "Working with point clouds, Gaussian splatting, and volumetric video, he turns real-world captures into imperfect digital objects. A moment becomes a volume and a video becomes a sculpture. The seams of the process, such as points, dither, and artifacts, are kept rather than hidden. That same interest carries into abstract music visualization, particle simulations, and visual effects, where rhythm and motion are treated as forms that unfold over time.",
+];
 export const visibleEntries = (preview = false) =>
   entries.filter((entry) => preview || !entry.draft);
 export const routeList = (preview = false) => [

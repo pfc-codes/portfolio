@@ -1,0 +1,444 @@
+[
+  {
+    "slug": "chet-baker-mel-bands",
+    "source": "audio visualization/chet baker audio compressed.mp4",
+    "sourceBytes": 18007643,
+    "sourceSha256": "9f66c3ef73a7bb818bb7959f381c68381891c8ab6e3729604f8ee8b9c7d1bf17",
+    "width": 1080,
+    "height": 1920,
+    "fps": 60,
+    "duration": 15,
+    "audio": false,
+    "posterTime": 4,
+    "files": [
+      {
+        "path": "/media/chet-baker-mel-bands/film.mp4",
+        "bytes": 11825344
+      },
+      {
+        "path": "/media/chet-baker-mel-bands/film-1080.mp4",
+        "bytes": 11848531
+      },
+      {
+        "path": "/media/chet-baker-mel-bands/loop.mp4",
+        "bytes": 825475
+      },
+      {
+        "path": "/media/chet-baker-mel-bands/poster.webp",
+        "bytes": 93420
+      }
+    ]
+  },
+  {
+    "slug": "james-blake-spherical-spectrogram",
+    "source": "audio visualization/james blake compressed 2.mp4",
+    "sourceBytes": 14424886,
+    "sourceSha256": "d4f81bdfeef64a18ba8dcf58a7e6a7d2eadc9788917700514b971a04107e4aea",
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "duration": 15,
+    "audio": false,
+    "posterTime": 4,
+    "files": [
+      {
+        "path": "/media/james-blake-spherical-spectrogram/film.mp4",
+        "bytes": 11816005
+      },
+      {
+        "path": "/media/james-blake-spherical-spectrogram/film-1080.mp4",
+        "bytes": 11805737
+      },
+      {
+        "path": "/media/james-blake-spherical-spectrogram/loop.mp4",
+        "bytes": 889568
+      },
+      {
+        "path": "/media/james-blake-spherical-spectrogram/poster.webp",
+        "bytes": 88904
+      }
+    ]
+  },
+  {
+    "slug": "cellophane",
+    "source": "depth echo/depth echo fka twigs compressed.mp4",
+    "sourceBytes": 2783462,
+    "sourceSha256": "88712eccf45019bad2b58ba272655d919b7f2dd6895b712f6cf5ed0baabc58d5",
+    "width": 1080,
+    "height": 1920,
+    "fps": 25,
+    "duration": 9.96,
+    "audio": false,
+    "posterTime": 3,
+    "files": [
+      {
+        "path": "/media/cellophane/film.mp4",
+        "bytes": 1797861
+      },
+      {
+        "path": "/media/cellophane/film-1080.mp4",
+        "bytes": 3185810
+      },
+      {
+        "path": "/media/cellophane/loop.mp4",
+        "bytes": 337029
+      },
+      {
+        "path": "/media/cellophane/poster.webp",
+        "bytes": 33688
+      }
+    ]
+  },
+  {
+    "slug": "jordan-simone",
+    "source": "depth echo/depth echo jordan simone compressed.mp4",
+    "sourceBytes": 8289212,
+    "sourceSha256": "00d6f379b55d4d200784018fc9e6ba19f6c0c174254424a3f758b4cb15e4ed53",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 7.666667,
+    "audio": false,
+    "posterTime": 2,
+    "files": [
+      {
+        "path": "/media/jordan-simone/film.mp4",
+        "bytes": 4712216
+      },
+      {
+        "path": "/media/jordan-simone/film-1080.mp4",
+        "bytes": 6291302
+      },
+      {
+        "path": "/media/jordan-simone/loop.mp4",
+        "bytes": 656847
+      },
+      {
+        "path": "/media/jordan-simone/poster.webp",
+        "bytes": 79930
+      }
+    ]
+  },
+  {
+    "slug": "back-on-74",
+    "source": "depth echo/depth echo jungle compressed.mp4",
+    "sourceBytes": 22124585,
+    "sourceSha256": "2e2a3c0bae3b93197d4474b98db42ea81390e922a273b8488db3ac7dce74fec8",
+    "width": 1080,
+    "height": 1920,
+    "fps": 25,
+    "duration": 15,
+    "audio": false,
+    "posterTime": 4,
+    "files": [
+      {
+        "path": "/media/back-on-74/film.mp4",
+        "bytes": 10871817
+      },
+      {
+        "path": "/media/back-on-74/film-1080.mp4",
+        "bytes": 11418466
+      },
+      {
+        "path": "/media/back-on-74/loop.mp4",
+        "bytes": 851390
+      },
+      {
+        "path": "/media/back-on-74/poster.webp",
+        "bytes": 129786
+      }
+    ]
+  },
+  {
+    "slug": "accretion-disk",
+    "source": "particle/particle accretion disk.mp4",
+    "sourceBytes": 13842520,
+    "sourceSha256": "f98979280ab0ef2dd7feb4f0e9a399818af81c1db9c5cd3296847674abc262a8",
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "duration": 10.416667,
+    "audio": false,
+    "posterTime": 3,
+    "files": [
+      {
+        "path": "/media/accretion-disk/film.mp4",
+        "bytes": 5745326
+      },
+      {
+        "path": "/media/accretion-disk/film-1080.mp4",
+        "bytes": 8378446
+      },
+      {
+        "path": "/media/accretion-disk/loop.mp4",
+        "bytes": 807384
+      },
+      {
+        "path": "/media/accretion-disk/poster.webp",
+        "bytes": 88440
+      }
+    ]
+  },
+  {
+    "slug": "motion-blur",
+    "source": "particle/particle motion blur compressed 3.mp4",
+    "sourceBytes": 12934364,
+    "sourceSha256": "ded832d7f09d09103d44f47c89281c547786979ce6f59136ee29d7e7257ad648",
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "duration": 10.416667,
+    "audio": false,
+    "posterTime": 3,
+    "files": [
+      {
+        "path": "/media/motion-blur/film.mp4",
+        "bytes": 8366880
+      },
+      {
+        "path": "/media/motion-blur/film-1080.mp4",
+        "bytes": 8349066
+      },
+      {
+        "path": "/media/motion-blur/loop.mp4",
+        "bytes": 842228
+      },
+      {
+        "path": "/media/motion-blur/poster.webp",
+        "bytes": 179638
+      }
+    ]
+  },
+  {
+    "slug": "apartment",
+    "source": "point cloud/point cloud apartment compressed.mp4",
+    "sourceBytes": 5013711,
+    "sourceSha256": "c2b054adeea095fa5d518274281f46b28b18cf7842b353b3ec29a441b121a006",
+    "width": 2056,
+    "height": 3656,
+    "fps": 24,
+    "duration": 13.333333,
+    "audio": false,
+    "posterTime": 4,
+    "files": [
+      {
+        "path": "/media/apartment/film.mp4",
+        "bytes": 3945010
+      },
+      {
+        "path": "/media/apartment/film-1080.mp4",
+        "bytes": 6949238
+      },
+      {
+        "path": "/media/apartment/loop.mp4",
+        "bytes": 603080
+      },
+      {
+        "path": "/media/apartment/poster.webp",
+        "bytes": 44770
+      }
+    ]
+  },
+  {
+    "slug": "san-gennaro-morph",
+    "source": "point cloud/point cloud morph compressed.mp4",
+    "sourceBytes": 22743374,
+    "sourceSha256": "e58aa29bca5524e86f8a533ac3148ef98e399b5fe2ce6b0f19f86d6071c940f7",
+    "width": 3840,
+    "height": 2160,
+    "fps": 24,
+    "duration": 15.625,
+    "audio": false,
+    "posterTime": 13.5,
+    "files": [
+      {
+        "path": "/media/san-gennaro-morph/film.mp4",
+        "bytes": 6018994
+      },
+      {
+        "path": "/media/san-gennaro-morph/film-1080.mp4",
+        "bytes": 11668136
+      },
+      {
+        "path": "/media/san-gennaro-morph/loop.mp4",
+        "bytes": 92487
+      },
+      {
+        "path": "/media/san-gennaro-morph/poster.webp",
+        "bytes": 29134
+      }
+    ]
+  },
+  {
+    "slug": "roberto-carlos",
+    "source": "time block/time block roberto carlos.mp4",
+    "sourceBytes": 21186032,
+    "sourceSha256": "ceac89a7000e38edd3b8d4b8833a67099fba4051dd1fb1303d81cef317538f62",
+    "width": 1080,
+    "height": 1920,
+    "fps": 24,
+    "duration": 11.458333,
+    "audio": false,
+    "posterTime": 3,
+    "files": [
+      {
+        "path": "/media/roberto-carlos/film.mp4",
+        "bytes": 2875307
+      },
+      {
+        "path": "/media/roberto-carlos/film-1080.mp4",
+        "bytes": 5137393
+      },
+      {
+        "path": "/media/roberto-carlos/loop.mp4",
+        "bytes": 336049
+      },
+      {
+        "path": "/media/roberto-carlos/poster.webp",
+        "bytes": 101234
+      }
+    ]
+  },
+  {
+    "slug": "time-block-viral",
+    "source": "time block/time block viral video compressed.mp4",
+    "sourceBytes": 6629155,
+    "sourceSha256": "2ec1254db041f21fbc1273e7e52b7f517ceb55ae94ba2a6ffb24acbee0c57363",
+    "width": 1080,
+    "height": 1920,
+    "fps": 24,
+    "duration": 26.965333,
+    "audio": true,
+    "posterTime": 7,
+    "files": [
+      {
+        "path": "/media/time-block-viral/film.mp4",
+        "bytes": 6733778
+      },
+      {
+        "path": "/media/time-block-viral/film-1080.mp4",
+        "bytes": 8341492
+      },
+      {
+        "path": "/media/time-block-viral/loop.mp4",
+        "bytes": 201924
+      },
+      {
+        "path": "/media/time-block-viral/poster.webp",
+        "bytes": 34734
+      }
+    ]
+  },
+  {
+    "slug": "god-particle-found-footage",
+    "source": "vfx/vfx 1 god particle.mp4",
+    "sourceBytes": 3541738,
+    "sourceSha256": "b1ffa385c97daac0cecacd9f03bfd6808b881208790e2ada2dec34f693679b59",
+    "width": 514,
+    "height": 914,
+    "fps": 24,
+    "duration": 13.333333,
+    "audio": false,
+    "posterTime": 4,
+    "files": [
+      {
+        "path": "/media/god-particle-found-footage/film.mp4",
+        "bytes": 3504569
+      },
+      {
+        "path": "/media/god-particle-found-footage/loop.mp4",
+        "bytes": 656857
+      },
+      {
+        "path": "/media/god-particle-found-footage/poster.webp",
+        "bytes": 26106
+      }
+    ]
+  },
+  {
+    "slug": "god-particle",
+    "source": "vfx/vfx 2 god particle compressed.mp4",
+    "sourceBytes": 4676361,
+    "sourceSha256": "f96d2fca36e90886f4330cdab41b7d709f22ea2f34ade824161014a793e037ea",
+    "width": 1920,
+    "height": 1080,
+    "fps": 29.97002997002997,
+    "duration": 13.346667,
+    "audio": false,
+    "posterTime": 4,
+    "files": [
+      {
+        "path": "/media/god-particle/film.mp4",
+        "bytes": 4580021
+      },
+      {
+        "path": "/media/god-particle/film-1080.mp4",
+        "bytes": 6633181
+      },
+      {
+        "path": "/media/god-particle/loop.mp4",
+        "bytes": 527249
+      },
+      {
+        "path": "/media/god-particle/poster.webp",
+        "bytes": 36934
+      }
+    ]
+  },
+  {
+    "slug": "volumetric-compositor",
+    "source": "volumetric video/volumetric video compositor compressed.mp4",
+    "sourceBytes": 5080815,
+    "sourceSha256": "139d0569b8606358a01a836735336b3918478806573d045f98bd61ef9a6a5143",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 21.546667,
+    "audio": true,
+    "posterTime": 6,
+    "files": [
+      {
+        "path": "/media/volumetric-compositor/film.mp4",
+        "bytes": 5080365
+      },
+      {
+        "path": "/media/volumetric-compositor/film-1080.mp4",
+        "bytes": 6672667
+      },
+      {
+        "path": "/media/volumetric-compositor/loop.mp4",
+        "bytes": 389150
+      },
+      {
+        "path": "/media/volumetric-compositor/poster.webp",
+        "bytes": 61566
+      }
+    ]
+  },
+  {
+    "slug": "iphone-lidar",
+    "source": "volumetric video/volumetric video iphone lidar.mp4",
+    "sourceBytes": 24915005,
+    "sourceSha256": "f234f727e070427c09e839471f21cd8367bc18a8791bee27773063d311c10cad",
+    "width": 960,
+    "height": 640,
+    "fps": 30,
+    "duration": 3.166667,
+    "audio": true,
+    "posterTime": 1,
+    "files": [
+      {
+        "path": "/media/iphone-lidar/film.mp4",
+        "bytes": 3022274
+      },
+      {
+        "path": "/media/iphone-lidar/loop.mp4",
+        "bytes": 497031
+      },
+      {
+        "path": "/media/iphone-lidar/poster.webp",
+        "bytes": 83524
+      }
+    ]
+  }
+]

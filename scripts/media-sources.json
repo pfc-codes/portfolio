@@ -1,0 +1,17 @@
+[
+  { "slug": "chet-baker-mel-bands", "source": "audio visualization/chet baker audio compressed.mp4", "posterTime": 4 },
+  { "slug": "james-blake-spherical-spectrogram", "source": "audio visualization/james blake compressed 2.mp4", "posterTime": 4 },
+  { "slug": "cellophane", "source": "depth echo/depth echo fka twigs compressed.mp4", "posterTime": 3 },
+  { "slug": "jordan-simone", "source": "depth echo/depth echo jordan simone compressed.mp4", "posterTime": 2 },
+  { "slug": "back-on-74", "source": "depth echo/depth echo jungle compressed.mp4", "posterTime": 4 },
+  { "slug": "accretion-disk", "source": "particle/particle accretion disk.mp4", "posterTime": 3 },
+  { "slug": "motion-blur", "source": "particle/particle motion blur compressed 3.mp4", "posterTime": 3 },
+  { "slug": "apartment", "source": "point cloud/point cloud apartment compressed.mp4", "posterTime": 4 },
+  { "slug": "san-gennaro-morph", "source": "point cloud/point cloud morph compressed.mp4", "posterTime": 13.5 },
+  { "slug": "roberto-carlos", "source": "time block/time block roberto carlos.mp4", "posterTime": 3 },
+  { "slug": "time-block-viral", "source": "time block/time block viral video compressed.mp4", "posterTime": 7 },
+  { "slug": "god-particle-found-footage", "source": "vfx/vfx 1 god particle.mp4", "posterTime": 4 },
+  { "slug": "god-particle", "source": "vfx/vfx 2 god particle compressed.mp4", "posterTime": 4 },
+  { "slug": "volumetric-compositor", "source": "volumetric video/volumetric video compositor compressed.mp4", "posterTime": 6 },
+  { "slug": "iphone-lidar", "source": "volumetric video/volumetric video iphone lidar.mp4", "posterTime": 1 }
+]

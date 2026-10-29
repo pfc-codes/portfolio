@@ -1,20 +1,18 @@
 # Moving image overhaul
 
-## Content to supply
+## Content status
 
-Unknown years are `null`. No additional artists, clients, project titles or credits have been invented. Search `needed`, `descriptionDraft` and `draft: true` in `src/content/work.ts` for editorial slots. Drafts and editorial notes are visible in development/Cloudflare previews, but absent from production. Empty discipline headings remain in the production index so the structure is ready for real work.
+The 2026-10-29 delivery adds all 15 supplied films, project descriptions, artist/source credits, the About biography, and Particle/Point Cloud categories. See [the import record](media-import.md) and [source/output inventory](media-inventory.json). The Work index now has nine disciplines and 19 published entries. Only the sculpture entry remains a draft.
 
 | Discipline | Needed |
 | --- | --- |
-| VFX for music videos | Ozzy release year, confirmed tools, approved poster, VFX shot breakdown clips, before/after pairs, stills and captions, source → depth → output or node-graph crop, short description and any additional approved credits. |
-| Audio-visual animations | Category description; project title, year, medium/tools, description, loop/full film, poster/stills/alt text, music/artist credits and links, process media. |
-| Semi-volumetric camera work | Project title/year, LiDAR or monocular depth method, tools, description, source footage/depth map/output camera move, poster/stills/captions, approved credits. Ozzy is cross-referenced here. |
+| VFX & music videos | Ozzy release year, approved poster and optional VFX shot/process breakdown. Its description, tools and Jabari Browne/Pietro Francis Costa credits are supplied. |
 | Time Block — the add-on | Confirm store version (see below); dedicated tool demo and interface screenshot, process/node graph, release year and final product copy. Jordan’s existing still is clearly captioned as work made with the tool. |
-| Time Block — work | Jordan release year, description, approved source-footage credits, source/result or node-graph media, original `jordan_render_instagram.mp4`. |
-| Depth Echo | Category description; Water Dance release year, description, tools, approved performer/source credits, source → depth → output media, original `water_dance_2_HQ.mp4`. |
+| Time Block — work | Jordan release year, approved source-footage credits, optional process media and original `jordan_render_instagram.mp4`. |
+| Depth Echo | Water Dance release year, approved performer/source credits, optional process media and original `water_dance_2_HQ.mp4`. |
 | 3D sculpture | Project title/year, materials, dimensions, printing method, description, sculpture/detail photos, turntable loop, alt text, source motion → time stack → printed object images, fabrication/exhibition credits if applicable. |
 
-Also supply final About copy. All generic copy is intentionally brief. Existing verified contact details are retained.
+Unknown years remain `null`. Search `needed` and `draft: true` in `src/content/work.ts` for remaining editorial slots. Drafts and notes appear only in development/Cloudflare previews. Existing contact details are retained.
 
 ## Decisions to review
 

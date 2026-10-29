@@ -5,6 +5,7 @@ import {
   routeList,
   site,
   pointCloudPoster,
+  aboutCopy,
   type Entry,
   type Still,
   type Film,
@@ -24,6 +25,10 @@ export const escape = (value: string | number) =>
       ]!,
   );
 const external = `<span aria-hidden='true'>↗</span>`;
+const creditName = (credit: NonNullable<Entry["credits"]>[number]) =>
+  credit.url
+    ? `<a href='${escape(credit.url)}'>${escape(credit.artist)} ${external}</a>`
+    : escape(credit.artist);
 const categoryFor = (entry: Entry) =>
   categories.find((c) => c.slug === entry.category)!;
 const copySlot = (text: string, preview: boolean) =>
@@ -121,18 +126,19 @@ function film(p: Entry) {
   const f = p.media.film!;
   const candidate = f.src.replace(/\.mp4$/, "-1080.mp4");
   const hd = f.hd || (__HD_MEDIA__.includes(candidate) ? candidate : undefined);
-  return `<figure class='film'><video controls playsinline preload='none' width='${f.width}' height='${f.height}' poster='${escape(p.media.poster!.src)}' aria-label='${escape(p.title)}, silent film' data-project-video>
+  return `<figure class='film'><video controls playsinline preload='none' width='${f.width}' height='${f.height}' poster='${escape(p.media.poster!.src)}' aria-label='${escape(p.title)}, ${f.audio ? "film with sound" : "silent film"}' data-project-video>
     ${hd ? `<source src='${escape(hd)}' type='video/mp4' media='(min-width: 701px)'>` : ""}<source src='${escape(f.src)}' type='video/mp4'>
     <p>Your browser cannot play this film. <a href='${escape(f.src)}'>Open the MP4</a>.</p></video>
-    <figcaption><span>${escape(p.title)}</span><span>${f.duration ? `${f.duration.toFixed(2)} s · ` : ""}${f.fps ? `${f.fps} fps · ` : ""}Silent</span><a href='${escape(f.src)}'>Open film</a></figcaption>
+    <figcaption><span>${escape(p.title)}</span><span>${f.duration ? `${f.duration.toFixed(2)} s · ` : ""}${f.fps ? `${f.fps} fps · ` : ""}${f.audio ? "Sound" : "Silent"}</span><a href='${escape(f.src)}'>Open film</a></figcaption>
     <p class='media-error' data-video-error hidden>The film could not load. <a href='${escape(f.src)}'>Open the MP4</a>.</p></figure>`;
 }
 
 function youtube(p: Entry) {
+  const vfx = p.credits?.filter((credit) => credit.role === "VFX") || [];
   return `<div class='youtube-facade' data-youtube='${escape(p.media.youtubeId!)}' data-video-title='${escape(p.title)}'>
     ${media(p.media.poster!)}<button class='youtube-play' data-youtube-load type='button' hidden><span aria-hidden='true'>▶</span> Play full video</button>
     <noscript><a class='youtube-play' href='${escape(p.links!.video!)}'>Watch on YouTube ${external}</a></noscript>
-  </div><p class='film-note'>Full music video · VFX by Pietro Francis Costa. <a href='${escape(p.links!.video!)}'>YouTube ${external}</a></p>`;
+  </div><p class='film-note'>Full music video${vfx.length ? ` · VFX by ${vfx.map(creditName).join(" and ")}.` : "."} <a href='${escape(p.links!.video!)}'>YouTube ${external}</a></p>`;
 }
 
 function projectPage(p: Entry, preview: boolean) {
@@ -143,7 +149,7 @@ function projectPage(p: Entry, preview: boolean) {
     ${p.description ? (p.descriptionDraft ? copySlot(p.description, preview) : `<p class='project-description'>${escape(p.description)}</p>`) : copySlot("[Copy needed: project description.]", preview)}</section>
     <section class='project-media wrap' aria-label='${escape(p.title)} media'>${p.media.film ? film(p) : p.media.youtubeId ? youtube(p) : p.media.poster ? `<figure>${media(p.media.poster)}${p.media.poster.caption ? `<figcaption>${escape(p.media.poster.caption)}</figcaption>` : ""}</figure>` : `<div class='media-placeholder'><span>Draft / media needed</span></div>`}</section>
     ${p.tool ? `<section class='tool-details wrap' aria-label='Add-on details'><dl><div><dt>Version listed on Gumroad</dt><dd>${escape(p.tool.version)}</dd></div><div><dt>Price</dt><dd>${escape(p.tool.price)}</dd></div><div><dt>License</dt><dd>${escape(p.tool.license)}</dd></div></dl><p class='film-note'>Store details checked ${escape(p.tool.checked)}.</p><a class='button' href='${escape(p.links!.store!)}'>Get Time Block on Gumroad ${external}</a><p><a href='/work/#time-block-work'>See work made with Time Block</a></p></section>` : ""}
-    ${p.credits?.length ? `<section class='credits wrap' aria-label='Credits'><dl>${p.credits.map((credit) => `<div><dt>${escape(credit.role)}</dt><dd>${escape(credit.artist)}</dd></div>`).join("")}</dl></section>` : ""}
+    ${p.credits?.length ? `<section class='credits wrap' aria-label='Credits'><dl>${p.credits.map((credit) => `<div><dt>${escape(credit.role)}</dt><dd>${creditName(credit)}</dd></div>`).join("")}</dl></section>` : ""}
     ${p.media.stills?.length ? `<section class='stills-section wrap' aria-labelledby='stills-heading'><h2 id='stills-heading'>Stills</h2><div class='stills-grid'>${p.media.stills.map((s) => `<figure tabindex='0'>${media(s, { entryFocus: p.focus })}<figcaption>${escape(s.caption || p.title)}</figcaption></figure>`).join("")}</div></section>` : ""}
     ${p.process?.length ? `<section class='process-section wrap' aria-labelledby='process-heading'><h2 id='process-heading'>Process</h2><div class='process-grid'>${p.process.map((m) => `<figure tabindex='0'>${media(m.still, { loop: m.video })}<figcaption>${escape(m.label)}</figcaption></figure>`).join("")}</div></section>` : ""}
     ${preview && p.needed?.length ? `<aside class='media-checklist wrap' aria-labelledby='needed-heading'><h2 id='needed-heading'>To supply / preview only</h2><ul>${p.needed.map((n) => `<li>${escape(n)}</li>`).join("")}</ul></aside>` : ""}
@@ -158,8 +164,8 @@ function pointCloud() {
     <p class='experiment-status' data-splat-status role='status' aria-live='polite'></p><p id='viewer-help' class='film-note'>Drag to orbit. Scroll or pinch to zoom. With the scene focused, use the arrow keys and + / −.</p></section>`;
 }
 
-function about(preview: boolean) {
-  return `<section class='page-intro wrap'><h1>About</h1><p>${escape(site.identity)}</p></section><div class='about-copy wrap'><p>I work with video, depth and real-world captures to build objects that show how they were made.</p>${copySlot("[Copy needed: final biography and practice statement.]", preview)}</div>${pointCloud()}`;
+function about() {
+  return `<section class='page-intro wrap'><h1>About</h1><p>${escape(site.identity)}</p></section><div class='about-copy wrap'>${aboutCopy.map((paragraph) => `<p>${escape(paragraph)}</p>`).join("")}</div>${pointCloud()}`;
 }
 function contact() {
   return `<section class='page-intro contact-intro wrap'><h1>Contact</h1><a class='email-link' href='mailto:${escape(site.email)}'>${escape(site.email)}</a><button class='copy-email' data-copy-email='${escape(site.email)}' type='button' hidden>Copy email address</button><p data-copy-status role='status' aria-live='polite'></p></section><nav class='contact-links wrap' aria-label='Elsewhere'>${[
@@ -195,7 +201,7 @@ export function render(pathname: string, preview = previewBuild) {
     "/": site.identity,
     "/work/":
       "Films, tools and objects by Pietro Francis Costa, grouped by discipline.",
-    "/about/": "The moving image practice of Pietro Francis Costa.",
+    "/about/": "Pietro Francis Costa is a creative technologist and digital artist from Brooklyn, working with time, moving image and real-world captures.",
     "/contact/": "Contact Pietro Francis Costa at phro.design.",
   };
   const title = p
@@ -228,7 +234,7 @@ export function render(pathname: string, preview = previewBuild) {
       : path === "/work/"
         ? work(preview)
         : path === "/about/"
-          ? about(preview)
+          ? about()
           : path === "/contact/"
             ? contact()
             : missing();

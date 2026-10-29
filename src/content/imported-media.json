@@ -1,0 +1,360 @@
+{
+  "chet-baker-mel-bands": {
+    "film": {
+      "src": "/media/chet-baker-mel-bands/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 15,
+      "fps": 30,
+      "audio": false,
+      "hd": "/media/chet-baker-mel-bands/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/chet-baker-mel-bands/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/chet-baker-mel-bands/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "james-blake-spherical-spectrogram": {
+    "film": {
+      "src": "/media/james-blake-spherical-spectrogram/film.mp4",
+      "width": 1280,
+      "height": 720,
+      "duration": 15,
+      "fps": 24,
+      "audio": false,
+      "hd": "/media/james-blake-spherical-spectrogram/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/james-blake-spherical-spectrogram/loop.mp4",
+      "width": 852,
+      "height": 480,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/james-blake-spherical-spectrogram/poster.webp",
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "cellophane": {
+    "film": {
+      "src": "/media/cellophane/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 9.96,
+      "fps": 25,
+      "audio": false,
+      "hd": "/media/cellophane/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/cellophane/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/cellophane/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "jordan-simone": {
+    "film": {
+      "src": "/media/jordan-simone/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 7.666667,
+      "fps": 30,
+      "audio": false,
+      "hd": "/media/jordan-simone/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/jordan-simone/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/jordan-simone/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "back-on-74": {
+    "film": {
+      "src": "/media/back-on-74/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 15,
+      "fps": 25,
+      "audio": false,
+      "hd": "/media/back-on-74/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/back-on-74/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/back-on-74/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "accretion-disk": {
+    "film": {
+      "src": "/media/accretion-disk/film.mp4",
+      "width": 1280,
+      "height": 720,
+      "duration": 10.416667,
+      "fps": 24,
+      "audio": false,
+      "hd": "/media/accretion-disk/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/accretion-disk/loop.mp4",
+      "width": 852,
+      "height": 480,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/accretion-disk/poster.webp",
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "motion-blur": {
+    "film": {
+      "src": "/media/motion-blur/film.mp4",
+      "width": 1280,
+      "height": 720,
+      "duration": 10.416667,
+      "fps": 24,
+      "audio": false,
+      "hd": "/media/motion-blur/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/motion-blur/loop.mp4",
+      "width": 852,
+      "height": 480,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/motion-blur/poster.webp",
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "apartment": {
+    "film": {
+      "src": "/media/apartment/film.mp4",
+      "width": 718,
+      "height": 1280,
+      "duration": 13.333333,
+      "fps": 24,
+      "audio": false,
+      "hd": "/media/apartment/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/apartment/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/apartment/poster.webp",
+      "width": 718,
+      "height": 1280
+    }
+  },
+  "san-gennaro-morph": {
+    "film": {
+      "src": "/media/san-gennaro-morph/film.mp4",
+      "width": 1280,
+      "height": 720,
+      "duration": 15.625,
+      "fps": 24,
+      "audio": false,
+      "hd": "/media/san-gennaro-morph/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/san-gennaro-morph/loop.mp4",
+      "width": 852,
+      "height": 480,
+      "duration": 3.125,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/san-gennaro-morph/poster.webp",
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "roberto-carlos": {
+    "film": {
+      "src": "/media/roberto-carlos/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 11.458333,
+      "fps": 24,
+      "audio": false,
+      "hd": "/media/roberto-carlos/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/roberto-carlos/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/roberto-carlos/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "time-block-viral": {
+    "film": {
+      "src": "/media/time-block-viral/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 26.965333,
+      "fps": 24,
+      "audio": true,
+      "hd": "/media/time-block-viral/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/time-block-viral/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/time-block-viral/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "god-particle-found-footage": {
+    "film": {
+      "src": "/media/god-particle-found-footage/film.mp4",
+      "width": 514,
+      "height": 914,
+      "duration": 13.333333,
+      "fps": 24,
+      "audio": false
+    },
+    "loop": {
+      "src": "/media/god-particle-found-footage/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/god-particle-found-footage/poster.webp",
+      "width": 514,
+      "height": 914
+    }
+  },
+  "god-particle": {
+    "film": {
+      "src": "/media/god-particle/film.mp4",
+      "width": 1280,
+      "height": 720,
+      "duration": 13.346667,
+      "fps": 29.97,
+      "audio": false,
+      "hd": "/media/god-particle/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/god-particle/loop.mp4",
+      "width": 852,
+      "height": 480,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/god-particle/poster.webp",
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "volumetric-compositor": {
+    "film": {
+      "src": "/media/volumetric-compositor/film.mp4",
+      "width": 720,
+      "height": 1280,
+      "duration": 21.546667,
+      "fps": 30,
+      "audio": true,
+      "hd": "/media/volumetric-compositor/film-1080.mp4"
+    },
+    "loop": {
+      "src": "/media/volumetric-compositor/loop.mp4",
+      "width": 480,
+      "height": 852,
+      "duration": 6,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/volumetric-compositor/poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "iphone-lidar": {
+    "film": {
+      "src": "/media/iphone-lidar/film.mp4",
+      "width": 960,
+      "height": 640,
+      "duration": 3.166667,
+      "fps": 30,
+      "audio": true
+    },
+    "loop": {
+      "src": "/media/iphone-lidar/loop.mp4",
+      "width": 720,
+      "height": 480,
+      "duration": 3.166667,
+      "fps": 24,
+      "audio": false
+    },
+    "poster": {
+      "src": "/media/iphone-lidar/poster.webp",
+      "width": 960,
+      "height": 640
+    }
+  }
+}
