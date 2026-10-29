@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 .prerender
+.generated
+public/media/**/*.dither.png
+test-results
+playwright-report
 .openai
 *.local
 
@@ -31,6 +35,7 @@ dist-ssr
 # Project notes (private)
 *.txt
 !public/robots.txt
+!public/fonts/OFL-DepartureMono.txt
 context.md
 CLAUDE_INSTRUCTIONS.md
 session-notes.md

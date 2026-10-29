@@ -1,6 +1,11 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { render, routes } from "../.prerender/render.js";
+import {
+  render,
+  routes,
+  productionRoutes,
+  previewBuild,
+} from "../.prerender/render.js";
 
 const template = await readFile("dist/index.html", "utf8");
 if (
@@ -20,9 +25,13 @@ for (const route of routes) {
       .replace("<!--page-body-->", page.body),
   );
 }
-const urls = routes.filter((route) => route !== "/404.html");
+const urls = productionRoutes.filter((route) => route !== "/404.html");
 await writeFile(
   "dist/sitemap.xml",
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((route) => `<url><loc>https://phro.design${route}</loc></url>`).join("")}</urlset>\n`,
 );
-console.log(`Prerendered ${routes.length} pages and sitemap.`);
+if (previewBuild)
+  await writeFile("dist/robots.txt", "User-agent: *\nDisallow: /\n");
+console.log(
+  `Prerendered ${routes.length} ${previewBuild ? "preview" : "production"} pages and sitemap.`,
+);

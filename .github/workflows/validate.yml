@@ -2,18 +2,34 @@ name: Validate portfolio
 on:
   pull_request:
   push:
-    branches: [feat/temporal-atlas]
+    branches: [main]
 permissions:
   contents: read
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [production, preview]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -- --mode ${{ matrix.mode }}
+      - name: Install ffmpeg for frame-zero verification
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
       - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: moving-image-${{ matrix.mode }}-review
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30

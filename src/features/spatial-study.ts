@@ -14,6 +14,7 @@ export function setupSpatialStudy() {
   let renderer: WebGLRenderer | undefined;
   let resize: ResizeObserver | undefined;
   let ready = false;
+  let running = false;
   let visible = true;
   let generation = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -21,8 +22,11 @@ export function setupSpatialStudy() {
   let cleanup: Promise<void> = Promise.resolve();
   const sync = () => {
     if (viewer && ready) {
-      if (visible && !document.hidden) viewer.start();
-      else viewer.stop();
+      const shouldRun = visible && !document.hidden;
+      // Viewer.start() creates a new RAF loop on every call; keep one owner.
+      if (shouldRun && !running) viewer.start();
+      else if (!shouldRun && running) viewer.stop();
+      running = shouldRun;
     }
   };
   const observer = new IntersectionObserver((entries) => {
@@ -37,6 +41,7 @@ export function setupSpatialStudy() {
     generation++;
     clearTimeout(timer);
     ready = false;
+    running = false;
     const oldViewer = viewer;
     const oldRenderer = renderer;
     viewer = undefined;
@@ -58,7 +63,7 @@ export function setupSpatialStudy() {
         oldRenderer?.forceContextLoss();
         mount.replaceChildren();
         load.disabled = false;
-        load.textContent = "Load the 3D scene ↗";
+        load.textContent = "Explore the point cloud";
         if (focus) load.focus();
       }
     })();
@@ -101,8 +106,16 @@ export function setupSpatialStudy() {
         alpha: true,
         precision: "highp",
       });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-      renderer.setSize(mount.clientWidth, mount.clientHeight);
+      // Bound the optional million-point view independently of screen density.
+      // CSS retains its full stage size; this avoids huge mobile/4K buffers.
+      const fitRenderer = () => {
+        if (!renderer) return;
+        renderer.setPixelRatio(
+          Math.min(devicePixelRatio, 1.5, 960 / mount.clientWidth),
+        );
+        renderer.setSize(mount.clientWidth, mount.clientHeight);
+      };
+      fitRenderer();
       renderer.setClearColor(0x000000, 1);
       mount.appendChild(renderer.domElement);
       viewer = new SplatViewer({
@@ -130,7 +143,7 @@ export function setupSpatialStudy() {
       initialZoom = (viewer.camera as OrthographicCamera).zoom;
       resize = new ResizeObserver(() => {
         if (!renderer || !viewer) return;
-        renderer.setSize(mount.clientWidth, mount.clientHeight);
+        fitRenderer();
         viewer.forceRenderNextFrame();
       });
       resize.observe(mount);
@@ -148,7 +161,7 @@ export function setupSpatialStudy() {
         scale: [1.3, 1.3, 1.3],
         position: [0, 0, 0],
         onProgress: (percent) => {
-          if (request === generation)
+          if (request === generation && Number.isFinite(percent))
             status.textContent = `Loading the scene… ${Math.min(100, Math.round(percent))}%`;
         },
       });

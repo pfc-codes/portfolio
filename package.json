@@ -1,27 +1,30 @@
 {
-  "name": "phro-temporal-atlas",
+  "name": "phro-moving-image",
   "version": "1.0.0",
-  "description": "phro.design \u2014 creative technology, moving image, and spatial media",
+  "description": "phro.design — creative technology, moving image, and spatial media",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && vite build --ssr src/render.ts --outDir .prerender && node scripts/prerender.mjs",
+    "build": "node scripts/build.mjs",
     "preview": "vite preview",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "predev": "node --experimental-strip-types scripts/prepare-dither.mjs",
+    "build:preview": "node scripts/build.mjs --mode preview",
+    "prepare:dither": "node --experimental-strip-types scripts/prepare-dither.mjs",
+    "prepare:point-cloud": "node scripts/prepare-point-cloud.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "sharp": "^0.35.5",
     "typescript": "^5.3.3",
     "vite": "^8.2.4"
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "^0.4.7",
-    "@fontsource/inter": "^5.2.8",
-    "@fontsource/space-grotesk": "^5.2.10",
     "@types/three": "^0.182.0",
-    "gsap": "^3.14.2",
     "three": "^0.182.0"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.18.0"
   }
 }
