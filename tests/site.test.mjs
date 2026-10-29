@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, access, readdir, stat } from "node:fs/promises";
-import { join, dirname, resolve, extname } from "node:path";
+import { join, dirname, resolve, extname, sep } from "node:path";
 import { gzipSync } from "node:zlib";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -24,7 +24,9 @@ const walk = async (dir) =>
   (
     await Promise.all(
       (await readdir(dir, { withFileTypes: true })).map((f) =>
-        f.isDirectory() ? walk(join(dir, f.name)) : join(dir, f.name),
+        f.isDirectory()
+          ? walk(join(dir, f.name))
+          : join(dir, f.name).split(sep).join("/"),
       ),
     )
   ).flat();
