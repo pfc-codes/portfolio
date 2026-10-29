@@ -12,9 +12,11 @@ type Tile = {
   progress: number;
   target: number;
   white: number;
-  measured: number;
   uploaded: boolean;
   frameTime: number;
+  frameCallback?: number;
+  uploadSource?: TexImageSource;
+  layout?: { left: number; top: number; width: number; height: number; focus: number[]; cover: boolean };
   hero: boolean;
   released: boolean;
   failed: boolean;
@@ -68,7 +70,6 @@ export function setupMedia() {
       progress: 0,
       target: 0,
       white: 255,
-      measured: 0,
       uploaded: false,
       frameTime: NaN,
       hero: el.hasAttribute("data-hero"),
@@ -77,6 +78,9 @@ export function setupMedia() {
     };
   });
   const hero = tiles.find((t) => t.hero);
+  let layoutDirty = true;
+  let surfaceTop = 0, surfaceHeight = 0, contentHeight = 0;
+  const app = document.querySelector<HTMLElement>("#app")!;
   const playButton =
     document.querySelector<HTMLButtonElement>("[data-hero-play]");
   const motionButton = document.querySelector<HTMLButtonElement>(
@@ -169,6 +173,8 @@ export function setupMedia() {
   function load(tile: Tile) {
     if (!tile.source.src) {
       tile.source.onload = () => {
+        // A stable poster tone map avoids synchronous video pixel readbacks.
+        measure(tile, tile.source);
         tile.uploaded = false;
         wake();
       };
@@ -188,6 +194,24 @@ export function setupMedia() {
       tile.video.load();
     }
   }
+  function watchFrames(tile: Tile) {
+    const video = tile.video;
+    if (!video || !video.requestVideoFrameCallback) return;
+    const needed = !!gl && !lost && !reduce.matches && !document.hidden &&
+      tile.visible && !video.paused && !tile.failed && !tile.el.dataset.native &&
+      !(tile.progress === 1 && tile.target === 1);
+    if (!needed && tile.frameCallback !== undefined) {
+      video.cancelVideoFrameCallback(tile.frameCallback);
+      tile.frameCallback = undefined;
+    } else if (needed && tile.frameCallback === undefined) {
+      tile.frameCallback = video.requestVideoFrameCallback(() => {
+        tile.frameCallback = undefined;
+        tile.uploaded = false;
+        wake();
+        watchFrames(tile);
+      });
+    }
+  }
   function sync() {
     for (const tile of tiles) {
       if (!tile.video || tile.el.dataset.native) continue;
@@ -205,6 +229,8 @@ export function setupMedia() {
             if (tile.hero && playButton) playButton.hidden = false;
           });
       } else tile.video.pause();
+      watchFrames(tile);
+      if (reduce.matches || lost) delete tile.el.dataset.clean;
     }
     if (motionButton) {
       motionButton.hidden = reduce.matches || !gl;
@@ -215,8 +241,10 @@ export function setupMedia() {
     wake();
   }
   function setTarget(tile: Tile, value: number) {
+    if (tile.el.dataset.clean && value !== 1) tile.uploaded = false;
     tile.target = value;
     if (paused) tile.progress = value;
+    watchFrames(tile);
     wake();
   }
   function measure(tile: Tile, source: TexImageSource) {
@@ -228,19 +256,57 @@ export function setupMedia() {
       /* Keep the last valid tone map if a source cannot be sampled. */
     }
   }
+  function layout() {
+    // Cache document coordinates. Scrolling moves this layer and the tiles
+    // together in the browser compositor, even between JavaScript frames.
+    contentHeight = Math.ceil(app.getBoundingClientRect().bottom + scrollY);
+    for (const tile of tiles) {
+      const rect = tile.el.getBoundingClientRect();
+      const css = getComputedStyle(tile.poster);
+      tile.layout = {
+        left: rect.left + scrollX + tile.el.clientLeft,
+        top: rect.top + scrollY + tile.el.clientTop,
+        width: tile.el.clientWidth,
+        height: tile.el.clientHeight,
+        focus: css.objectPosition.split(" ").map(parseFloat),
+        cover: css.objectFit === "cover",
+      };
+    }
+    layoutDirty = false;
+  }
+  function positionSurface() {
+    const overscan = Math.min(200, innerHeight / 4);
+    const height = Math.min(contentHeight, innerHeight + overscan * 2);
+    if (surfaceHeight !== height || scrollY < surfaceTop + overscan / 2 ||
+        scrollY + innerHeight > surfaceTop + height - overscan / 2) {
+      surfaceTop = Math.max(0, Math.min(contentHeight - height, scrollY - overscan));
+      surfaceHeight = height;
+      canvas.style.top = `${surfaceTop}px`;
+      canvas.style.height = `${height}px`;
+    }
+  }
+  function needsRebase() {
+    const edge = Math.min(100, innerHeight / 8);
+    return (scrollY < surfaceTop + edge && surfaceTop > 0) ||
+      (scrollY + innerHeight > surfaceTop + surfaceHeight - edge &&
+        surfaceTop + surfaceHeight < contentHeight);
+  }
   function draw(now: number) {
     raf = 0;
     if (!gl || !program || lost || document.hidden || reduce.matches) return;
-    // Films are 24/25 fps; cap the shared compositor at 30 fps.
-    if (last && now - last < 30) {
+    // Coalesce callbacks from multiple 24/25 fps films. Scroll positioning no
+    // longer depends on this cadence; layout changes/rebases paint immediately.
+    if (last && now - last < 30 && !layoutDirty && !needsRebase()) {
       wake();
       return;
     }
     const dt = Math.min(50, last ? now - last : 16);
     last = now;
+    if (layoutDirty) layout();
+    positionSurface();
     const dpr = Math.min(devicePixelRatio, 1.5);
-    const w = Math.round(innerWidth * dpr),
-      h = Math.round(innerHeight * dpr);
+    const w = Math.round(document.documentElement.clientWidth * dpr),
+      h = Math.round(surfaceHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
@@ -259,12 +325,13 @@ export function setupMedia() {
         tile.el.closest("[hidden]")
       )
         continue;
-      const rect = tile.el.getBoundingClientRect();
+      const rect = tile.layout!;
+      const top = rect.top - surfaceTop, bottom = top + rect.height;
       if (
         !rect.width ||
         !rect.height ||
-        rect.bottom <= 0 ||
-        rect.top >= innerHeight
+        bottom <= 0 ||
+        top >= surfaceHeight
       )
         continue;
       const playing =
@@ -287,7 +354,18 @@ export function setupMedia() {
       tile.progress +=
         Math.sign(tile.target - tile.progress) *
         Math.min(Math.abs(tile.target - tile.progress), dt / 520);
-      moving ||= tile.progress !== tile.target || playing;
+      moving ||= tile.progress !== tile.target;
+      // Once resolved, the browser can display and composite the video directly.
+      // Keep the same element/time so the Bayer reveal never restarts playback.
+      if (useVideo && tile.progress === 1 && tile.target === 1) {
+        tile.el.dataset.clean = "true";
+        tile.el.dataset.live = "true";
+        watchFrames(tile);
+        if (tile.hero && before < 1) sync();
+        continue;
+      }
+      delete tile.el.dataset.clean;
+      moving ||= playing && !tile.video!.requestVideoFrameCallback;
       try {
         if (!tile.texture) {
           tile.texture = gl.createTexture()!;
@@ -298,7 +376,8 @@ export function setupMedia() {
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         } else gl.bindTexture(gl.TEXTURE_2D, tile.texture);
         const frameTime = useVideo ? tile.video!.currentTime : -1;
-        if (frameTime !== tile.frameTime || !tile.uploaded) {
+        if (!tile.uploaded || tile.uploadSource !== source ||
+            (useVideo && !tile.video!.requestVideoFrameCallback && frameTime !== tile.frameTime)) {
           gl.texImage2D(
             gl.TEXTURE_2D,
             0,
@@ -309,34 +388,30 @@ export function setupMedia() {
           );
           tile.uploaded = true;
           tile.frameTime = frameTime;
+          tile.uploadSource = source;
         }
-        if (!tile.measured || (playing && now - tile.measured > 750)) {
-          measure(tile, source);
-          tile.measured = now;
-        }
-        const css = getComputedStyle(tile.poster);
-        const pos = css.objectPosition.split(" ").map(parseFloat);
+        const pos = rect.focus;
         gl.viewport(
           Math.round(rect.left * dpr),
-          Math.round((innerHeight - rect.bottom) * dpr),
+          Math.round((surfaceHeight - bottom) * dpr),
           Math.round(rect.width * dpr),
           Math.round(rect.height * dpr),
         );
         const left = Math.max(0, Math.round(rect.left * dpr)),
-          bottom = Math.max(0, Math.round((innerHeight - rect.bottom) * dpr));
+          clipBottom = Math.max(0, Math.round((surfaceHeight - bottom) * dpr));
         gl.scissor(
           left,
-          bottom,
-          Math.max(0, Math.min(w, Math.round(rect.right * dpr)) - left),
+          clipBottom,
+          Math.max(0, Math.min(w, Math.round((rect.left + rect.width) * dpr)) - left),
           Math.max(
             0,
-            Math.min(h, Math.round((innerHeight - rect.top) * dpr)) - bottom,
+            Math.min(h, Math.round((surfaceHeight - top) * dpr)) - clipBottom,
           ),
         );
         gl.uniform2f(uniforms.boxSize, rect.width, rect.height);
         gl.uniform2f(uniforms.imageSize, sw, sh);
         gl.uniform2f(uniforms.focus, (pos[0] || 0) / 100, (pos[1] || 0) / 100);
-        gl.uniform1f(uniforms.cover, css.objectFit === "cover" ? 1 : 0);
+        gl.uniform1f(uniforms.cover, rect.cover ? 1 : 0);
         gl.uniform1f(uniforms.progress, tile.progress);
         gl.uniform1f(uniforms.white, tile.white);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -395,6 +470,11 @@ export function setupMedia() {
       if (tile.hero && tile.released) setTarget(tile, 1);
       sync();
     });
+    tile.video?.addEventListener("playing", () => watchFrames(tile));
+    tile.video?.addEventListener("seeked", () => {
+      tile.uploaded = false;
+      wake();
+    });
     tile.video?.addEventListener("error", () => {
       if (tile.hero && playButton) playButton.hidden = false;
     });
@@ -406,7 +486,9 @@ export function setupMedia() {
     canvas.hidden = true;
     tiles.forEach((t) => {
       delete t.el.dataset.live;
+      delete t.el.dataset.clean;
       t.video?.pause();
+      watchFrames(t);
     });
     if (playButton) playButton.hidden = false;
   });
@@ -439,13 +521,19 @@ export function setupMedia() {
     sync();
   });
   document.addEventListener("visibilitychange", sync);
-  addEventListener("resize", wake);
-  addEventListener("scroll", wake, { passive: true });
+  const invalidateLayout = () => { layoutDirty = true; wake(); };
+  const resize = new ResizeObserver(invalidateLayout);
+  resize.observe(app);
+  tiles.forEach((tile) => resize.observe(tile.el));
+  addEventListener("resize", invalidateLayout);
+  addEventListener("scroll", () => {
+    if (needsRebase()) wake();
+  }, { passive: true });
   addEventListener("pageshow", sync);
   addEventListener("pagehide", () => {
     cancelAnimationFrame(raf);
     raf = 0;
-    tiles.forEach((t) => t.video?.pause());
+    tiles.forEach((t) => { t.video?.pause(); watchFrames(t); });
   });
   addEventListener("pcl:done", () => {
     if (!hero) return;
