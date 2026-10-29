@@ -149,7 +149,9 @@ test("Ozzy has no YouTube request before click and uses the privacy iframe after
 test("full films stay clean and the point cloud downloads only after activation", async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  // Allow software CI GPUs extra time for the full million-point capture.
+  // Keep the real asset and input path; also require disposal and focus recovery.
+  test.setTimeout(180000);
   const requests: string[] = [];
   page.on("request", (r) => requests.push(r.url()));
   await page.goto("/work/jordan/?noloader");
@@ -176,6 +178,8 @@ test("full films stay clean and the point cloud downloads only after activation"
   await expect(
     page.getByRole("button", { name: "Explore the point cloud" }),
   ).toBeFocused();
+  await expect(page.locator("[data-splat-mount] canvas")).toHaveCount(0);
+  await expect(page.locator("[data-splat-status]")).toContainText("Scene closed");
 });
 
 test("posters and complete content remain with JavaScript disabled", async ({
