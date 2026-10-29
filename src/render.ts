@@ -5,6 +5,7 @@ import {
   routeList,
   site,
   pointCloudPoster,
+  jordanIntro,
   aboutCopy,
   type Entry,
   type Still,
@@ -83,7 +84,7 @@ const footer = () =>
 function home() {
   const jordan = entries.find((p) => p.slug === "jordan")!;
   return `<section class='hero' aria-label='Jordan — Time Block film'>
-    ${media(jordan.media.poster!, { loop: jordan.media.loop, hero: true })}
+    ${media(jordanIntro, { loop: jordan.media.loop, hero: true })}
     <div class='hero-caption'><a href='/work/jordan/'>Jordan / Time Block</a><button type='button' data-hero-play hidden>Play film</button><a href='/work/'>View work</a></div>
     <noscript><a class='hero-static-play' href='/work/jordan/'>Play Jordan</a></noscript>
   </section>

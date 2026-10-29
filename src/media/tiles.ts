@@ -45,6 +45,7 @@ export function setupMedia() {
   sample.height = 96;
   const sampleContext = sample.getContext("2d", { willReadFrequently: true });
   let paused = false,
+    handingOff = false,
     raf = 0,
     last = 0,
     lost = false;
@@ -174,9 +175,14 @@ export function setupMedia() {
       tile.source.src = tile.poster.dataset.cleanSrc!;
     }
     if (tile.video && !tile.video.src && !reduce.matches && gl) {
-      // No source is fetched until visible. The loader holds frame zero paused.
+      // No source is fetched until visible. The hero holds the intro frame paused.
       tile.video.autoplay = false;
       tile.video.muted = true;
+      if (tile.hero) {
+        tile.video.addEventListener("loadedmetadata", () => {
+          tile.video!.currentTime = DITHER.heroTime;
+        }, { once: true });
+      }
       tile.video.src = tile.video.dataset.src!;
       tile.video.preload = "auto";
       tile.video.load();
@@ -246,6 +252,7 @@ export function setupMedia() {
     for (const tile of tiles) {
       if (
         !tile.visible ||
+        (tile.hero && handingOff) ||
         tile.failed ||
         tile.el.dataset.native ||
         !tile.el.isConnected ||
@@ -442,6 +449,8 @@ export function setupMedia() {
   });
   addEventListener("pcl:done", () => {
     if (!hero) return;
+    handingOff = false;
+    hero.el.style.removeProperty("visibility");
     hero.released = true;
     if (hero.video && hero.video.readyState >= 2) setTarget(hero, 1);
     sync();
@@ -463,7 +472,6 @@ export function setupMedia() {
         return;
       }
       video.pause();
-      video.currentTime = 0;
       const old = detail.canvas.getBoundingClientRect();
       const box = hero.el.getBoundingClientRect();
       const css = getComputedStyle(hero.poster);
@@ -497,6 +505,11 @@ export function setupMedia() {
         transformOrigin: "0 0",
         outline: "none",
       });
+      // The moving loader is the only copy of the subject during the flight.
+      // Reveal the matching hero frame only once it reaches its destination.
+      handingOff = true;
+      hero.el.style.visibility = "hidden";
+      wake();
       document.documentElement.classList.remove("pcl-on");
       document.querySelector("#pcl")?.classList.add("pcl-flight");
       const [, , drawWidth, drawHeight] = detail.drawn;
@@ -518,12 +531,18 @@ export function setupMedia() {
       try {
         await animation.finished;
       } catch {
+        detail.complete();
         return;
       }
-      detail.canvas.style.visibility = "hidden";
+      handingOff = false;
+      hero.el.style.removeProperty("visibility");
       hero.released = true;
       hero.progress = 0;
       setTarget(hero, 1);
+      detail.canvas.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 180,
+        fill: "forwards",
+      });
       setTimeout(detail.complete, 550);
     };
     if (video.readyState >= 3) void begin();
