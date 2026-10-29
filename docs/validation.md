@@ -1,5 +1,9 @@
 # Validation
 
+## Loader correction — 2026-10-29
+
+The homepage intro restores the owner-selected stretched Time Block frame at 6.42 seconds. An exact decoded-frame check protects its alignment with playback. Browser checks cover the handoff at 390, 1440 and 1894 pixels, including a delayed poster response, a single visible subject during flight, full-frame containment and repeat visits. The delivered film is unchanged; the original export itself clips some later movement at its frame boundaries.
+
 Run `npm run build && npm test` for production, or `npm run build:preview && npm test` for previews. Both use the same static renderer.
 
 The Node suite checks route output and metadata, all eight discipline anchors, redirects, production exclusion of drafts, sitemap membership, internal links/media, escaping, native clean film controls, click-to-load YouTube, every poster/still fallback and its exact palette, Jordan frame-zero equality, the original capture hash, the unchanged 10 kB gzip entry budget, Cloudflare’s 25 MiB file limit, and source/public-asset references. It also probes all 15 imported films, their HD variants and card loops for codecs, dimensions, duration, audio, fast-start ordering and loop size. Both ffmpeg and ffprobe must be on PATH. The final content checks require the four supplied external links and reject editorial placeholders or a Sculpture category/route in either mode.

@@ -34,4 +34,5 @@ done
 encode "$source_dir/jordan_render_instagram.mp4" public/media/time-block jordan 0 2.5 10.5
 encode "$source_dir/water_dance_2_HQ.mp4" public/media/depth-echo water-dance 6.8 2.8 9.4
 # HD files are picked up automatically by the prerenderer; update metadata to the decoded poster size.
+node scripts/prepare-intro.mjs
 node --experimental-strip-types scripts/prepare-dither.mjs

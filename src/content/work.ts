@@ -1,4 +1,5 @@
 import importedMedia from "./imported-media.json" with { type: "json" };
+import { DITHER } from "../media/dither.ts";
 
 export type CategorySlug =
   | "vfx-music-videos"
@@ -460,6 +461,12 @@ export const routeList = (preview = false) => [
   "/contact/",
   "/404.html",
 ];
+export const jordanIntro: Still = {
+  src: DITHER.heroImage,
+  width: 720,
+  height: 1280,
+  alt: "Jordan: a basketball sequence stretches out from the Time Block volume.",
+};
 export const allStills = () =>
   [
     ...entries.flatMap((p) => [
@@ -468,4 +475,5 @@ export const allStills = () =>
       ...(p.process || []).map((m) => m.still),
     ]),
     pointCloudPoster,
+    jordanIntro,
   ].filter((s): s is Still => !!s);

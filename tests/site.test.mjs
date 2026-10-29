@@ -7,6 +7,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import ts from "typescript";
 import sharp from "sharp";
+import { DITHER } from "../src/media/dither.ts";
 import {
   render,
   routes,
@@ -215,6 +216,7 @@ test("Bayer fallbacks exist for every poster/still, have the right dimensions an
       ])
       .filter(Boolean),
     { src: "/media/about/point-cloud.webp" },
+    { src: DITHER.heroImage },
   ];
   const paths = new Set(stills.map((s) => s.src));
   assert.equal(manifest.length, paths.size);
@@ -260,6 +262,18 @@ test("Jordan poster is pixel-identical to decoded film frame zero", async () => 
     .raw()
     .toBuffer();
   assert.deepEqual(poster, raw);
+});
+
+test("the restored loader image matches the homepage video's starting frame", async () => {
+  const frame = execFileSync("ffmpeg", [
+    "-v", "error", "-i", "public/media/time-block/jordan.mp4",
+    "-vf", `select=eq(n\\,${Math.floor(DITHER.heroTime * 24)})`,
+    "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-",
+  ], { maxBuffer: 10_000_000 });
+  const expected = await sharp(frame).removeAlpha().raw().toBuffer();
+  const intro = await sharp(join("public", DITHER.heroImage)).removeAlpha().raw().toBuffer();
+  assert.equal(createHash("sha256").update(intro).digest("hex"), createHash("sha256").update(expected).digest("hex"));
+  assert.match(await read("/"), /data-clean-src='\/media\/time-block\/intro.webp'/);
 });
 
 test("entry JS remains under 10 kB gzip, 3D stays lazy, capture is unchanged, and every file is below Cloudflare’s limit", async () => {

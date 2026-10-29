@@ -32,9 +32,9 @@ html.pcl-on body>*:not(#pcl){visibility:hidden!important}
     word: 'phro.design',
     title: 'Pietro Francis Costa',
     filename: 'phro_design_0001.png',
-    image: '/media/time-block/poster.webp',
+    image: DITHER.heroImage,
     crop: DITHER.heroCrop,      // subject region of the poster: x, y, w, h
-    imageWaitMs: 700,               // after this, render the fallback sphere
+    imageWaitMs: 2000,              // allow the original subject to arrive on a cold cache
     samples: 32,
     threads: 4,
     minMs: 2600,

@@ -9,7 +9,10 @@ export const DITHER = {
   whitePercentile: 0.02,
   minimumWhite: 60,
   gamma: 0.8,
-  heroCrop: [40, 430, 640, 440],
+  // The original stretched Time Block composition, aligned to a delivered frame.
+  heroImage: "/media/time-block/intro.webp",
+  heroTime: 6.42, // Inside frame 154 at 24 fps, avoiding a seek on its boundary.
+  heroCrop: [32, 472, 688, 344],
 } as const;
 
 export function whitePoint(

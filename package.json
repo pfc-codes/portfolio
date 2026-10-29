@@ -11,6 +11,7 @@
     "predev": "node --experimental-strip-types scripts/prepare-dither.mjs",
     "build:preview": "node scripts/build.mjs --mode preview",
     "prepare:dither": "node --experimental-strip-types scripts/prepare-dither.mjs",
+    "prepare:intro": "node scripts/prepare-intro.mjs",
     "prepare:point-cloud": "node scripts/prepare-point-cloud.mjs"
   },
   "devDependencies": {

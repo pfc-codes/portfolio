@@ -31,7 +31,7 @@ npm test
 
 After a full import, append an entry slug to the import command to regenerate only that entry.
 
-The older `bash scripts/prepare-media.sh /path/to/originals` command is only for Jordan and Water Dance’s separate original masters, which were not included in this delivery. Their existing films are retained. Jordan’s poster remains pixel-identical to frame zero of its delivered film so the loader handoff is unchanged.
+The older `bash scripts/prepare-media.sh /path/to/originals` command is only for Jordan and Water Dance’s separate original masters, which were not included in this delivery. Their existing films are retained. Jordan’s project poster remains pixel-identical to frame zero. The homepage and render loader use the original stretched composition at 6.42 seconds; regenerate that exact-frame still with `npm run prepare:intro`. The homepage holds that frame until the loader lands, then dissolves to clean playback. All viewport widths contain the complete portrait film.
 
 The About capture stays unloaded until activated. To regenerate its still, run `npm run prepare:point-cloud`. Departure Mono is self-hosted under the [SIL OFL](public/fonts/OFL-DepartureMono.txt).
 
