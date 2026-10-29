@@ -8,13 +8,11 @@ export type CategorySlug =
   | "time-block-work"
   | "depth-echo"
   | "particle"
-  | "point-cloud"
-  | "sculpture";
+  | "point-cloud";
 export interface Category {
   slug: CategorySlug;
   title: string;
   description: string;
-  descriptionDraft?: boolean;
   related?: string[];
 }
 export interface Still {
@@ -47,10 +45,9 @@ export interface Entry {
   medium: string[];
   tools: string[];
   description?: string;
-  descriptionDraft?: boolean;
   draft?: boolean;
   credits?: { artist: string; role: string; url?: string }[];
-  links?: { video?: string; store?: string };
+  links?: { video?: string; store?: string; audio?: string };
   media: {
     poster?: Still;
     loop?: Film;
@@ -60,8 +57,6 @@ export interface Entry {
   };
   focus?: readonly [number, number];
   process?: ProcessMedia[];
-  /** Missing slots are editorial instructions, visible only in previews. */
-  needed?: string[];
   tool?: {
     version: string;
     price: string;
@@ -113,11 +108,6 @@ export const categories: Category[] = [
     title: "Point Cloud",
     description: "Real-world scans and transformations between captured objects.",
   },
-  {
-    slug: "sculpture",
-    title: "3D sculpture",
-    description: "Physical, 3D-printed motion sculptures.",
-  },
 ];
 
 const jordanFilm: Film = {
@@ -158,16 +148,11 @@ export const entries: Entry[] = [
       youtubeId: "aOJ1GtodHKo",
       poster: {
         src: "/media/ozzy/poster.webp",
-        alt: "Temporary title card for Sero Flame’s Ozzy music video.",
+        alt: "Title card for Sero Flame’s Ozzy music video.",
         width: 1280,
         height: 720,
       },
     },
-    needed: [
-      "Release year.",
-      "Approved Ozzy poster; VFX shot clips, before/after pairs, stills and captions.",
-      "Source clip → depth map → output, or a node-graph crop.",
-    ],
   },
   {
     slug: "god-particle-found-footage",
@@ -201,6 +186,7 @@ export const entries: Entry[] = [
     description:
       "A three-dimensional visualization of a Chet Baker song. Each of 128 mel-frequency bands maps to a horizontal ring of points.",
     credits: [{ artist: "Chet Baker", role: "Music source" }],
+    links: { audio: "https://www.instagram.com/reel/Dax7FUNidEI/" },
     media: suppliedMedia("chet-baker-mel-bands", "Horizontal rings of points stacked into a three-dimensional music visualization."),
   },
   {
@@ -213,6 +199,7 @@ export const entries: Entry[] = [
     description:
       "A James Blake spectrogram translated into a three-dimensional sphere using Geometry Nodes in Blender.",
     credits: [{ artist: "James Blake", role: "Music source" }],
+    links: { audio: "https://www.instagram.com/reel/DZAmQ-_hKGf/" },
     media: suppliedMedia("james-blake-spherical-spectrogram", "A spherical spectrogram formed from dark, closely spaced strands on a pale background."),
   },
   {
@@ -264,11 +251,6 @@ export const entries: Entry[] = [
       checked: "2026-10-28",
       source: "https://phr0swork.gumroad.com/l/time-block",
     },
-    needed: [
-      "Confirm Gumroad’s displayed version 0.2.2 is intended; update the store first if outdated.",
-      "Dedicated add-on demo, interface screenshot and node-graph/process image.",
-      "Final product copy and release year.",
-    ],
   },
   {
     slug: "jordan",
@@ -305,11 +287,6 @@ export const entries: Entry[] = [
         },
       ],
     },
-    needed: [
-      "Release year and any approved source-footage credits.",
-      "Original jordan_render_instagram.mp4 for the 1080 × 1920 encode.",
-      "Source/result or node-graph process media.",
-    ],
   },
   {
     slug: "time-block-viral",
@@ -343,6 +320,9 @@ export const entries: Entry[] = [
     tools: ["Depth Echo"],
     description:
       "A moving figure unfolds into overlapping traces through time in Depth Echo.",
+    credits: [
+      { artist: "AMA — Julie Gautier", role: "Source film", url: "https://www.youtube.com/watch?v=bdBuDg7mrT8" },
+    ],
     media: {
       film: waterFilm,
       loop: waterFilm,
@@ -369,11 +349,6 @@ export const entries: Entry[] = [
         },
       ],
     },
-    needed: [
-      "Release year and approved performer/source credits.",
-      "Original water_dance_2_HQ.mp4 for the 1080 × 1920 encode.",
-      "Source → depth map → output process media.",
-    ],
   },
   {
     slug: "cellophane",
@@ -408,7 +383,7 @@ export const entries: Entry[] = [
     tools: ["Depth Echo"],
     description:
       "A collaboration with dancer Jordan Simone, capturing movement from her pole-dancing routine with Depth Echo.",
-    credits: [{ artist: "Jordan Simone", role: "Dancer / collaborator" }],
+    credits: [{ artist: "Jordan Simone", role: "Dancer / collaborator", url: "https://www.instagram.com/jsiim/" }],
     media: suppliedMedia("jordan-simone", "Jordan Simone’s pole-dance movement extended into a layered three-dimensional trace."),
   },
   {
@@ -453,22 +428,6 @@ export const entries: Entry[] = [
     description:
       "Point clouds morph into one another using captures of the Treasure of San Gennaro in Napoli.",
     media: suppliedMedia("san-gennaro-morph", "An ornate object from the Treasure of San Gennaro dissolves into a morphing cloud of points."),
-  },
-  {
-    slug: "sculpture-placeholder",
-    title: "[Sculpture project needed]",
-    category: "sculpture",
-    draft: true,
-    year: null,
-    medium: [],
-    tools: [],
-    media: {},
-    needed: [
-      "Title, year, materials, dimensions, printing method and description.",
-      "Sculpture photographs, detail images, turntable loop and alt text.",
-      "Source motion → time stack → printed object process images.",
-      "Fabrication and exhibition credits, if applicable.",
-    ],
   },
 ];
 

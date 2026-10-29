@@ -32,6 +32,6 @@ Ozzy now has the supplied depth-displacement description and VFX credits for Jab
 - Only the viral Time Block, volumetric compositor and iPhone depth files contain audio. The Chet Baker and James Blake source files are silent; no missing soundtrack is fabricated.
 - Source hashes, original dimensions/durations and every output's byte size are recorded in [media-inventory.json](media-inventory.json). Generated assets are checked both during import and in the built-output tests.
 
-## Content still outside this delivery
+## Final launch decisions
 
-No new Ozzy poster or shot breakdown, sculpture project, original Jordan/Water Dance master, confirmed release years, or dedicated add-on interface/demo was supplied. Existing assets and preview-only notes remain for those items. These do not block integration of any of the 15 supplied films.
+The owner confirmed retaining Ozzy and Time Block as supplied, removed Sculpture, and requested removal of all editorial checklist areas. Jordan Simone’s profile and Julie Gautier’s source film are linked in the respective credits. The Chet Baker and James Blake pages link to the supplied Instagram reels for audio. Existing Jordan/Water Dance films remain; unknown years are omitted. No editorial placeholders remain in either build mode.

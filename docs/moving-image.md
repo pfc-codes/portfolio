@@ -2,23 +2,21 @@
 
 ## Content status
 
-The 2026-10-29 delivery adds all 15 supplied films, project descriptions, artist/source credits, the About biography, and Particle/Point Cloud categories. See [the import record](media-import.md) and [source/output inventory](media-inventory.json). The Work index now has nine disciplines and 19 published entries. Only the sculpture entry remains a draft.
+The 2026-10-29 delivery adds all 15 supplied films, project descriptions, artist/source credits, the About biography, and Particle/Point Cloud categories. See [the import record](media-import.md) and [source/output inventory](media-inventory.json). The final Work index has eight disciplines and 19 published entries, with no draft project or editorial checklist on the site.
 
-| Discipline | Needed |
-| --- | --- |
-| VFX & music videos | Ozzy release year, approved poster and optional VFX shot/process breakdown. Its description, tools and Jabari Browne/Pietro Francis Costa credits are supplied. |
-| Time Block — the add-on | Confirm store version (see below); dedicated tool demo and interface screenshot, process/node graph, release year and final product copy. Jordan’s existing still is clearly captioned as work made with the tool. |
-| Time Block — work | Jordan release year, approved source-footage credits, optional process media and original `jordan_render_instagram.mp4`. |
-| Depth Echo | Water Dance release year, approved performer/source credits, optional process media and original `water_dance_2_HQ.mp4`. |
-| 3D sculpture | Project title/year, materials, dimensions, printing method, description, sculpture/detail photos, turntable loop, alt text, source motion → time stack → printed object images, fabrication/exhibition credits if applicable. |
+- Ozzy’s existing title card, copy and credits are confirmed for launch.
+- Time Block’s existing product details and illustration are confirmed for launch.
+- Jordan Simone’s credit links to her supplied Instagram profile. Water Dance credits Julie Gautier’s *AMA* and links to the source film on YouTube.
+- Chet Baker and James Blake each have a “Watch with audio on Instagram” link to the supplied reel; the local files remain silent.
+- Sculpture and all “To supply / preview only” areas have been removed at the owner’s request.
 
-Unknown years remain `null`. Search `needed` and `draft: true` in `src/content/work.ts` for remaining editorial slots. Drafts and notes appear only in development/Cloudflare previews. Existing contact details are retained.
+Unknown years remain `null` and are omitted from the rendered pages. Existing contact details are retained.
 
-## Decisions to review
+## Implementation decisions
 
 - Canonical film URLs are `/work/jordan/` and `/work/water-dance/`; the old `/work/time-block/` and `/work/depth-echo/` URLs redirect permanently. Existing `/lab` redirects remain.
-- [Time Block’s Gumroad page](https://phr0swork.gumroad.com/l/time-block) displayed **0.2.2**, a **$0 minimum / pay-what-you-want** price and a **$5 suggested amount** when retrieved on **2026-10-28**. The site states 0.2.2 and free/pay-what-you-want, with that verification date. This may be an outdated store listing: review it before merging. The license is **GPL-3.0-or-later**, as specified in the brief; no Blender compatibility claim was added.
-- Ozzy’s thumbnail host returned an unavailable response. A temporary, locally rendered title slate is used for the facade; it does not pretend to be a VFX still. Replace `/media/ozzy/poster.webp` with an approved poster. No YouTube connection occurs until the play button is clicked.
+- [Time Block’s Gumroad page](https://phr0swork.gumroad.com/l/time-block) displayed **0.2.2**, a **$0 minimum / pay-what-you-want** price and a **$5 suggested amount** when retrieved on **2026-10-28**. The owner confirmed retaining the displayed version, free/pay-what-you-want price and **GPL-3.0-or-later** license for launch. No Blender compatibility claim was added.
+- Ozzy uses the existing locally rendered title slate, confirmed by the owner for launch. No YouTube connection occurs until the play button is clicked.
 - [Departure Mono 1.500](https://github.com/rektdeckard/departure-mono) is self-hosted, with the upstream **SIL Open Font License 1.1** copyright and license shipped in `public/fonts/OFL-DepartureMono.txt`.
 - Poster generation uses lossless two-colour PNG so the fallback palette is exactly black and #ededed. Live video uses the same luminance weights, 98th-percentile white normalization, black exclusion and gamma as the loader, sampling the current frame periodically. The shared renderer uses one WebGL2 context; the explicitly activated About 3D viewer has its own independent context.
 - Jordan’s old poster was a later frame. Its replacement is a lossless, pixel-identical decode of frame zero of the delivered 720p film. The loader crop was remeasured for that image and the FLIP calculation uses the actual video fitting/positioning geometry.

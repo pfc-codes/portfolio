@@ -31,8 +31,6 @@ const creditName = (credit: NonNullable<Entry["credits"]>[number]) =>
     : escape(credit.artist);
 const categoryFor = (entry: Entry) =>
   categories.find((c) => c.slug === entry.category)!;
-const copySlot = (text: string, preview: boolean) =>
-  preview ? `<p class='copy-slot' data-copy-needed>${escape(text)}</p>` : "";
 const focus = (point: readonly [number, number] = [50, 50]) =>
   `${point[0]}% ${point[1]}%`;
 
@@ -52,13 +50,12 @@ function media(
   </div>`;
 }
 
-function card(p: Entry, preview: boolean) {
-  return `<article class='work-card${p.draft ? " draft-card" : ""}'>
+function card(p: Entry) {
+  return `<article class='work-card'>
     <a class='work-card-link' href='/work/${escape(p.slug)}/'>
-      ${p.media.poster ? media(p.media.poster, { loop: p.media.loop, entryFocus: p.focus }) : `<div class='media-placeholder'><span>Draft / media needed</span></div>`}
-      <div class='card-caption'><h3>${escape(p.title)}</h3><span>${p.draft ? "Preview only" : escape(p.medium.join(" / "))}</span></div>
+      ${p.media.poster ? media(p.media.poster, { loop: p.media.loop, entryFocus: p.focus }) : ""}
+      <div class='card-caption'><h3>${escape(p.title)}</h3><span>${escape(p.medium.join(" / "))}</span></div>
     </a>
-    ${p.draft ? copySlot(p.needed?.[0] || "Project details needed.", preview) : ""}
   </article>`;
 }
 
@@ -83,7 +80,7 @@ function header(path: string) {
 const footer = () =>
   `<footer class='site-footer wrap'><a class='footer-email' href='mailto:${escape(site.email)}'>${escape(site.email)}</a><div class='footer-bottom'><span>phro.design</span><a href='${escape(site.instagram)}'>Instagram ${external}</a></div></footer>`;
 
-function home(preview: boolean) {
+function home() {
   const jordan = entries.find((p) => p.slug === "jordan")!;
   return `<section class='hero' aria-label='Jordan — Time Block film'>
     ${media(jordan.media.poster!, { loop: jordan.media.loop, hero: true })}
@@ -91,7 +88,7 @@ function home(preview: boolean) {
     <noscript><a class='hero-static-play' href='/work/jordan/'>Play Jordan</a></noscript>
   </section>
   <section class='identity wrap'><h1>${escape(site.identity)}</h1></section>
-  <section class='home-work wrap' aria-labelledby='selected-title'><div class='section-heading'><h2 id='selected-title'>Selected work</h2><a href='/work/'>Full index</a></div><div class='work-grid'>${[entries.find((p) => p.slug === "water-dance")!, entries.find((p) => p.slug === "ozzy")!].map((p) => card(p, preview)).join("")}</div></section>
+  <section class='home-work wrap' aria-labelledby='selected-title'><div class='section-heading'><h2 id='selected-title'>Selected work</h2><a href='/work/'>Full index</a></div><div class='work-grid'>${[entries.find((p) => p.slug === "water-dance")!, entries.find((p) => p.slug === "ozzy")!].map(card).join("")}</div></section>
   <div class='home-tool wrap'><a href='/work/time-block-addon/'>Time Block — the Blender add-on</a><span>Tool &amp; practice</span></div>`;
 }
 
@@ -104,10 +101,10 @@ function work(preview: boolean) {
         (
           c,
         ) => `<section class='category-section' id='${escape(c.slug)}' aria-labelledby='heading-${escape(c.slug)}'>
-      <div class='category-heading'><h2 id='heading-${escape(c.slug)}'>${escape(c.title)}</h2>${c.descriptionDraft ? copySlot(c.description, preview) : `<p>${escape(c.description)}</p>`}</div>
+      <div class='category-heading'><h2 id='heading-${escape(c.slug)}'>${escape(c.title)}</h2><p>${escape(c.description)}</p></div>
       <div class='work-grid'>${projects
         .filter((p) => p.category === c.slug)
-        .map((p) => card(p, preview))
+        .map(card)
         .join("")}</div>
       ${
         c.related
@@ -130,7 +127,8 @@ function film(p: Entry) {
     ${hd ? `<source src='${escape(hd)}' type='video/mp4' media='(min-width: 701px)'>` : ""}<source src='${escape(f.src)}' type='video/mp4'>
     <p>Your browser cannot play this film. <a href='${escape(f.src)}'>Open the MP4</a>.</p></video>
     <figcaption><span>${escape(p.title)}</span><span>${f.duration ? `${f.duration.toFixed(2)} s · ` : ""}${f.fps ? `${f.fps} fps · ` : ""}${f.audio ? "Sound" : "Silent"}</span><a href='${escape(f.src)}'>Open film</a></figcaption>
-    <p class='media-error' data-video-error hidden>The film could not load. <a href='${escape(f.src)}'>Open the MP4</a>.</p></figure>`;
+    <p class='media-error' data-video-error hidden>The film could not load. <a href='${escape(f.src)}'>Open the MP4</a>.</p></figure>
+    ${p.links?.audio ? `<p class='film-note'><a href='${escape(p.links.audio)}'>Watch with audio on Instagram ${external}</a></p>` : ""}`;
 }
 
 function youtube(p: Entry) {
@@ -141,18 +139,16 @@ function youtube(p: Entry) {
   </div><p class='film-note'>Full music video${vfx.length ? ` · VFX by ${vfx.map(creditName).join(" and ")}.` : "."} <a href='${escape(p.links!.video!)}'>YouTube ${external}</a></p>`;
 }
 
-function projectPage(p: Entry, preview: boolean) {
+function projectPage(p: Entry) {
   const c = categoryFor(p);
   return `<section class='project-intro wrap'><a class='breadcrumb' href='/work/#${escape(c.slug)}'>${escape(c.title)}</a><h1>${escape(p.title)}</h1>
     <div class='project-meta'><span>${escape(p.medium.join(" / "))}</span>${p.year ? `<span>${p.year}</span>` : ""}${p.tools.length ? `<span>${escape(p.tools.join(" / "))}</span>` : ""}</div>
-    ${p.draft ? `<p class='draft-badge'>Draft / preview only</p>` : ""}
-    ${p.description ? (p.descriptionDraft ? copySlot(p.description, preview) : `<p class='project-description'>${escape(p.description)}</p>`) : copySlot("[Copy needed: project description.]", preview)}</section>
-    <section class='project-media wrap' aria-label='${escape(p.title)} media'>${p.media.film ? film(p) : p.media.youtubeId ? youtube(p) : p.media.poster ? `<figure>${media(p.media.poster)}${p.media.poster.caption ? `<figcaption>${escape(p.media.poster.caption)}</figcaption>` : ""}</figure>` : `<div class='media-placeholder'><span>Draft / media needed</span></div>`}</section>
+    ${p.description ? `<p class='project-description'>${escape(p.description)}</p>` : ""}</section>
+    <section class='project-media wrap' aria-label='${escape(p.title)} media'>${p.media.film ? film(p) : p.media.youtubeId ? youtube(p) : p.media.poster ? `<figure>${media(p.media.poster)}${p.media.poster.caption ? `<figcaption>${escape(p.media.poster.caption)}</figcaption>` : ""}</figure>` : ""}</section>
     ${p.tool ? `<section class='tool-details wrap' aria-label='Add-on details'><dl><div><dt>Version listed on Gumroad</dt><dd>${escape(p.tool.version)}</dd></div><div><dt>Price</dt><dd>${escape(p.tool.price)}</dd></div><div><dt>License</dt><dd>${escape(p.tool.license)}</dd></div></dl><p class='film-note'>Store details checked ${escape(p.tool.checked)}.</p><a class='button' href='${escape(p.links!.store!)}'>Get Time Block on Gumroad ${external}</a><p><a href='/work/#time-block-work'>See work made with Time Block</a></p></section>` : ""}
     ${p.credits?.length ? `<section class='credits wrap' aria-label='Credits'><dl>${p.credits.map((credit) => `<div><dt>${escape(credit.role)}</dt><dd>${creditName(credit)}</dd></div>`).join("")}</dl></section>` : ""}
     ${p.media.stills?.length ? `<section class='stills-section wrap' aria-labelledby='stills-heading'><h2 id='stills-heading'>Stills</h2><div class='stills-grid'>${p.media.stills.map((s) => `<figure tabindex='0'>${media(s, { entryFocus: p.focus })}<figcaption>${escape(s.caption || p.title)}</figcaption></figure>`).join("")}</div></section>` : ""}
     ${p.process?.length ? `<section class='process-section wrap' aria-labelledby='process-heading'><h2 id='process-heading'>Process</h2><div class='process-grid'>${p.process.map((m) => `<figure tabindex='0'>${media(m.still, { loop: m.video })}<figcaption>${escape(m.label)}</figcaption></figure>`).join("")}</div></section>` : ""}
-    ${preview && p.needed?.length ? `<aside class='media-checklist wrap' aria-labelledby='needed-heading'><h2 id='needed-heading'>To supply / preview only</h2><ul>${p.needed.map((n) => `<li>${escape(n)}</li>`).join("")}</ul></aside>` : ""}
     <div class='project-return wrap'><a href='/work/'>All work</a></div>`;
 }
 
@@ -228,9 +224,9 @@ export function render(pathname: string, preview = previewBuild) {
     <meta property='og:type' content='${p ? "video.other" : "website"}'><meta property='og:title' content='${escape(title)}'><meta property='og:description' content='${escape(description)}'><meta property='og:url' content='${escape(canonical)}'><meta property='og:image' content='${escape(site.origin + poster.src)}'><meta property='og:image:alt' content='${escape(poster.alt)}'><meta property='og:site_name' content='${escape(site.name)}'><meta name='twitter:card' content='summary_large_image'>
     <script type='application/ld+json'>${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`;
   const page = p
-    ? projectPage(p, preview)
+    ? projectPage(p)
     : path === "/"
-      ? home(preview)
+      ? home()
       : path === "/work/"
         ? work(preview)
         : path === "/about/"

@@ -11,11 +11,11 @@ npm ci
 npm run dev
 ```
 
-`npm run build` creates a production build. Run it before `npm test`, which checks that build and needs ffmpeg and ffprobe for media verification. `npm run build:preview` includes clearly marked drafts. On Cloudflare, `CF_PAGES_BRANCH` selects preview mode for any branch other than `main`; use `npm run build -- --mode production` to force production. Previews are noindex; draft URLs never enter the sitemap.
+`npm run build` creates a production build. Run it before `npm test`, which checks that build and needs ffmpeg and ffprobe for media verification. `npm run build:preview` creates a noindex branch preview. On Cloudflare, `CF_PAGES_BRANCH` selects preview mode for any branch other than `main`; use `npm run build -- --mode production` to force production. Draft URLs never enter the sitemap.
 
 ## Add work
 
-Edit `src/content/work.ts`. Put media in `public/media/<entry>/`, supply image dimensions and alt text, and select one of the nine category slugs. Use `year: null` until confirmed. `draft: true` entries appear only in development and preview builds. Optional `focus` is an `[x, y]` percentage pair. `process` accepts labelled source/depth/output images, optional loops, or node-graph crops. Credits accept an optional `url`. Film `audio: true` labels the native player as having sound; card loops remain muted.
+Edit `src/content/work.ts`. Put media in `public/media/<entry>/`, supply image dimensions and alt text, and select one of the eight category slugs. Use `year: null` until confirmed. `draft: true` entries appear only in development and preview builds; the launch content has no drafts or editorial placeholders. Optional `focus` is an `[x, y]` percentage pair. `process` accepts labelled source/depth/output images, optional loops, or node-graph crops. Credits accept an optional `url`; `links.audio` adds a link to the Instagram version with audio. Film `audio: true` labels the native player as having sound; card loops remain muted.
 
 `npm run prepare:dither` generates a two-colour Bayer fallback for every poster and still. This also runs before development and builds. The matrix, palette and tone mapping live in `src/media/dither.ts`; the loader and shared WebGL renderer use the same definitions. Full films stay clean.
 

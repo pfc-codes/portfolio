@@ -394,33 +394,6 @@ figure:focus-visible .media-tile:not([data-live]) .clean-poster {
 .cross-reference a {
   text-decoration: underline;
 }
-.media-placeholder {
-  min-height: 220px;
-  border: 1px dashed #484848;
-  display: grid;
-  place-items: center;
-  color: var(--muted);
-  font-size: 11px;
-  background: #080808;
-}
-.draft-badge,
-.copy-slot {
-  font-size: 11px;
-  color: #b9b9b9;
-  border-left: 2px solid #777;
-  padding: 6px 12px;
-  background: #111;
-}
-.copy-slot {
-  margin-top: 14px;
-}
-.draft-badge {
-  display: inline-block;
-  margin-top: 20px;
-}
-.draft-card {
-  opacity: 0.8;
-}
 .project-intro {
   padding-block: 52px 36px;
 }
@@ -562,18 +535,6 @@ dd {
 }
 .stills-grid .media-tile {
   aspect-ratio: 3/4;
-}
-.media-checklist {
-  margin-top: 60px;
-  border: 1px dashed #555;
-  padding: 24px;
-}
-.media-checklist h2 {
-  font-size: 14px;
-}
-.media-checklist li {
-  font-size: 11px;
-  margin-block: 10px;
 }
 .project-return {
   padding-block: 60px 10px;
@@ -849,9 +810,6 @@ dd {
   }
   .stills-grid .media-tile {
     aspect-ratio: 9/16;
-  }
-  .media-checklist {
-    padding: 18px;
   }
   .about-copy > p {
     font-size: 14px;

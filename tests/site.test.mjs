@@ -61,10 +61,11 @@ test("all routes are prerendered with unique metadata, one main heading, accessi
       html,
       /<em>|<br\s*\/?\s*>|Have something|Back to top|time-ruler|staggered|title-period/,
     );
+    assert.doesNotMatch(html, /To supply|preview only|Copy needed|media needed|data-copy-needed|media-checklist/i);
   }
 });
 
-test("canonical work routes and all nine discipline anchors exist; old links redirect", async () => {
+test("canonical work routes and all eight discipline anchors exist; old links redirect", async () => {
   const required = [
     "/work/ozzy/",
     "/work/time-block-addon/",
@@ -82,10 +83,11 @@ test("canonical work routes and all nine discipline anchors exist; old links red
     "depth-echo",
     "particle",
     "point-cloud",
-    "sculpture",
   ];
   const positions = slugs.map((slug) => work.indexOf(`id='${slug}'`));
   assert.ok(positions.every((p, i) => p >= 0 && (!i || p > positions[i - 1])));
+  assert.doesNotMatch(work, /id='sculpture'|href='#sculpture'|sculpture-placeholder/);
+  assert.equal(render("/work/sculpture-placeholder/", true).status, 404);
   assert.match(work, /depth workflow, listed under VFX/);
   const redirects = await readFile("dist/_redirects", "utf8");
   for (const [from, to] of [
@@ -334,6 +336,17 @@ test("all supplied films are published with accurate media metadata, muted light
   assert.match(ozzy, /href='https:\/\/jabaribrxwne.com\/'/);
   assert.match(ozzy, /Jabari Browne/);
   assert.match(ozzy, /Pietro Francis Costa/);
+  for (const [slug, url] of [
+    ["jordan-simone", "https://www.instagram.com/jsiim/"],
+    ["water-dance", "https://www.youtube.com/watch?v=bdBuDg7mrT8"],
+    ["chet-baker-mel-bands", "https://www.instagram.com/reel/Dax7FUNidEI/"],
+    ["james-blake-spherical-spectrogram", "https://www.instagram.com/reel/DZAmQ-_hKGf/"],
+  ]) {
+    const html = await read(`/work/${slug}/`);
+    assert.ok(html.includes(`href='${url}'`), `${slug}: ${url}`);
+    if (slug === "water-dance") assert.match(html, /AMA — Julie Gautier/);
+    if (/chet-baker|james-blake/.test(slug)) assert.match(html, /Watch with audio on Instagram/);
+  }
 });
 
 test("no unreferenced source files or public assets remain", async () => {
